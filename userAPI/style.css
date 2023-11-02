@@ -1,8 +1,7 @@
 body {
-  background-color: rgb(250, 243, 236);
+  background-color: white;
   margin: 0;
   padding: 0;
-  font-family: "Courier New", Courier, monospace;
 }
 
 .home-header {
@@ -16,16 +15,20 @@ body {
 }
 
 .upload-box {
-  border: 3px solid black;
+  border: 1px solid black;
+  background-color: rgb(219, 219, 219);
   margin-left: auto;
   margin-right: auto;
-  width: 500px;
+  width: 400px;
   padding-bottom: 20px;
+  border-radius: 5px;
 }
 
 .upload-header {
-  font-weight: bold;
-  text-align: center;
+  text-align: left;
+  width: 320px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .upload-form {

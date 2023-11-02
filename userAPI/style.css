@@ -1,0 +1,39 @@
+body {
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.home-header {
+  display: block;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-bottom: 100px;
+}
+
+.upload-box {
+  border: 1px solid black;
+  background-color: rgb(219, 219, 219);
+  margin-left: auto;
+  margin-right: auto;
+  width: 400px;
+  padding-bottom: 20px;
+  border-radius: 5px;
+}
+
+.upload-header {
+  text-align: left;
+  width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.upload-form {
+  display: block;
+  width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}

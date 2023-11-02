@@ -1,0 +1,36 @@
+body {
+  background-color: rgb(250, 243, 236);
+  margin: 0;
+  padding: 0;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.home-header {
+  display: block;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-bottom: 100px;
+}
+
+.upload-box {
+  border: 3px solid black;
+  margin-left: auto;
+  margin-right: auto;
+  width: 500px;
+  padding-bottom: 20px;
+}
+
+.upload-header {
+  font-weight: bold;
+  text-align: center;
+}
+
+.upload-form {
+  display: block;
+  width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}

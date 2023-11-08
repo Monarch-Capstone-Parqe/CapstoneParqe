@@ -1,6 +1,8 @@
 /*
 Official PSU brand colors here:
 https://www.pdx.edu/university-communications/tools-and-templates/brand-colors
+
+Official PSU fonts located in fonts folder
 */
 
 @font-face {
@@ -42,7 +44,7 @@ body {
 
 #upload-box {
   border: 1px solid black;
-  background-color: rgba(138, 138, 103, 0.2);
+  background-color: rgba(138, 138, 103, 0.2); /* Sand */
   margin-left: auto;
   margin-right: auto;
   width: 400px;

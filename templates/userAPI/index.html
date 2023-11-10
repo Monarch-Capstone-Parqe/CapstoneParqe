@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>PrusaSlicer Automated Routing and Quoting Engine</title>
-    <link rel="stylesheet" href="style.css" />
-    <script defer src="index.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <title>Your Page Title</title>
+    <script defer src="{{ url_for('static', filename='index.js') }}"></script>
   </head>
   <body>
     <main>
-      <img id="psu-logo" src="/userAPI/images/portland-state-university_1162.png" alt="Portland State Logo" width="200px">
+      <img id="psu-logo" src="{{ url_for('static', filename='images/portland-state-university_1162.png') }}" alt="Portland State Logo" width="200px">
       <div id="header-box">
         <h1 id="header-text">PrusaSlicer Automated Routing and Quoting Engine</h1>
       </div>

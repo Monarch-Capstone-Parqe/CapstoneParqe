@@ -24,10 +24,28 @@ function uploadAndShowFile() {
       console.log(data);
       // Handle the response data as needed
       showFileInfo(fileInput);
+
+      displayStatusMessage("success");
     })
     .catch((error) => {
       console.error("Error:", error);
+
+      displayStatusMessage("failure");
     });
+}
+
+function displayStatusMessage(status) {
+  const statusMessage = document.querySelector("#status-message");
+  
+  if (status === "success") {
+    statusMessage.textContent = "Upload Success";
+    statusMessage.style.display = "block";
+    statusMessage.style.color = "green";
+  } else {
+    statusMessage.textContent = "Upload Failure";
+    statusMessage.style.display = "block";
+    statusMessage.style.color = "red";
+  }
 }
 
 function showFileInfo(fileInput) {

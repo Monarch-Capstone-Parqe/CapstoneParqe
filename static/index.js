@@ -24,12 +24,10 @@ function uploadAndShowFile() {
       console.log(data);
       // Handle the response data as needed
       showFileInfo(fileInput);
-
       displayStatusMessage("success");
     })
     .catch((error) => {
       console.error("Error:", error);
-
       displayStatusMessage("failure");
     });
 }

@@ -1,0 +1,43 @@
+/*
+Official PSU brand colors here:
+https://www.pdx.edu/university-communications/tools-and-templates/brand-colors
+
+Official PSU fonts located in fonts folder
+*/
+
+@font-face {
+  font-family: 'Acumin-RPro';
+  src: url('/userAPI/fonts/Acumin-RPro.otf');
+}
+
+body {
+  background-color:white;
+  font-family: 'Acumin-RPro';
+  margin: 0;
+  padding: 0;
+}
+
+#header-box {
+  display: table;
+  background-color: rgba(109, 141, 36, 1); /* PSU Green */
+  background-size: 100%;
+  width: 100%;
+  height: 200px;
+  margin-bottom: 100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#header-text {
+  display: table-cell;
+  color: white;
+  text-shadow: 1px 1px 2px rgb(0, 0, 0);
+  margin: 0;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  vertical-align: middle;
+  font-size: 1.5em;
+}

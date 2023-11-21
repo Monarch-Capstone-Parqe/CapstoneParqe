@@ -1,10 +1,10 @@
-let submitButton = document.querySelector("#submit-button");
+let submitButton = document.querySelector(".submit-button");
 submitButton.onclick = function (event) {
   event.preventDefault();
   uploadAndShowFile();
 };
 function uploadAndShowFile() {
-  const fileInput = document.querySelector("#file-input");
+  const fileInput = document.querySelector(".file-input");
   const file = fileInput.files[0];
 
   if (!file) {
@@ -64,9 +64,9 @@ function showFileInfo(fileInput) {
 
 // notifies the user of web api of status of their file upload in the html form
 function displayUploadStatus(status) {
-  const statusMessageContainer = document.querySelector("#status-message-container");
+  const statusMessageContainer = document.querySelector(".status-message-container");
   statusMessageContainer.innerHTML = '';
-  document.querySelector("#upload-form").reset();
+  document.querySelector(".upload-form").reset();
 
   if (status === "success") {
     insertGoogleIcon(statusMessageContainer, "check", "lime");

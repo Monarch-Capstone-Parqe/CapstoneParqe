@@ -10,6 +10,15 @@ Official PSU fonts located in fonts folder
   src: url("fonts/Acumin-RPro.otf");
 }
 
+/* Google Font */
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+
 body {
   background-color: white;
   font-family: "Acumin-RPro";
@@ -73,6 +82,7 @@ body {
   margin-right: auto;
   margin-top: 10px;
   font-size: 0.8em;
+  text-shadow: 1px 1px 2px rgb(0, 0, 0);
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {

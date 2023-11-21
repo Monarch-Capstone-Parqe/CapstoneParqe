@@ -9,6 +9,7 @@ function uploadAndShowFile() {
 
   if (!file) {
     console.error("No file selected.");
+    displayUploadStatus("noFile");
     return;
   }
 
@@ -24,25 +25,28 @@ function uploadAndShowFile() {
       console.log(data);
       // Handle the response data as needed
       showFileInfo(fileInput);
-      displayStatusMessage("success");
+      displayUploadStatus("success");
     })
     .catch((error) => {
       console.error("Error:", error);
-      displayStatusMessage("failure");
+      displayUploadStatus("failure");
     });
 }
 
-function displayStatusMessage(status) {
-  const statusMessage = document.querySelector("#status-message");
-  
+function displayUploadStatus(status) {
+  const statusMessageContainer = document.querySelector("#status-message-container");
+  statusMessageContainer.innerHTML = '';
+  document.querySelector("#upload-form").reset();
+
   if (status === "success") {
-    statusMessage.textContent = "Upload Success";
-    statusMessage.style.display = "block";
-    statusMessage.style.color = "green";
+    statusMessageContainer.style.color = "lime";
+    statusMessageContainer.innerHTML = '<span class="material-symbols-outlined">check</span>';
+  } else if (status === "failure"){
+    statusMessageContainer.style.color = "red";
+    statusMessageContainer.innerHTML = '<span class="material-symbols-outlined">close</span>';
   } else {
-    statusMessage.textContent = "Upload Failure";
-    statusMessage.style.display = "block";
-    statusMessage.style.color = "red";
+    statusMessageContainer.style.color = "yellow";
+    statusMessageContainer.innerHTML = '<span class="material-symbols-outlined">question_mark</span>';
   }
 }
 

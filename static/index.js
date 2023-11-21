@@ -33,23 +33,33 @@ function uploadAndShowFile() {
     });
 }
 
+// notifies the user of web api of status of their file upload in the html form
 function displayUploadStatus(status) {
   const statusMessageContainer = document.querySelector("#status-message-container");
   statusMessageContainer.innerHTML = '';
-  document.querySelector("#upload-form").reset();
 
   if (status === "success") {
-    statusMessageContainer.style.color = "lime";
-    statusMessageContainer.innerHTML = '<span class="material-symbols-outlined">check</span>';
+    insertGoogleIcon(statusMessageContainer, "check", "lime");
   } else if (status === "failure"){
-    statusMessageContainer.style.color = "red";
-    statusMessageContainer.innerHTML = '<span class="material-symbols-outlined">close</span>';
-  } else {
-    statusMessageContainer.style.color = "yellow";
-    statusMessageContainer.innerHTML = '<span class="material-symbols-outlined">question_mark</span>';
+    insertGoogleIcon(statusMessageContainer, "close", "red");
+  } else if (status === "noFile") {
+    insertGoogleIcon(statusMessageContainer, "question_mark", "yellow");
   }
+
+  // clears the form and status after a given amount of milliseconds
+  setTimeout(function() {
+    document.querySelector("#upload-form").reset();
+    statusMessageContainer.innerHTML = '';
+  }, 2000);
 }
 
+// inserts a google icon into an element. Input parameters for element, icon name, and desired color
+function insertGoogleIcon(element, iconName, color) {
+  element.style.color = color;
+  element.innerHTML = '<span class="material-symbols-outlined">'+iconName+'</span>';
+}
+
+// displays file info to console for debugging purposes
 function showFileInfo(fileInput) {
   if (fileInput.files.item(0) != null) {
     console.log("File Submitted");
@@ -62,6 +72,7 @@ function showFileInfo(fileInput) {
   }
 }
 
+// downloads the inputted file into user local directory
 function downloadFile(fileInput) {
   // hidden anchor element that allows to "click" a href
   let a = document.createElement("a");

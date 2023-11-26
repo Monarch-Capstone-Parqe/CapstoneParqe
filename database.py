@@ -3,6 +3,7 @@ import psycopg2 as ps
 import sqlalchemy as db
 from sqlalchemy import Table, Column, String, MetaData, create_engine, text, insert
 #from sqlalchemy.orm import sessionmaker
+from datetime import date
 
 #Constants
 #MAIL_ADDR_LEN = 40 #See --> https://stackoverflow.com/questions/1297272/how-long-should-sql-email-fields-be
@@ -22,39 +23,40 @@ engine = db.create_engine(f'postgresql://{os.environ["DB_USERNAME"]}:{os.environ
 # Create PARQE tables
 def create_tables():
     with engine.connect() as conn:
-        conn.execute(text("CREATE TABLE IF NOT EXISTS users("
-                                                        "email VARCHAR PRIMARY KEY,"
-                                                        "phone VARCHAR,"
-                                                        "is_standard BOOLEAN NOT NULL,"
-                                                        "is_staff BOOLEAN NOT NULL,"
-                                                        "is_admin BOOLEAN NOT NULL)"))
-        conn.execute(text("CREATE TABLE IF NOT EXISTS jobs("
-                                                        "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
-                                                        "email VARCHAR,"
-                                                        "cost NUMERIC(6,2) NOT NULL,"
-                                                        "CONSTRAINT fk_user FOREIGN KEY(email) REFERENCES users(email) ON DELETE CASCADE)"))
+        conn.execute(text("CREATE TABLE IF NOT EXISTS staff("
+                            "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                            "email VARCHAR UNIQUE NOT NULL)"))
+        
+        conn.execute(text("CREATE TABLE IF NOT EXISTS orders("
+                            "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                            "email VARCHAR NOT NULL,"
+                            "file_path VARCHAR NOT NULL,"
+                            "price NUMERIC(6,2) NOT NULL,"
+                            "note VARCHAR,"
+                            "date DATE DEFAULT CURRENT_DATE,"
+                            "approved_by INTEGER REFERENCES staff(id) DEFAULT NULL)"))
         conn.commit()
 
-# Performs an insert on the 'users' table
-#   @email - string | PRIMARY KEY
-#   @phone - string | NULLABLE
-#   @standard - boolean | NOT NULLABLE
-#   @staff - boolean | NOT NULLABLE
-#   @admin - boolean | NOT NULLABLE
-def insert_user(email="NULL", phone="NULL", standard=True, staff=False, admin=False):
+def insert_order(email, file, price, note=None):
     with engine.connect() as conn:
-        conn.execute(text("INSERT INTO users VALUES (:email, :phone, :standard, :staff, :admin)"),
-                            { "email":email, "phone":phone, "standard":standard, "staff":staff, "admin":admin })
+        conn.execute(text("INSERT INTO orders(email, file_path, price, note, date) "
+                          "VALUES (:email, :file, :price, :note, :date)"),
+                     {"email": email, "file": file, "price": price, "note": note, "date": date.today()})
 
         conn.commit()
 
-# Performs in insert on the 'jobs' table
-#   @id - integer | AUTOINCREMENT
-#   @email - string | FOREIGN KEY -> 'users'
-#   @cost - float | NOT NULLABLE | bounded in range $xxxx.xx
-def insert_job(email="NULL", cost=-1):
+def add_staff(email):
     with engine.connect() as conn:
-        conn.execute(text("INSERT INTO jobs(email, cost) VALUES (:email, :cost)"), 
-                           { "email":email, "cost":cost })
-    
+        # Check if the admin exists, if not, add to the staff table
+        admin_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM staff WHERE email = :email)"), {"email": email}).scalar()
+        if not admin_exists:
+            conn.execute(text("INSERT INTO staff(email) VALUES (:email)"), {"email": email})
+
         conn.commit()
+
+def get_staff_emails():
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT email FROM staff")).fetchall()
+        staff_emails = [row[0] for row in result]
+        return staff_emails
+

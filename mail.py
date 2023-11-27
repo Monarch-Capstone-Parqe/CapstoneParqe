@@ -17,7 +17,14 @@ def send_email(receiver_email, message):
     sender_email, password = read_credentials("creds.txt")
 
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, message)
+    try:
+        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message)
+        print("Email sent successfully.")
+        return True
+    except smtplib.SMTPException as e:
+        print(f"Error sending email: {e}")
+        return False
+
 

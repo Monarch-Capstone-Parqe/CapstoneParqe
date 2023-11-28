@@ -14,6 +14,10 @@ logger.add("app.log", rotation="500 MB", level="INFO")
 def home():
     return render_template("userAPI/index.html")
 
+@app.route("/staff")
+def staffHome():
+    return render_template("staffAPI/staffIndex.html")
+
 ALLOWED_EXTENSIONS = {'stl', 'stp', 'step', '3mf'}
 
 def allowed_file(filename):

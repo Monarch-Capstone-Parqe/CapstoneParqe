@@ -12,11 +12,11 @@ logger.add("app.log", rotation="500 MB", level="INFO")
 
 @app.route("/")
 def home():
-    return render_template("userAPI/index.html")
+    return render_template("user/index.html")
 
 @app.route("/staff")
 def staffHome():
-    return render_template("staffAPI/staffIndex.html")
+    return render_template("staff/index.html")
 
 ALLOWED_EXTENSIONS = {'stl', 'stp', 'step', '3mf'}
 
@@ -32,6 +32,8 @@ def gen_file_name(ext):
 
     return file_name
 
+# User uploads model and prefernces
+# Parse, store, and return the results to the user
 @app.route('/upload_model', methods=['POST'])
 def upload_model():
     try:
@@ -79,7 +81,7 @@ def upload_model():
         logger.error(f"Error in upload_model route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
-@app.route('/records', methods=['GET'])
+@app.route('/staff/pending-orders', methods=['GET'])
 def get_pending_orders():
     pending_orders = database.get_pending_orders()
 

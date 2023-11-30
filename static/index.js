@@ -4,8 +4,15 @@ submitButton.onclick = function (event) {
   uploadAndShowFile();
 };
 function uploadAndShowFile() {
+  const email = document.querySelector(".email");
   const fileInput = document.querySelector(".file-input");
   const file = fileInput.files[0];
+  const layerHeight = document.querySelector(".layer-height");
+  const nozzleWidth = document.querySelector(".nozzle-width");
+  const infill = document.querySelector(".infill");
+  const supports = document.querySelector(".supports");
+  const pieces = document.querySelector(".pieces");
+  const note = document.querySelector(".note");
 
   if (!file) {
     console.error("No file selected.");
@@ -14,7 +21,14 @@ function uploadAndShowFile() {
   }
 
   const formData = new FormData();
+  formData.append("email", email);
   formData.append("file", file);
+  formData.append("layer height", layerHeight);
+  formData.append("nozzle width", nozzleWidth);
+  formData.append("infill", infill);
+  formData.append("supports", supports);
+  formData.append("pieces", pieces);
+  formData.append("note", note);
 
   fetch("/upload_model", {
     method: "POST",

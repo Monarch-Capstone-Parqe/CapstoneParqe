@@ -51,30 +51,6 @@ body {
   font-size: 1.5em;
 }
 
-/* .upload-box {
-  border: 1px solid black;
-  background-color: rgba(138, 138, 103, 0.2);
-  margin-left: auto;
-  margin-right: auto;
-  width: 400px;
-  height: 110px;
-  border-radius: 5px;
-}
-
-.upload-instructions {
-  text-align: left;
-  width: 320px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.upload-form {
-  display: block;
-  width: 320px;
-  margin-left: auto;
-  margin-right: auto;
-} */
-
 .form {
   display: block;
   width: 500px;
@@ -127,7 +103,7 @@ body {
   background-color: #0056b3;
 }
 
-#note {
+.note {
   width: 100%;
   height: 50px;
 }

@@ -7,11 +7,11 @@
     </div>
     <div class="form-group">
         <label for="file">File: (.stl, .stp, .step, .3mf)</label>
-        <input type="file" id="file" accept=".stl, .stp, .step, .3mf">
+        <input type="file" id="file" accept=".stl, .stp, .step, .3mf" class="file-input">
     </div>
     <div class="form-group">
         <label for="layer-height">Layer Height:</label>
-        <select name="layer-height" id="layer-height"> 
+        <select name="layer-height" class="layer-height"> 
             <option value="0.2">0.2mm (default)</option> 
             <option value="0.1">0.1mm</option> 
             <option value="0.3">0.3mm</option> 
@@ -20,7 +20,7 @@
     </div>
     <div class="form-group">
       <label for="nozzle-width">Nozzle Width:</label>
-      <select name="nozzle-width" id="nozzle-width"> 
+      <select name="nozzle-width" class="nozzle-width"> 
           <option value="0.2">0.2mm (default)</option> 
           <option value="0.1">0.1mm</option> 
           <option value="0.3">0.3mm</option> 
@@ -29,7 +29,7 @@
     </div>
     <div class="form-group">
       <label for="infill">Infill:</label>
-      <select name="infill" id="infill"> 
+      <select name="infill" class="infill"> 
         <option value="20">20% (default)</option> 
         <option value="10">10%</option> 
         <option value="30">30%</option> 
@@ -44,7 +44,7 @@
     </div>
     <div class="form-group">
         <label for="supports">Supports:</label>
-        <select name="supports" id="supports"> 
+        <select name="supports" class="supports"> 
             <option value="none">none (default)</option> 
             <option value="organic">tree</option> 
             <option value="grid">grid</option> 
@@ -52,7 +52,7 @@
     </div>
     <div class="form-group">
         <label for="pieces">Pieces:</label>
-        <select name="pieces" id="pieces"> 
+        <select name="pieces" class="pieces"> 
             <option value="single">single (default)</option> 
             <option value="multi">multi</option> 
         </select>
@@ -61,7 +61,7 @@
       <label for="note">Note:</label>
             <textarea
               name="note"
-              id="note"
+              class="note"
               placeholder="Additional info about your order"
             ></textarea>
     </div>

@@ -1,4 +1,16 @@
 
+import * as GCodePreview from './node_modules/gcode-preview/dist/gcode-preview.js';
+  
+  const preview = window.preview(new GCodePreview.init(
+  {
+      canvas: document.querySelector('canvas'),
+      extrusionColor: 'hotpink'
+  }
+  ));
+  
+  // draw a diagonal line
+  const gcode = 'G0 X0 Y0 Z0.2\nG1 X42 Y42 E10';
+  preview.processGCode(gcode);
 //todo create job objects
 //
 function approve(name)
@@ -61,7 +73,10 @@ function renderJob(name, cost, etc)
     dataBox.appendChild(job);
     dataBox.appendChild(approveButton);
     dataBox.appendChild(denyButton);
+    dataBox.appendChild(preview);
     jobsBox.appendChild(dataBox);
+
+
 }
 
 //Function to remove a job by id from the page

@@ -1,29 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>PrusaSlicer Automated Routing and Quoting Engine</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/x-icon">
-    <title>Your Page Title</title>
-    <script defer src="{{ url_for('static', filename='index.js') }}"></script>
-  </head>
-  <body>
-    <main>
-      <img id="psu-logo" src="{{ url_for('static', filename='images/psu-logo.png') }}" alt="Portland State Logo" width="200px">
-      <div id="header-box">
-        <h1 id="header-text">PrusaSlicer Automated Routing and Quoting Engine</h1>
-      </div>
-      <div id="upload-box">
-        <p id="upload-instructions">Accepted file types .stl, .stp, .step, .3mf</p>
-            <form id="upload-form">
-                <input type="file" accept=".stl, .stp, .step, .3mf" id="file-input">
-                <input type="submit" id="submit-button">
-            </form>
-      </div>
-      </div>
-    </main>
-  </body>
-</html>
+{% extends 'base.html' %} {% block content %}
+<div class="upload-box">
+  <p class="upload-instructions">Accepted file types .stl, .stp, .step, .3mf</p>
+  <form class="upload-form">
+    <input type="file" accept=".stl, .stp, .step, .3mf" class="file-input" />
+    <input type="submit" class="submit-button" />
+  </form>
+  <div class="status-message-container">
+    <span class="status-message" style="display: none"></span>
+  </div>
+</div>
+{% endblock %}

@@ -1,22 +1,91 @@
 import os
 from http import HTTPStatus
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import database
 import mail
 from uuid import uuid4
 import price
 from loguru import logger  
+from functools import wraps
+
+import json
+from os import environ as env
+from urllib.parse import quote_plus, urlencode
+from authlib.integrations.flask_client import OAuth
+from dotenv import find_dotenv, load_dotenv
+
+# Load enviroment variables
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
+app.secret_key = env.get("APP_SECRET_KEY")
+
+oauth = OAuth(app)
+
+oauth.register(
+    "auth0",
+    client_id=env.get("AUTH0_CLIENT_ID"),
+    client_secret=env.get("AUTH0_CLIENT_SECRET"),
+    client_kwargs={
+        "scope": "openid profile email",
+    },
+    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
+)
+
 logger.add("app.log", rotation="500 MB", level="INFO") 
 
 @app.route("/")
-def home():
+def user_home():
     return render_template("user/index.html")
 
-@app.route("/staff")
-def staffHome():
-    return render_template("staff/index.html")
+# Labels certain endpoints as privilged
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated
+
+@app.route('/staff')
+@requires_auth
+def staff_home():
+     return render_template(
+        "staff/index.html",
+        session=session["user"]
+    )
+
+@app.route("/staff/callback", methods=["GET", "POST"])
+def callback():
+    token = oauth.auth0.authorize_access_token()
+
+    session["user"] = token
+    return redirect("/staff")
+
+@app.route("/staff/login")
+def login():
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=url_for("callback", _external=True)
+    )
+
+@app.route("/staff/logout")
+@requires_auth
+def logout():
+    session.clear()
+    return redirect(
+        "https://"
+        + env.get("AUTH0_DOMAIN")
+        + "/v2/logout?"
+        + urlencode(
+            {
+                "returnTo": url_for("home", _external=True),
+                "client_id": env.get("AUTH0_CLIENT_ID"),
+            },
+            quote_via=quote_plus,
+        )
+    )
 
 ALLOWED_EXTENSIONS = {'stl', 'stp', 'step', '3mf'}
 
@@ -81,8 +150,8 @@ def upload_model():
         logger.error(f"Error in upload_model route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
-@app.route('/staff/pending-orders', methods=['GET'])
-def get_pending_orders():
+@app.route('/staff/orders', methods=['GET'])
+def get_orders():
     pending_orders = database.get_pending_orders()
 
     for order in pending_orders:

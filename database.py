@@ -51,9 +51,9 @@ def insert_order(email, file, price, note=None):
 
         conn.commit()
 
-def get_pending_orders():
+def get_orders():
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM orders WHERE approved_by IS NULL ORDER BY date")).fetchall()
+        result = conn.execute(text("SELECT * FROM orders ORDER BY date")).fetchall()
         orders = [dict(row) for row in result]
         return orders
     

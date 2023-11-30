@@ -51,9 +51,9 @@ body {
   font-size: 1.5em;
 }
 
-.upload-box {
+/* .upload-box {
   border: 1px solid black;
-  background-color: rgba(138, 138, 103, 0.2); /* Sand */
+  background-color: rgba(138, 138, 103, 0.2);
   margin-left: auto;
   margin-right: auto;
   width: 400px;
@@ -73,6 +73,63 @@ body {
   width: 320px;
   margin-left: auto;
   margin-right: auto;
+} */
+
+.form {
+  display: block;
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.order-form {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.order-form .form-group {
+  margin-bottom: 15px;
+}
+
+.order-form .form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.order-form .form-group input[type="email"],
+.order-form .form-group input[type="file"],
+.order-form .form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box; /* Ensures padding doesn't affect overall width */
+}
+
+.order-form .form-group input[type="submit"] {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.order-form .form-group input[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+#note {
+  width: 100%;
+  height: 50px;
 }
 
 .status-message-container {

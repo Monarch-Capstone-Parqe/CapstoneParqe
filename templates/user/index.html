@@ -1,0 +1,34 @@
+{% extends 'base.html' %} 
+
+{% block title %} PrusaSlicer Automated Routing and Quoting Engine{% endblock %}
+
+{% block head %}
+<script defer src="{{ url_for('static', filename='user.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+<main>
+  <img
+    class="psu-logo"
+    src="{{ url_for('static', filename='images/psu_logo.png') }}"
+    alt="Portland State Logo"
+    width="200px"
+  />
+  <div class="header-box">
+    <h1 class="header-text">
+      PrusaSlicer Automated Routing and Quoting Engine
+    </h1>
+  </div>
+  <div class="upload-box">
+    <p class="upload-instructions">Accepted file types .stl, .stp, .step, .3mf</p>
+    <form class="upload-form">
+      <input type="file" accept=".stl, .stp, .step, .3mf" class="file-input" />
+      <input type="submit" class="submit-button" />
+    </form>
+    <div class="status-message-container">
+      <span class="status-message" style="display: none"></span>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

@@ -35,8 +35,13 @@ def gen_file_name(ext):
 @app.route('/upload_model', methods=['POST'])
 def upload_model():
     try:
-        file = request.files['file']
         email = request.form['email']
+        file = request.files['file']
+        layerHeight = request.form['layer height']
+        nozzleWidth = request.form['nozzle width']
+        infill = request.form['infill']
+        supports = request.form['supports']
+        pieces = request.form['pieces']
         note = request.form['note']
 
         if not email:

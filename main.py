@@ -7,38 +7,30 @@ from uuid import uuid4
 import price
 from loguru import logger  
 from functools import wraps
-
-import json
-from os import environ as env
+import config.variables as variables
 from urllib.parse import quote_plus, urlencode
 from authlib.integrations.flask_client import OAuth
-from dotenv import find_dotenv, load_dotenv
 
-# Load enviroment variables
-ENV_FILE = find_dotenv()
-if ENV_FILE:
-    load_dotenv(ENV_FILE)
+# Init db
+database.check_db_connect()
+database.create_tables()
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
-app.secret_key = env.get("APP_SECRET_KEY")
+app.secret_key = variables.APP_SECRET_KEY
 
 oauth = OAuth(app)
 
 oauth.register(
     "auth0",
-    client_id=env.get("AUTH0_CLIENT_ID"),
-    client_secret=env.get("AUTH0_CLIENT_SECRET"),
+    client_id=variables.AUTH0_CLIENT_ID,
+    client_secret=variables.AUTH0_CLIENT_SECRET,
     client_kwargs={
         "scope": "openid profile email",
     },
-    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
+    server_metadata_url=f'https://{variables.AUTH0_DOMAIN}/.well-known/openid-configuration',
 )
 
 logger.add("app.log", rotation="500 MB", level="INFO") 
-
-# Init db
-database.check_db_connect()
-database.create_tables()
 
 @app.route("/")
 def user_home():
@@ -80,12 +72,12 @@ def logout():
     session.clear()
     return redirect(
         "https://"
-        + env.get("AUTH0_DOMAIN")
+        + variables.AUTH0_DOMAIN
         + "/v2/logout?"
         + urlencode(
             {
                 "returnTo": url_for("home", _external=True),
-                "client_id": env.get("AUTH0_CLIENT_ID"),
+                "client_id": variables.AUTH0_CLIENT_ID,
             },
             quote_via=quote_plus,
         )
@@ -97,7 +89,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def gen_file_name(ext):
-    file_name = str(uuid4()) + ext
+    file_name = str(uuid4()) + '.' + ext
 
     # Check if the file with the same name already exists
     while os.path.exists(file_name):
@@ -124,7 +116,7 @@ def upload_model():
             return jsonify({'error': 'Email is a required field'}), HTTPStatus.BAD_REQUEST
         
         # Send email to the user to verify its valid
-        if not mail.send_email(email, "Welcome to EPL."):
+        if not mail.send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, email, "Welcome to EPL."):
             return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
 
         if not note or note == '':
@@ -140,7 +132,7 @@ def upload_model():
         file.save(file_name)
 
         # Generate G-code
-        os.system(f'./prusa.AppImage --export-gcode {file_name}')
+        os.system(f'./prusa.AppImage --export-gcode /uploads/{file_name}')
 
         # Remove the original file
         os.remove(file_name)

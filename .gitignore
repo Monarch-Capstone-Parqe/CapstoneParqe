@@ -1,4 +1,5 @@
 .vscode/
 __pycache__/
+config/__pycache__
 /uploads
 app.log

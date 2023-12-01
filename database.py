@@ -2,6 +2,7 @@ import os
 import psycopg2 as ps
 import sqlalchemy as db
 from sqlalchemy import Table, Column, String, MetaData, create_engine, text, insert
+from sqlalchemy.exc import SQLAlchemyError
 #from sqlalchemy.orm import sessionmaker
 from datetime import date
 import os
@@ -25,6 +26,14 @@ engine = db.create_engine(f'postgresql://{os.environ["DB_USERNAME"]}:{os.environ
 #conn = engine.connect()
 #metadata = db.MetaData()
 #metadata.reflect(bind=engine)
+
+def check_db_connect():
+    try:
+        engine.connect()
+        print("PostgreSQL Connection Established...")
+    except SQLAlchemyError as e:
+        print(f"PostgreSQL Connection Failed: [{e}]")
+        return 1
 
 # Create PARQE tables
 def create_tables():

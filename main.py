@@ -36,6 +36,10 @@ oauth.register(
 
 logger.add("app.log", rotation="500 MB", level="INFO") 
 
+# Init db
+database.check_db_connect()
+database.create_tables()
+
 @app.route("/")
 def user_home():
     return render_template("user/index.html")

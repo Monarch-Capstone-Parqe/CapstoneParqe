@@ -1,18 +1,18 @@
-let submitButton = document.querySelector(".submit-button");
+let submitButton = document.querySelector("#submit-button");
 submitButton.onclick = function (event) {
   event.preventDefault();
   uploadAndShowFile();
 };
 function uploadAndShowFile() {
-  const email = document.querySelector(".email");
-  const fileInput = document.querySelector(".file-input");
+  const email = document.querySelector("#email").value;
+  const fileInput = document.querySelector("#file-input");
   const file = fileInput.files[0];
-  const layerHeight = document.querySelector(".layer-height");
-  const nozzleWidth = document.querySelector(".nozzle-width");
-  const infill = document.querySelector(".infill");
-  const supports = document.querySelector(".supports");
-  const pieces = document.querySelector(".pieces");
-  const note = document.querySelector(".note");
+  const layerHeight = document.querySelector("#layer-height").value;
+  const nozzleWidth = document.querySelector("#nozzle-width").value;
+  const infill = document.querySelector("#infill").value;
+  const supports = document.querySelector("#supports").value;
+  const pieces = document.querySelector("#pieces").value;
+  const note = document.querySelector("#note").value;
 
   if (!file) {
     console.error("No file selected.");

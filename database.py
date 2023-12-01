@@ -1,22 +1,18 @@
-import os
 import psycopg2 as ps
 import sqlalchemy as db
 from sqlalchemy import Table, Column, String, MetaData, create_engine, text, insert
+from sqlalchemy.exc import SQLAlchemyError
 #from sqlalchemy.orm import sessionmaker
 from datetime import date
-import os
+import config.variables as variables
 
 #Constants
 #MAIL_ADDR_LEN = 40 #See --> https://stackoverflow.com/questions/1297272/how-long-should-sql-email-fields-be
 
 
-# Set environment variables
-os.environ["DB_USERNAME"] = "your_username"
-os.environ["DB_PASSWORD"] = "your_password"
-
 #DB_USERNAME & DB_PASSWORD exist as system environment variables
 # -TODO Likely will make the whole DB_URI its own env var eventually
-engine = db.create_engine(f'postgresql://{os.environ["DB_USERNAME"]}:{os.environ["DB_PASSWORD"]}@localhost:5432/parqe')
+engine = create_engine(f'postgresql://{variables.DB_USERNAME}:{variables.DB_PASSWORD}@localhost:5432/parqe')
 
 #################################
 # CURRENTLY NO ORM UTILIZIATION #
@@ -25,6 +21,14 @@ engine = db.create_engine(f'postgresql://{os.environ["DB_USERNAME"]}:{os.environ
 #conn = engine.connect()
 #metadata = db.MetaData()
 #metadata.reflect(bind=engine)
+
+def check_db_connect():
+    try:
+        engine.connect()
+        print("PostgreSQL Connection Established...")
+    except SQLAlchemyError as e:
+        print(f"PostgreSQL Connection Failed: [{e}]")
+        return 1
 
 # Create PARQE tables
 def create_tables():

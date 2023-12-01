@@ -1,37 +1,34 @@
 import os
+import subprocess
 from http import HTTPStatus
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import database
 import mail
 from uuid import uuid4
-import price
+from price import calc_price
 from loguru import logger  
 from functools import wraps
-
-import json
-from os import environ as env
+import config.variables as variables
 from urllib.parse import quote_plus, urlencode
 from authlib.integrations.flask_client import OAuth
-from dotenv import find_dotenv, load_dotenv
 
-# Load enviroment variables
-ENV_FILE = find_dotenv()
-if ENV_FILE:
-    load_dotenv(ENV_FILE)
+# Init db
+database.check_db_connect()
+database.create_tables()
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
-app.secret_key = env.get("APP_SECRET_KEY")
+app.secret_key = variables.APP_SECRET_KEY
 
 oauth = OAuth(app)
 
 oauth.register(
     "auth0",
-    client_id=env.get("AUTH0_CLIENT_ID"),
-    client_secret=env.get("AUTH0_CLIENT_SECRET"),
+    client_id=variables.AUTH0_CLIENT_ID,
+    client_secret=variables.AUTH0_CLIENT_SECRET,
     client_kwargs={
         "scope": "openid profile email",
     },
-    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
+    server_metadata_url=f'https://{variables.AUTH0_DOMAIN}/.well-known/openid-configuration',
 )
 
 logger.add("app.log", rotation="500 MB", level="INFO") 
@@ -76,12 +73,12 @@ def logout():
     session.clear()
     return redirect(
         "https://"
-        + env.get("AUTH0_DOMAIN")
+        + variables.AUTH0_DOMAIN
         + "/v2/logout?"
         + urlencode(
             {
                 "returnTo": url_for("home", _external=True),
-                "client_id": env.get("AUTH0_CLIENT_ID"),
+                "client_id": variables.AUTH0_CLIENT_ID,
             },
             quote_via=quote_plus,
         )
@@ -92,12 +89,12 @@ ALLOWED_EXTENSIONS = {'stl', 'stp', 'step', '3mf'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def gen_file_name(ext):
-    file_name = str(uuid4()) + ext
+def gen_file_name():
+    file_name = str(uuid4())
 
     # Check if the file with the same name already exists
     while os.path.exists(file_name):
-        file_name = str(uuid4()) + ext
+        file_name = str(uuid4())
 
     return file_name
 
@@ -106,8 +103,13 @@ def gen_file_name(ext):
 @app.route('/upload_model', methods=['POST'])
 def upload_model():
     try:
-        file = request.files['file']
         email = request.form['email']
+        file = request.files['file']
+        layerHeight = request.form['layer height']
+        nozzleWidth = request.form['nozzle width']
+        infill = request.form['infill']
+        supports = request.form['supports']
+        pieces = request.form['pieces']
         note = request.form['note']
 
         if not email:
@@ -115,7 +117,7 @@ def upload_model():
             return jsonify({'error': 'Email is a required field'}), HTTPStatus.BAD_REQUEST
         
         # Send email to the user to verify its valid
-        if not mail.send_email(email, "Welcome to EPL."):
+        if not mail.send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, email, "Welcome to EPL."):
             return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
 
         if not note or note == '':
@@ -126,18 +128,23 @@ def upload_model():
         if not allowed_file(file.filename):
             return jsonify({'error': 'Invalid file type'}), HTTPStatus.UNSUPPORTED_MEDIA_TYPE
 
-        # Save file with a unique name
-        file_name = gen_file_name(file.filename.rsplit('.', 1)[1].lower())
-        file.save(file_name)
+      # Save file with a unique name in the 'uploads' directory
+        _, ext = os.path.splitext(file.filename)
+        new_name = gen_file_name()
+        file_path = os.path.join('uploads', f'{new_name}{ext}')
+        gcode_output_path = os.path.join('uploads', f'{new_name}.gcode')
+        file.save(file_path)
 
         # Generate G-code
-        os.system(f'./prusa.AppImage --export-gcode {file_name}')
+        command = f'./prusa.AppImage --export-gcode {file_path}'
+        output = subprocess.getoutput(command)
 
         # Remove the original file
-        os.remove(file_name)
+        os.remove(file_path)
 
         # Store the order
-        database.insert_order(email, file_name, price.calc_price(file_name), note)
+        price = calc_price(gcode_output_path)  # Assuming you have a price module
+        database.insert_order(email, gcode_output_path, price, note)
 
         # Email the staff that a new order has been submitted
         for staff_email in database.get_staff_emails():

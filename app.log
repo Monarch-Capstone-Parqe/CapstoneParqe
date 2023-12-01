@@ -1,1 +1,4 @@
 2023-11-26 16:46:35.472 | ERROR    | __main__:upload_model:75 - Error in upload_model route: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2023-11-30 14:19:47.640 | ERROR    | __main__:upload_model:79 - Error in upload_model route: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2023-11-30 14:20:22.473 | ERROR    | __main__:upload_model:79 - Error in upload_model route: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
+2023-11-30 14:22:04.322 | ERROR    | __main__:upload_model:79 - Error in upload_model route: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.

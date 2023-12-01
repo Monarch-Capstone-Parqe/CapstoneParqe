@@ -1,10 +1,11 @@
 import os
+import subprocess
 from http import HTTPStatus
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import database
 import mail
 from uuid import uuid4
-import price
+from price import calc_price
 from loguru import logger  
 from functools import wraps
 import config.variables as variables
@@ -88,12 +89,12 @@ ALLOWED_EXTENSIONS = {'stl', 'stp', 'step', '3mf'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def gen_file_name(ext):
-    file_name = str(uuid4()) + '.' + ext
+def gen_file_name():
+    file_name = str(uuid4())
 
     # Check if the file with the same name already exists
     while os.path.exists(file_name):
-        file_name = str(uuid4()) + ext
+        file_name = str(uuid4())
 
     return file_name
 
@@ -127,20 +128,23 @@ def upload_model():
         if not allowed_file(file.filename):
             return jsonify({'error': 'Invalid file type'}), HTTPStatus.UNSUPPORTED_MEDIA_TYPE
 
-        # Save file with a unique name in the 'uploads' directory
-        file_name = gen_file_name(file.filename.rsplit('.', 1)[1].lower())
-        file_path = os.path.join('uploads', file_name)
+      # Save file with a unique name in the 'uploads' directory
+        _, ext = os.path.splitext(file.filename)
+        new_name = gen_file_name()
+        file_path = os.path.join('uploads', f'{new_name}{ext}')
+        gcode_output_path = os.path.join('uploads', f'{new_name}.gcode')
         file.save(file_path)
 
         # Generate G-code
-        gcode_output_path = os.path.join('uploads', f'{file_name}.gcode')
-        os.system(f'./prusa.AppImage --export-gcode {file_path}')
+        command = f'./prusa.AppImage --export-gcode {file_path}'
+        output = subprocess.getoutput(command)
 
         # Remove the original file
         os.remove(file_path)
 
         # Store the order
-        database.insert_order(email, file_name, price.calc_price(file_name), note)
+        price = calc_price(gcode_output_path)  # Assuming you have a price module
+        database.insert_order(email, gcode_output_path, price, note)
 
         # Email the staff that a new order has been submitted
         for staff_email in database.get_staff_emails():

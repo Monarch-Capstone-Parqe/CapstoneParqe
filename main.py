@@ -127,15 +127,17 @@ def upload_model():
         if not allowed_file(file.filename):
             return jsonify({'error': 'Invalid file type'}), HTTPStatus.UNSUPPORTED_MEDIA_TYPE
 
-        # Save file with a unique name
+        # Save file with a unique name in the 'uploads' directory
         file_name = gen_file_name(file.filename.rsplit('.', 1)[1].lower())
-        file.save(file_name)
+        file_path = os.path.join('uploads', file_name)
+        file.save(file_path)
 
         # Generate G-code
-        os.system(f'./prusa.AppImage --export-gcode /uploads/{file_name}')
+        gcode_output_path = os.path.join('uploads', f'{file_name}.gcode')
+        os.system(f'./prusa.AppImage --export-gcode {file_path}')
 
         # Remove the original file
-        os.remove(file_name)
+        os.remove(file_path)
 
         # Store the order
         database.insert_order(email, file_name, price.calc_price(file_name), note)

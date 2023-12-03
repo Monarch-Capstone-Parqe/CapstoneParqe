@@ -4,10 +4,7 @@
 sudo apt update
 sudo apt install postgresql postgresql-contrib
 
-# Start PostgreSQL service
-sudo systemctl start postgresql.service
-#Ubuntu
-#sudo service postgresql start
+sudo service postgresql start
 
 # Run PostgreSQL commands
 sudo -iu postgres psql <<EOF

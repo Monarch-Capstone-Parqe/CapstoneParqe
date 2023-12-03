@@ -49,7 +49,8 @@ def requires_auth(f):
 @app.route('/staff')
 @requires_auth
 def staff_home():
-     return render_template(
+    database.add_staff(session['user']['userinfo']['email'])
+    return render_template(
         "staff/index.html",
         session=session["user"]
     )
@@ -158,19 +159,50 @@ def upload_model():
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route('/staff/orders', methods=['GET'])
+@requires_auth
 def get_orders():
     pending_orders = database.get_pending_orders()
 
-    for order in pending_orders:
-        file_name = order['file_name']
-        del order['file_name']
-        file_path = os.path.join('/uploads', file_name)
-        if os.path.exists(file_path):
-            order['file'] = file_path
-        else:
-            order['file'] = None
+    # for order in pending_orders:
+    #     file_name = order['file_name']
+    #     #del order['file_name']
+    #     file_path = os.path.join('/uploads', file_name)
+    #     #if os.path.exists(file_path):
+    #         #order.update({'file': file_path})
+    #     else:
+    #         order.update({'file': None})
 
     return jsonify({'pending_orders': pending_orders}), HTTPStatus.OK
+
+@app.route('/staff/orders/all', methods=['GET'])
+def get_all_orders():
+    orders = database.get_orders()
+    return jsonify({'pending_orders': orders}), HTTPStatus.OK
+
+@app.route('/staff/return_orders', methods=['PUT'])
+@requires_auth
+def return_orders():
+    try:
+        id = request.form['id']
+        status = request.form['status']
+
+        email = session['user']['userinfo']['email']
+
+        if(status == 'denied'):
+            database.remove_order(id)
+        if(status == 'approved'):
+            database.update_approved(id, email)
+        return jsonify({'message': 'update received'}), HTTPStatus.OK
+    
+    except Exception as e:
+        logger.error(f"Error in return_orders route: {e}")
+        return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+@app.route('/staff/all', methods=['GET'])
+def return_staff():
+    staff = database.get_staff_emails()
+    return jsonify({'staff': staff}), HTTPStatus.OK
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

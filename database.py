@@ -58,8 +58,45 @@ def insert_order(email, file, price, note=None):
 def get_orders():
     with engine.connect() as conn:
         result = conn.execute(text("SELECT * FROM orders ORDER BY date")).fetchall()
-        orders = [dict(row) for row in result]
+        orders = []
+        for row in result:
+            row_as_dict = row._mapping
+            orders.append(dict(row_as_dict))
+
         return orders
+
+def get_pending_orders():
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM orders WHERE approved_by IS NULL ORDER BY date")).fetchall()
+        orders = []
+        for row in result:
+            row_as_dict = row._mapping
+            #if(row_as_dict.approved_by != None):
+                #continue
+            orders.append(dict(row_as_dict))
+
+        return orders
+
+def remove_order(match):
+    with engine.connect() as conn: 
+        conn.execute(text("DELETE FROM orders WHERE id=:match"),
+                        {"match": match})
+        
+        conn.commit()
+
+def update_approved(match, email):
+    with engine.connect() as conn:
+        staff_id_result = conn.execute(text("SELECT id FROM staff WHERE email=:email"),
+                                    {"email": email})
+        staff_id_dict = []
+        for row in staff_id_result:
+            row_as_dict = row._mapping
+            staff_id_dict.append(dict(row_as_dict))
+        staff_id = staff_id_dict[0]['id']
+        conn.execute(text("UPDATE orders SET approved_by=:staff_id WHERE id=:match"),
+                            {"staff_id": staff_id, "match": match})
+        
+        conn.commit()
     
 def add_staff(email):
     with engine.connect() as conn:

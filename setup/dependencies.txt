@@ -1,8 +1,0 @@
-Flask
-loguru
-authlib
-sqlalchemy
-psycopg2
-ssl
-python-dotenv
-requests

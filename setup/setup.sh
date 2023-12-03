@@ -14,5 +14,5 @@ GRANT ALL PRIVILEGES ON DATABASE parqe TO app;
 \q
 EOF
 
-# Install Python dependencies
-pip install -r dependencies.txt
+# Install Python requirements
+pip install -r requirements.txt

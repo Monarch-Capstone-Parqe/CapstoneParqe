@@ -1,0 +1,6 @@
+Flask==2.3.2
+Flask-Session==0.5.0
+validate-email-address==1
+loguru==0.7.0
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.23

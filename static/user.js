@@ -1,11 +1,18 @@
-let submitButton = document.querySelector(".submit-button");
+let submitButton = document.querySelector("#submit-button");
 submitButton.onclick = function (event) {
   event.preventDefault();
   uploadAndShowFile();
 };
 function uploadAndShowFile() {
-  const fileInput = document.querySelector(".file-input");
+  const email = document.querySelector("#email").value;
+  const fileInput = document.querySelector("#file-input");
   const file = fileInput.files[0];
+  const layerHeight = document.querySelector("#layer-height").value;
+  const nozzleWidth = document.querySelector("#nozzle-width").value;
+  const infill = document.querySelector("#infill").value;
+  const supports = document.querySelector("#supports").value;
+  const pieces = document.querySelector("#pieces").value;
+  const note = document.querySelector("#note").value;
 
   if (!file) {
     console.error("No file selected.");
@@ -14,7 +21,14 @@ function uploadAndShowFile() {
   }
 
   const formData = new FormData();
+  formData.append("email", email);
   formData.append("file", file);
+  formData.append("layer height", layerHeight);
+  formData.append("nozzle width", nozzleWidth);
+  formData.append("infill", infill);
+  formData.append("supports", supports);
+  formData.append("pieces", pieces);
+  formData.append("note", note);
 
   fetch("/upload_model", {
     method: "POST",

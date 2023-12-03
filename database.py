@@ -1,22 +1,18 @@
-import os
 import psycopg2 as ps
 import sqlalchemy as db
 from sqlalchemy import Table, Column, String, MetaData, create_engine, text, insert
+from sqlalchemy.exc import SQLAlchemyError
 #from sqlalchemy.orm import sessionmaker
 from datetime import date
-import os
+import config.variables as variables
 
 #Constants
 #MAIL_ADDR_LEN = 40 #See --> https://stackoverflow.com/questions/1297272/how-long-should-sql-email-fields-be
 
 
-# Set environment variables
-os.environ["DB_USERNAME"] = "your_username"
-os.environ["DB_PASSWORD"] = "your_password"
-
 #DB_USERNAME & DB_PASSWORD exist as system environment variables
 # -TODO Likely will make the whole DB_URI its own env var eventually
-engine = db.create_engine(f'postgresql://{os.environ["DB_USERNAME"]}:{os.environ["DB_PASSWORD"]}@localhost:5432/parqe')
+engine = create_engine(f'postgresql://{variables.DB_USERNAME}:{variables.DB_PASSWORD}@localhost:5432/parqe')
 
 #################################
 # CURRENTLY NO ORM UTILIZIATION #
@@ -25,6 +21,14 @@ engine = db.create_engine(f'postgresql://{os.environ["DB_USERNAME"]}:{os.environ
 #conn = engine.connect()
 #metadata = db.MetaData()
 #metadata.reflect(bind=engine)
+
+def check_db_connect():
+    try:
+        engine.connect()
+        print("PostgreSQL Connection Established...")
+    except SQLAlchemyError as e:
+        print(f"PostgreSQL Connection Failed: [{e}]")
+        return 1
 
 # Create PARQE tables
 def create_tables():
@@ -37,25 +41,70 @@ def create_tables():
                             "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                             "email VARCHAR NOT NULL,"
                             "file_name VARCHAR NOT NULL,"
-                            "price NUMERIC(6,2) NOT NULL,"
                             "note VARCHAR,"
+                            "layer_height VARCHAR NOT NULL,"      
+                            "nozzle_width VARCHAR NOT NULL,"      
+                            "infill INTEGER NOT NULL,"            
+                            "supports VARCHAR NOT NULL,"          
+                            "pieces BOOLEAN NOT NULL,"            
+                            "price NUMERIC(6,2) NOT NULL,"
                             "date DATE DEFAULT CURRENT_DATE,"
                             "approved_by INTEGER REFERENCES staff(id) DEFAULT NULL)"))
+        
         conn.commit()
 
-def insert_order(email, file, price, note=None):
+def insert_order(email, file_name, price, note=None, layer_height=None, nozzle_width=None, infill=None, supports=None, pieces=None):
     with engine.connect() as conn:
-        conn.execute(text("INSERT INTO orders(email, file_name, price, note, date) "
-                          "VALUES (:email, :file, :price, :note, :date)"),
-                     {"email": email, "file": file, "price": price, "note": note, "date": date.today()})
+        conn.execute(text("INSERT INTO orders(email, file_name, note, layer_height, nozzle_width, infill, supports, pieces, price, date) "
+                          "VALUES (:email, :file_name, :note, :layer_height, :nozzle_width, :infill, :supports, :pieces, :price, :date)"),
+                     {"email": email, "file_name": file_name, "note": note, "layer_height": layer_height, 
+                      "nozzle_width": nozzle_width, "infill": infill, "supports": supports, "pieces": pieces, 
+                      "price": price, "date": date.today()})
 
         conn.commit()
+
+def get_orders():
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM orders ORDER BY date")).fetchall()
+        orders = []
+        for row in result:
+            row_as_dict = row._mapping
+            orders.append(dict(row_as_dict))
+
+        return orders
 
 def get_pending_orders():
     with engine.connect() as conn:
         result = conn.execute(text("SELECT * FROM orders WHERE approved_by IS NULL ORDER BY date")).fetchall()
-        orders = [dict(row) for row in result]
+        orders = []
+        for row in result:
+            row_as_dict = row._mapping
+            #if(row_as_dict.approved_by != None):
+                #continue
+            orders.append(dict(row_as_dict))
+
         return orders
+
+def delete_order(match):
+    with engine.connect() as conn: 
+        conn.execute(text("DELETE FROM orders WHERE id=:match"),
+                        {"match": match})
+        
+        conn.commit()
+
+def approve_order(match, email):
+    with engine.connect() as conn:
+        staff_id_result = conn.execute(text("SELECT id FROM staff WHERE email=:email"),
+                                    {"email": email})
+        staff_id_dict = []
+        for row in staff_id_result:
+            row_as_dict = row._mapping
+            staff_id_dict.append(dict(row_as_dict))
+        staff_id = staff_id_dict[0]['id']
+        conn.execute(text("UPDATE orders SET approved_by=:staff_id WHERE id=:match"),
+                            {"staff_id": staff_id, "match": match})
+        
+        conn.commit()
     
 def add_staff(email):
     with engine.connect() as conn:

@@ -1,3 +1,24 @@
+// toggles dark mode on an off in form
+const darkModeToggle = document.querySelector("input[name=dark-mode]");
+darkModeToggle.addEventListener("change", function () {
+  const modeIcon = document.querySelector(".mode-icon")
+  if (this.checked) {
+    console.log("dark mode active");
+    insertGoogleIcon(modeIcon, "dark_mode", "white");
+    darkMode(".order-form");
+  } else {
+    console.log("light mode active");
+    insertGoogleIcon(modeIcon, "light_mode", "black");
+    darkMode(".order-form");
+  }
+});
+
+// dark mode color scheme toggle
+function darkMode(selector) {
+  const element = document.querySelector(selector);
+  element.classList.toggle("dark-mode");
+}
+
 let submitButton = document.querySelector("#submit-button");
 submitButton.onclick = function (event) {
   event.preventDefault();
@@ -99,5 +120,6 @@ function showFileInfo(fileInput) {
 // inserts a google icon into an element. Input parameters for element, icon name, and desired color
 function insertGoogleIcon(element, iconName, color) {
   element.style.color = color;
-  element.innerHTML = '<span class="material-symbols-outlined">'+iconName+'</span>';
+  element.innerHTML =
+    '<span class="material-symbols-outlined">' + iconName + "</span>";
 }

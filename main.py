@@ -2,10 +2,9 @@ import os
 import subprocess
 from http import HTTPStatus
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from flask_session import Session
 import database
-import mail
-from uuid import uuid4
-from price import calc_price
+from util import get_price, send_email, gen_file_uuid, validate_data
 from loguru import logger  
 from functools import wraps
 import config.variables as variables
@@ -18,6 +17,9 @@ database.create_tables()
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.secret_key = variables.APP_SECRET_KEY
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
 oauth = OAuth(app)
 
@@ -84,78 +86,94 @@ def logout():
         )
     )
 
-ALLOWED_EXTENSIONS = {'stl', 'stp', 'step', '3mf'}
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def gen_file_name():
-    file_name = str(uuid4())
-
-    # Check if the file with the same name already exists
-    while os.path.exists(file_name):
-        file_name = str(uuid4())
-
-    return file_name
-
 # User uploads model and prefernces
 # Parse, store, and return the results to the user
 @app.route('/upload_model', methods=['POST'])
 def upload_model():
     try:
-        email = request.form['email']
-        file = request.files['file']
-        layerHeight = request.form['layer height']
-        nozzleWidth = request.form['nozzle width']
-        infill = request.form['infill']
-        supports = request.form['supports']
-        pieces = request.form['pieces']
-        note = request.form['note']
+        data = {
+            'email': request.form.get('email', None),
+            'file': request.files.get('file', None),
+            'layerHeight': request.form.get('layer height', None),
+            'nozzleWidth': request.form.get('nozzle width', None),
+            'infill': request.form.get('infill', None),
+            'supports': request.form.get('supports', None),
+            'pieces': request.form.get('pieces', None),
+            'note': request.form.get('note', None)
+        }
 
-        if not email:
-            logger.info(f"Error in upload_model route: {e}")
-            return jsonify({'error': 'Email is a required field'}), HTTPStatus.BAD_REQUEST
-        
-        # Send email to the user to verify its valid
-        if not mail.send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, email, "Welcome to EPL."):
-            return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
+        validation_result = validate_data(data)
+        if validation_result:
+            return jsonify({"error": "Validation failed", "errors": validation_result}), HTTPStatus.BAD_REQUEST
 
-        if not note or note == '':
-            note = None
-        if file == None:
-            return jsonify({'error': 'An stl, stp, step, or 3mf file is required'}), HTTPStatus.BAD_REQUEST
+        # Check if note is empty string
+        if data['note'] == '':
+            data['note'] = None
 
-        if not allowed_file(file.filename):
-            return jsonify({'error': 'Invalid file type'}), HTTPStatus.UNSUPPORTED_MEDIA_TYPE
-
-      # Save file with a unique name in the 'uploads' directory
-        _, ext = os.path.splitext(file.filename)
-        new_name = gen_file_name()
-        file_path = os.path.join('uploads', f'{new_name}{ext}')
-        gcode_output_path = os.path.join('uploads', f'{new_name}.gcode')
-        file.save(file_path)
+      # Save the model with a unique name in the uploads directory
+        _, ext = os.path.splitext(data['file'].filename)
+        uuid = gen_file_uuid()
+        model_path = f'uploads/{uuid}{ext}'
+        data['file'].save(model_path)
+        gcode_path = f'uploads/{uuid}.gcode'
 
         # Generate G-code
-        command = f'./prusa.AppImage --export-gcode {file_path}'
-        output = subprocess.getoutput(command)
-
+        #TODO: Apply default config file and user prefernces
+        command = f'./prusa.AppImage --export-gcode {model_path}'
+        prusa_output = subprocess.getoutput(command)
         # Remove the original file
-        os.remove(file_path)
+        os.remove(model_path)
 
-        # Store the order
-        price = calc_price(gcode_output_path)  # Assuming you have a price module
-        database.insert_order(email, gcode_output_path, price, note)
+         # Check if G-code was generated successfully
+        if not os.path.exists(gcode_path):
+            return jsonify({"error": f"Failed to generate G-code. Check your file."}), HTTPStatus.BAD_REQUEST
+        
+        # Grab Prusa suggestions
+        lines = prusa_output.split('\n')
+        suggestions = [line for line in lines if uuid not in line and '=>' not in line]
+        price = get_price(gcode_path)
+        
+        # Replace the original file with the path to the gcode
+        data['file'] = gcode_path
 
-        # Email the staff that a new order has been submitted
-        for staff_email in database.get_staff_emails():
-            mail.send_email(staff_email, "A new order is pending.")
+         # Store key-value pairs in the session
+        for key, value in data.items():
+            session[key] = value
 
-        response_data = {'message': 'File uploaded successfully', 'filename': file.filename}
+        # TODO: If supports are off, turn them on and fetch price
+        response_data = {'suggestions': suggestions, 'price': price}
         return jsonify(response_data), HTTPStatus.CREATED
     
     except Exception as e:
         logger.error(f"Error in upload_model route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
+
+app.route('/upload_model/publish', methods=['POST'])
+def upload_model():
+    supports = request.form.get('supports', None)
+    
+    validation_result = validate_data({'supports' : supports})
+    if validation_result:
+        return jsonify({"error": "Validation failed", "errors": validation_result}), HTTPStatus.BAD_REQUEST
+    
+    # TODO: set final decison on supports, update price if needed
+
+    # Send email to the user to verify its valid
+    if not send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, session['email'], "Welcome to EPL."):
+        # TODO: Clear session if email is invalid
+        return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
+
+    # Store the order
+    database.insert_order(session['email'], session['file_name'], session['layer_height'],
+        session['nozzle_width'], session['infill'], session['supports'],
+        session['pieces'], session['note'])
+
+    # Email the staff that a new order has been submitted
+    for staff_email in database.get_staff_emails():
+        send_email(staff_email, "A new order is pending.")
+
+    response_data = {'message': 'Order Made, please await an approval email.'}
+    return jsonify(response_data), HTTPStatus.CREATED
 
 @app.route('/staff/orders', methods=['GET'])
 def get_orders():

@@ -41,10 +41,16 @@ def create_tables():
                             "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                             "email VARCHAR NOT NULL,"
                             "file_name VARCHAR NOT NULL,"
-                            "price NUMERIC(6,2) NOT NULL,"
                             "note VARCHAR,"
+                            "layer_height VARCHAR NOT NULL,"      
+                            "nozzle_width VARCHAR NOT NULL,"      
+                            "infill INTEGER NOT NULL,"            
+                            "supports VARCHAR NOT NULL,"          
+                            "pieces BOOLEAN NOT NULL,"            
+                            "price NUMERIC(6,2) NOT NULL,"
                             "date DATE DEFAULT CURRENT_DATE,"
                             "approved_by INTEGER REFERENCES staff(id) DEFAULT NULL)"))
+        
         conn.commit()
 
 def insert_order(email, file, price, note=None):

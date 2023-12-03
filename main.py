@@ -51,7 +51,7 @@ def requires_auth(f):
 @app.route('/staff')
 @requires_auth
 def staff_home():
-     return render_template(
+    return render_template(
         "staff/index.html",
         session=session["user"]
     )
@@ -59,7 +59,6 @@ def staff_home():
 @app.route("/staff/callback", methods=["GET", "POST"])
 def callback():
     token = oauth.auth0.authorize_access_token()
-
     session["user"] = token
     return redirect("/staff")
 
@@ -176,19 +175,49 @@ def upload_model():
     return jsonify(response_data), HTTPStatus.CREATED
 
 @app.route('/staff/orders', methods=['GET'])
+@requires_auth
 def get_orders():
-    pending_orders = database.get_pending_orders()
+    """
+    Retrieve orders based on the specified type.
 
-    for order in pending_orders:
-        file_name = order['file_name']
+    Returns:
+        A JSON response containing the retrieved orders.
+    """
+    
+    order_type = request.args.get('type', 'all')
+
+    if order_type == 'all':
+        orders = database.get_orders()
+    elif order_type == 'pending':
+        orders = database.get_pending_orders()
+    else:
+        return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
+
+    # Remove file name from return data
+    for order in orders:
         del order['file_name']
-        file_path = os.path.join('/uploads', file_name)
-        if os.path.exists(file_path):
-            order['file'] = file_path
-        else:
-            order['file'] = None
 
-    return jsonify({'pending_orders': pending_orders}), HTTPStatus.OK
+    return jsonify({'orders': orders}), HTTPStatus.OK
+
+@app.route('/staff/return_orders', methods=['PUT'])
+@requires_auth
+def return_orders():
+    # TODO: Provide a reason for denial and update user on statusvia email
+    try:
+        id = request.form['id']
+        status = request.form['status']
+
+        email = session['user']['userinfo']['email']
+
+        if(status == 'denied'):
+            database.delete_order(id)
+        if(status == 'approved'):
+            database.approve_order(id, email)
+        return jsonify({'message': 'Update received'}), HTTPStatus.OK
+    
+    except Exception as e:
+        logger.error(f"Error in return_orders route: {e}")
+        return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

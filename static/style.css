@@ -188,6 +188,11 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
+.dark-mode-toggle {
+  width: 100px;
+  margin-left: auto;
+}
+
 .dark-mode { 
   background-color: rgb(23, 23, 23);
   color: white; 

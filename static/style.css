@@ -188,9 +188,10 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-.dark-mode-toggle {
+.dark-mode-toggle-container {
   width: 55px;
   margin-left: auto;
+  margin-bottom: 10px;
 }
 
 .dark-mode { 
@@ -200,7 +201,6 @@ input:checked + .slider:before {
 
 .mode-icon {
   display: inline-block;
-  margin-bottom: 10px;
 }
 /* end dark mode toggle code */
 

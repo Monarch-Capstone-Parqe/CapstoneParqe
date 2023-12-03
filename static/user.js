@@ -37,7 +37,7 @@ function uploadAndShowFile() {
 
   if (!file) {
     console.error("No file selected.");
-    displayUploadStatus("noFile");
+    window.alert("Please choose a file to upload");
     return;
   }
 
@@ -60,11 +60,21 @@ function uploadAndShowFile() {
       console.log(data);
       // Handle the response data as needed
       showFileInfo(fileInput);
-      displayUploadStatus("success");
+
+      // A sample string for demo purposes. Will be updated to reflect real order details after model has been sliced
+      const demoOrderDetails = "Print Cost: $2.36\nPress Ok to submit order for admin review, or Cancel to cancel";
+      // Alerts user of the total cost of print. Ok sends print for admin review, Cancel cancels the print job
+      if (confirm(demoOrderDetails)) {
+        window.alert("Your order was successfully sent for review\nPlease monitor your email for admin approval");
+        document.querySelector(".order-form").reset();
+      } else {
+        window.alert("Your order was cancelled");
+      }
     })
     .catch((error) => {
       console.error("Error:", error);
-      displayUploadStatus("failure");
+      // alerts the user of an error while uploading order
+      window.alert("There was a problem submitting your order\nPlease try again");
     });
 }
 

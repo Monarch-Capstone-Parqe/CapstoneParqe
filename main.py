@@ -186,6 +186,7 @@ def get_orders():
 @app.route('/staff/return_orders', methods=['PUT'])
 @requires_auth
 def return_orders():
+    # TODO: Provide a reason for denial and update user on statusvia email
     try:
         id = request.form['id']
         status = request.form['status']
@@ -193,10 +194,10 @@ def return_orders():
         email = session['user']['userinfo']['email']
 
         if(status == 'denied'):
-            database.remove_order(id)
+            database.delete_order(id)
         if(status == 'approved'):
-            database.update_approved(id, email)
-        return jsonify({'message': 'update received'}), HTTPStatus.OK
+            database.approve_order(id, email)
+        return jsonify({'message': 'Update received'}), HTTPStatus.OK
     
     except Exception as e:
         logger.error(f"Error in return_orders route: {e}")

@@ -77,14 +77,14 @@ def get_pending_orders():
 
         return orders
 
-def remove_order(match):
+def delete_order(match):
     with engine.connect() as conn: 
         conn.execute(text("DELETE FROM orders WHERE id=:match"),
                         {"match": match})
         
         conn.commit()
 
-def update_approved(match, email):
+def approve_order(match, email):
     with engine.connect() as conn:
         staff_id_result = conn.execute(text("SELECT id FROM staff WHERE email=:email"),
                                     {"email": email})

@@ -48,8 +48,7 @@ def requires_auth(f):
 
 @app.route('/staff')
 @requires_auth
-def staff_home():
-    database.add_staff(session['user']['userinfo']['email'])
+def staff_home(): 
     return render_template(
         "staff/index.html",
         session=session["user"]
@@ -58,8 +57,8 @@ def staff_home():
 @app.route("/staff/callback", methods=["GET", "POST"])
 def callback():
     token = oauth.auth0.authorize_access_token()
-
     session["user"] = token
+    database.add_staff(session['user']['userinfo']['email'])
     return redirect("/staff")
 
 @app.route("/staff/login")

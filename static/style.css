@@ -189,7 +189,7 @@ input:checked + .slider:before {
 }
 
 .dark-mode-toggle {
-  width: 100px;
+  width: 55px;
   margin-left: auto;
 }
 

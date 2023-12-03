@@ -158,26 +158,32 @@ def upload_model():
         logger.error(f"Error in upload_model route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
+
 @app.route('/staff/orders', methods=['GET'])
 @requires_auth
 def get_orders():
-    pending_orders = database.get_pending_orders()
+    """
+    Retrieve orders based on the specified type.
 
-    # for order in pending_orders:
-    #     file_name = order['file_name']
-    #     #del order['file_name']
-    #     file_path = os.path.join('/uploads', file_name)
-    #     #if os.path.exists(file_path):
-    #         #order.update({'file': file_path})
-    #     else:
-    #         order.update({'file': None})
+    Returns:
+        A JSON response containing the retrieved orders.
+    """
+    
+    order_type = request.args.get('type', 'all')
 
-    return jsonify({'pending_orders': pending_orders}), HTTPStatus.OK
+    if order_type == 'all':
+        orders = database.get_orders()
+    elif order_type == 'pending':
+        orders = database.get_pending_orders()
+    else:
+        return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 
-@app.route('/staff/orders/all', methods=['GET'])
-def get_all_orders():
-    orders = database.get_orders()
-    return jsonify({'pending_orders': orders}), HTTPStatus.OK
+    # Remove file name from return data
+    for order in orders:
+        del order['file_name']
+
+    return jsonify({'orders': orders}), HTTPStatus.OK
+
 
 @app.route('/staff/return_orders', methods=['PUT'])
 @requires_auth

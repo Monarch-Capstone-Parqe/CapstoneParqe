@@ -49,7 +49,6 @@ def requires_auth(f):
 @app.route('/staff')
 @requires_auth
 def staff_home():
-    database.add_staff(session['user']['userinfo']['email'])
     return render_template(
         "staff/index.html",
         session=session["user"]
@@ -183,7 +182,6 @@ def get_orders():
         del order['file_name']
 
     return jsonify({'orders': orders}), HTTPStatus.OK
-
 
 @app.route('/staff/return_orders', methods=['PUT'])
 @requires_auth

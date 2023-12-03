@@ -57,7 +57,6 @@ def staff_home():
 @app.route("/staff/callback", methods=["GET", "POST"])
 def callback():
     token = oauth.auth0.authorize_access_token()
-
     session["user"] = token
     return redirect("/staff")
 

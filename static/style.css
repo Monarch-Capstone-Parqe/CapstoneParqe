@@ -114,7 +114,7 @@ body {
   background-color: #0056b3;
 }
 
-.note {
+.order-form .form-group #note {
   width: 100%;
   height: 50px;
 }

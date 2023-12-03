@@ -77,24 +77,24 @@ function showFileInfo(fileInput) {
 }
 
 // notifies the user of web api of status of their file upload in the html form
-function displayUploadStatus(status) {
-  const statusMessageContainer = document.querySelector(".status-message-container");
-  statusMessageContainer.innerHTML = '';
-  document.querySelector(".upload-form").reset();
+// function displayUploadStatus(status) {
+//   const statusMessageContainer = document.querySelector(".status-message-container");
+//   statusMessageContainer.innerHTML = '';
+//   document.querySelector(".upload-form").reset();
 
-  if (status === "success") {
-    insertGoogleIcon(statusMessageContainer, "check", "lime");
-  } else if (status === "failure"){
-    insertGoogleIcon(statusMessageContainer, "close", "red");
-  } else {
-    insertGoogleIcon(statusMessageContainer, "question_mark", "yellow");
-  }
+//   if (status === "success") {
+//     insertGoogleIcon(statusMessageContainer, "check", "lime");
+//   } else if (status === "failure"){
+//     insertGoogleIcon(statusMessageContainer, "close", "red");
+//   } else {
+//     insertGoogleIcon(statusMessageContainer, "question_mark", "yellow");
+//   }
 
-  // status after a given amount of milliseconds
-  setTimeout(function() {
-    statusMessageContainer.innerHTML = '';
-  }, 2000);
-}
+//   // status after a given amount of milliseconds
+//   setTimeout(function() {
+//     statusMessageContainer.innerHTML = '';
+//   }, 2000);
+// }
 
 // inserts a google icon into an element. Input parameters for element, icon name, and desired color
 function insertGoogleIcon(element, iconName, color) {

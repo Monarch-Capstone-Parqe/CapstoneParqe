@@ -53,11 +53,13 @@ def create_tables():
         
         conn.commit()
 
-def insert_order(email, file, price, note=None):
+def insert_order(email, file_name, price, note=None, layer_height=None, nozzle_width=None, infill=None, supports=None, pieces=None):
     with engine.connect() as conn:
-        conn.execute(text("INSERT INTO orders(email, file_name, price, note, date) "
-                          "VALUES (:email, :file, :price, :note, :date)"),
-                     {"email": email, "file": file, "price": price, "note": note, "date": date.today()})
+        conn.execute(text("INSERT INTO orders(email, file_name, note, layer_height, nozzle_width, infill, supports, pieces, price, date) "
+                          "VALUES (:email, :file_name, :note, :layer_height, :nozzle_width, :infill, :supports, :pieces, :price, :date)"),
+                     {"email": email, "file_name": file_name, "note": note, "layer_height": layer_height, 
+                      "nozzle_width": nozzle_width, "infill": infill, "supports": supports, "pieces": pieces, 
+                      "price": price, "date": date.today()})
 
         conn.commit()
 

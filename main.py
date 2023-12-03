@@ -136,8 +136,11 @@ def upload_model():
         # Replace the original file with the path to the gcode
         data['file'] = gcode_path
 
-        session['data'] = data
+         # Store key-value pairs in the session
+        for key, value in data.items():
+            session[key] = value
 
+        # TODO: If supports are off, turn them on and fetch price
         response_data = {'suggestions': suggestions, 'price': price}
         return jsonify(response_data), HTTPStatus.CREATED
     
@@ -147,26 +150,29 @@ def upload_model():
 
 app.route('/upload_model/publish', methods=['POST'])
 def upload_model():
-    revised_data = {
-            'supports': request.form.get('supports', None)
-    }
+    supports = request.form.get('supports', None)
     
-    validation_result = validate_data(revised_data)
+    validation_result = validate_data({'supports' : supports})
     if validation_result:
         return jsonify({"error": "Validation failed", "errors": validation_result}), HTTPStatus.BAD_REQUEST
     
+    # TODO: set final decison on supports, update price if needed
+
     # Send email to the user to verify its valid
-    if not send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, data['email'], "Welcome to EPL."):
+    if not send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, session['email'], "Welcome to EPL."):
+        # TODO: Clear session if email is invalid
         return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
 
     # Store the order
-    database.insert_order(data['email'], gcode_path, price, data['note'])
+    database.insert_order(session['email'], session['file_name'], session['layer_height'],
+        session['nozzle_width'], session['infill'], session['supports'],
+        session['pieces'], session['note'])
 
     # Email the staff that a new order has been submitted
     for staff_email in database.get_staff_emails():
         send_email(staff_email, "A new order is pending.")
 
-    response_data = {'message': 'File uploaded successfully', 'filename': file.filename}
+    response_data = {'message': 'Order Made, please await an approval email.'}
     return jsonify(response_data), HTTPStatus.CREATED
 
 @app.route('/staff/orders', methods=['GET'])

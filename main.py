@@ -198,7 +198,6 @@ def return_orders():
         logger.error(f"Error in return_orders route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
-
 @app.route('/staff/all', methods=['GET'])
 def return_staff():
     staff = database.get_staff_emails()

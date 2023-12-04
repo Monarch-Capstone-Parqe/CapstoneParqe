@@ -75,7 +75,7 @@ function uploadAndShowFile() {
 
 // Displays print cost to user upon form submission, requires approval or cancel before being sent for review
 function openReviewModal(cost) {
-  const priceModal = document.querySelector(".modal-background");
+  const priceModal = document.querySelector(".review-order-modal");
   const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
   const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
 
@@ -87,14 +87,27 @@ function openReviewModal(cost) {
     priceModal.style.display = "none";
 
     // TODO make a new custom modal for following alert
-    window.alert("Your order was successfully sent for review\nPlease monitor your email for admin approval");
+    // window.alert("Your order was successfully sent for review\nPlease monitor your email for admin approval");
+    openOrderSuccessModal();
   }
 
   reviewModalCancelButton.onclick = function() {
     priceModal.style.display = "none";
-    
+
     // TODO make a new custom modal for following alert
     window.alert("Your order was cancelled");
+  }
+}
+
+// Displays print cost to user upon form submission, requires approval or cancel before being sent for review
+function openOrderSuccessModal() {
+  const successModal = document.querySelector(".order-success-modal");
+  const orderSuccessOkButton = document.querySelector("#order-success-ok-button");
+
+  successModal.style.display = "block";
+
+  orderSuccessOkButton.onclick = function() {
+    successModal.style.display = "none";
   }
 }
 

@@ -205,9 +205,9 @@ input:checked + .slider:before {
 }
 /************** end dark mode toggle **************/
 
-/************** general custom modal code **************/
+/************** review order modal code **************/
 
-.modal-background {
+.review-order-modal {
   display: none;
   position: fixed;
   z-index: 1;
@@ -220,7 +220,7 @@ input:checked + .slider:before {
   background-color: rgba(0,0,0,0.4);
 }
 
-.modal-content {
+.review-order-modal-content {
   background-color: #fefefe;
   margin: 15% auto;
   padding: 20px;
@@ -228,14 +228,11 @@ input:checked + .slider:before {
   width: 500px;
 }
 
-.modal-content .button-container {
+.review-order-modal-content .button-container {
   text-align: center;
 }
-/************** end general custom modal code **************/
 
-/************** review modal code **************/
-
-.modal-content .review-modal-button {
+.review-order-modal-content .review-modal-button {
   display: inline-block;
   color: white;
   text-shadow: 1px 1px 2px rgb(0, 0, 0);
@@ -247,14 +244,58 @@ input:checked + .slider:before {
   width: 100px;
 }
 
-.modal-content button[id="review-modal-approve-button"] {
+.review-order-modal-content button[id="review-modal-approve-button"] {
   background-color: #0b8109;
   margin-right: 2px;
 }
 
-.modal-content button[id="review-modal-cancel-button"] {
+.review-order-modal-content button[id="review-modal-cancel-button"] {
   background-color: #a10e0e;
   margin-left: 2px;
+}
+/************** end review order modal code **************/
+
+/************** order success modal code **************/
+
+.order-success-modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+}
+
+.order-success-modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 500px;
+}
+
+.order-success-modal-content .button-container {
+  text-align: center;
+}
+
+.order-success-modal-content .order-success-modal-button {
+  display: inline-block;
+  color: white;
+  text-shadow: 1px 1px 2px rgb(0, 0, 0);
+  margin-left: auto;
+  margin-right: auto;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100px;
+}
+
+.order-success-modal-content button[id="order-success-ok-button"] {
+  background-color: #0056b3;
 }
 /************** end review modal code **************/
 

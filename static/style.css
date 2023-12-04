@@ -128,6 +128,8 @@ body {
   text-shadow: 1px 1px 2px rgb(0, 0, 0);
 }
 
+/************** dark mode toggle code **************/
+
 /* box around the slider */
 .switch {
   position: relative;
@@ -201,9 +203,9 @@ input:checked + .slider:before {
 .mode-icon {
   display: inline-block;
 }
-/* end dark mode toggle code */
+/************** end dark mode toggle **************/
 
-/************** custom review modal code **************/
+/************** general custom modal code **************/
 
 .modal-background {
   display: none;
@@ -229,6 +231,9 @@ input:checked + .slider:before {
 .modal-content .button-container {
   text-align: center;
 }
+/************** end general custom modal code **************/
+
+/************** review modal code **************/
 
 .modal-content .review-modal-button {
   display: inline-block;
@@ -251,7 +256,8 @@ input:checked + .slider:before {
   background-color: #a10e0e;
   margin-left: 2px;
 }
-/************** end custom modal code **************/
+/************** end review modal code **************/
+
 
 /* Staff API Section */
 #jobs-box {

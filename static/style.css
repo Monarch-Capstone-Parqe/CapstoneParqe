@@ -218,7 +218,7 @@ input:checked + .slider:before {
   background-color: rgba(0,0,0,0.4);
 }
 
-.review-modal-content {
+.modal-content {
   background-color: #fefefe;
   margin: 15% auto;
   padding: 20px;
@@ -226,11 +226,11 @@ input:checked + .slider:before {
   width: 500px;
 }
 
-.review-modal-content .button-container {
+.modal-content .button-container {
   text-align: center;
 }
 
-.review-modal-content button {
+.modal-content .review-modal-button {
   display: inline-block;
   color: white;
   text-shadow: 1px 1px 2px rgb(0, 0, 0);
@@ -242,12 +242,12 @@ input:checked + .slider:before {
   width: 100px;
 }
 
-.review-modal-content button[id="review-modal-approve-button"] {
+.modal-content button[id="review-modal-approve-button"] {
   background-color: #0b8109;
   margin-right: 2px;
 }
 
-.review-modal-content button[id="review-modal-cancel-button"] {
+.modal-content button[id="review-modal-cancel-button"] {
   background-color: #a10e0e;
   margin-left: 2px;
 }

@@ -51,7 +51,6 @@ def requires_auth(f):
 @app.route('/staff')
 @requires_auth
 def staff_home():
-    database.add_staff('mmahnke@pdx.edu')
     return render_template(
         "staff/index.html",
         session=session["user"]

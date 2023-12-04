@@ -61,21 +61,41 @@ function uploadAndShowFile() {
       // Handle the response data as needed
       showFileInfo(fileInput);
 
-      // A sample string for demo purposes. Will be updated to reflect real order details after model has been sliced
-      const demoOrderDetails = "Print Cost: $2.36\nPress Ok to submit order for admin review, or Cancel to cancel";
-      // Alerts user of the total cost of print. Ok sends print for admin review, Cancel cancels the print job
-      if (confirm(demoOrderDetails)) {
-        window.alert("Your order was successfully sent for review\nPlease monitor your email for admin approval");
-        document.querySelector(".order-form").reset();
-      } else {
-        window.alert("Your order was cancelled");
-      }
+      // Demo price to test modal. Send actual cost from gcode parse
+      let printPrice = "2.34";
+      openReviewModal(printPrice);
     })
     .catch((error) => {
       console.error("Error:", error);
+
       // alerts the user of an error while uploading order
       window.alert("There was a problem submitting your order\nPlease try again");
     });
+}
+
+// Displays print cost to user upon form submission, requires approval or cancel before being sent for review
+function openReviewModal(cost) {
+  const priceModal = document.querySelector(".modal-background");
+  const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
+  const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
+
+  let priceString = document.querySelector(".print-cost");
+  priceString.innerHTML += cost;
+  priceModal.style.display = "block";
+
+  reviewModalApproveButton.onclick = function() {
+    priceModal.style.display = "none";
+
+    // TODO make a new custom modal for following alert
+    window.alert("Your order was successfully sent for review\nPlease monitor your email for admin approval");
+  }
+
+  reviewModalCancelButton.onclick = function() {
+    priceModal.style.display = "none";
+    
+    // TODO make a new custom modal for following alert
+    window.alert("Your order was cancelled");
+  }
 }
 
 // downloads the inputted file into user local directory
@@ -106,26 +126,6 @@ function showFileInfo(fileInput) {
     console.log("No File Selected");
   }
 }
-
-// notifies the user of web api of status of their file upload in the html form
-// function displayUploadStatus(status) {
-//   const statusMessageContainer = document.querySelector(".status-message-container");
-//   statusMessageContainer.innerHTML = '';
-//   document.querySelector(".upload-form").reset();
-
-//   if (status === "success") {
-//     insertGoogleIcon(statusMessageContainer, "check", "lime");
-//   } else if (status === "failure"){
-//     insertGoogleIcon(statusMessageContainer, "close", "red");
-//   } else {
-//     insertGoogleIcon(statusMessageContainer, "question_mark", "yellow");
-//   }
-
-//   // status after a given amount of milliseconds
-//   setTimeout(function() {
-//     statusMessageContainer.innerHTML = '';
-//   }, 2000);
-// }
 
 // inserts a google icon into an element. Input parameters for element, icon name, and desired color
 function insertGoogleIcon(element, iconName, color) {

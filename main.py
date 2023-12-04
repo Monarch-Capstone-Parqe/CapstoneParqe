@@ -51,6 +51,7 @@ def requires_auth(f):
 @app.route('/staff')
 @requires_auth
 def staff_home():
+    database.add_staff('mmahnke@pdx.edu')
     return render_template(
         "staff/index.html",
         session=session["user"]
@@ -131,6 +132,10 @@ def upload_model():
         lines = prusa_output.split('\n')
         suggestions = [line for line in lines if uuid not in line and '=>' not in line]
         price = get_price(gcode_path)
+        if(data['pieces'] == 'single'):
+            data['pieces'] = False
+        else:
+            data['pieces'] = True
         
         # Replace the original file with the path to the gcode
         data['file'] = gcode_path
@@ -138,6 +143,11 @@ def upload_model():
          # Store key-value pairs in the session
         for key, value in data.items():
             session[key] = value
+
+        #Temporary bypass for prototype to add an order to the database without user confirmation as that feature doesn't exist yet
+        database.insert_order(session['email'], session['file'], price, session['note'], session['layerHeight'],
+        session['nozzleWidth'], session['infill'], session['supports'],
+        session['pieces'])
 
         # TODO: If supports are off, turn them on and fetch price
         response_data = {'suggestions': suggestions, 'price': price}

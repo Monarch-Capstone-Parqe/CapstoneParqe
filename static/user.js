@@ -37,7 +37,7 @@ function uploadAndShowFile() {
 
   if (!file) {
     console.error("No file selected.");
-    displayUploadStatus("noFile");
+    //displayUploadStatus("noFile");
     return;
   }
 
@@ -60,11 +60,11 @@ function uploadAndShowFile() {
       console.log(data);
       // Handle the response data as needed
       showFileInfo(fileInput);
-      displayUploadStatus("success");
+   //   displayUploadStatus("success");
     })
     .catch((error) => {
       console.error("Error:", error);
-      displayUploadStatus("failure");
+    //  displayUploadStatus("failure");
     });
 }
 

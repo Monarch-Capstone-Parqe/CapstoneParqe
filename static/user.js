@@ -80,22 +80,19 @@ function openReviewModal(cost) {
   const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
 
   let priceString = document.querySelector(".print-cost");
-  priceString.innerHTML += cost;
+  priceString.innerHTML = "Print Cost: " + cost;
   priceModal.style.display = "block";
 
   reviewModalApproveButton.onclick = function() {
+    // close (hide) review modal
     priceModal.style.display = "none";
-
-    // TODO make a new custom modal for following alert
-    // window.alert("Your order was successfully sent for review\nPlease monitor your email for admin approval");
     openOrderSuccessModal();
   }
 
   reviewModalCancelButton.onclick = function() {
+    // close (hide) review modal
     priceModal.style.display = "none";
-
-    // TODO make a new custom modal for following alert
-    window.alert("Your order was cancelled");
+    openCancelOrderModal();
   }
 }
 
@@ -107,7 +104,21 @@ function openOrderSuccessModal() {
   successModal.style.display = "block";
 
   orderSuccessOkButton.onclick = function() {
+    // close (hide) order success modal
     successModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user that there order was cancelled
+function openCancelOrderModal() {
+  const cancelOrderModal = document.querySelector(".order-cancel-modal");
+  const orderCancelOkButton = document.querySelector("#order-cancel-ok-button");
+
+  cancelOrderModal.style.display = "block";
+
+  orderCancelOkButton.onclick = function() {
+    // close (hide) cancel order modal
+    cancelOrderModal.style.display = "none";
   }
 }
 

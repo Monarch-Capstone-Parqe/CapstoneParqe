@@ -99,7 +99,7 @@ function openReviewModal(cost) {
   }
 }
 
-// Displays print cost to user upon form submission, requires approval or cancel before being sent for review
+// Displays a message to the user that there print was successful uploaded for review and informs next steps
 function openOrderSuccessModal() {
   const successModal = document.querySelector(".order-success-modal");
   const orderSuccessOkButton = document.querySelector("#order-success-ok-button");

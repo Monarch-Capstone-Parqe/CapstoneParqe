@@ -37,7 +37,7 @@ function uploadAndShowFile() {
 
   if (!file) {
     console.error("No file selected.");
-    window.alert("Please choose a file to upload");
+    noFileSelectedModal();
     return;
   }
 
@@ -98,8 +98,13 @@ function openReviewModal(cost) {
 
 // Displays a message to the user that there print was successful uploaded for review and informs next steps
 function openOrderSuccessModal() {
-  const successModal = document.querySelector(".order-success-modal");
-  const orderSuccessOkButton = document.querySelector("#order-success-ok-button");
+  const successModal = document.querySelector(".multi-purpose-modal");
+  const orderSuccessOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = 'Your order was successfully sent for review';
+  lineTwo.innerHTML = 'Please monitor your email for admin approval';
 
   successModal.style.display = "block";
 
@@ -111,14 +116,37 @@ function openOrderSuccessModal() {
 
 // Displays a message to the user that there order was cancelled
 function openCancelOrderModal() {
-  const cancelOrderModal = document.querySelector(".order-cancel-modal");
-  const orderCancelOkButton = document.querySelector("#order-cancel-ok-button");
+  const cancelOrderModal = document.querySelector(".multi-purpose-modal");
+  const orderCancelOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = 'Your order was cancelled';
+  lineTwo.innerHTML = '';
 
   cancelOrderModal.style.display = "block";
 
   orderCancelOkButton.onclick = function() {
     // close (hide) cancel order modal
     cancelOrderModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user that no file was selected for upload
+function noFileSelectedModal() {
+  const noFileModal = document.querySelector(".multi-purpose-modal");
+  const noFileOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = 'No file selected';
+  lineTwo.innerHTML = 'Please select a file to upload';
+
+  noFileModal.style.display = "block";
+
+  noFileOkButton.onclick = function() {
+    // close (hide) no file modal
+    noFileModal.style.display = "none";
   }
 }
 

@@ -204,7 +204,7 @@ function openSubmissionErrorModal() {
   submissionErrorModal.style.display = "block";
 
   submissionErrorOkButton.onclick = function() {
-    // close (hide) cancel order modal
+    // close (hide) submission error modal
     submissionErrorModal.style.display = "none";
   }
 }

@@ -70,7 +70,7 @@ function uploadAndShowFile() {
       if (supportsRecommened) {
         openSupportRecommendedModal(originalPrice, supportsPrice);
       } else {
-        openReviewModal(printPrice);
+        openReviewModal(originalPrice);
       }
     })
     .catch((error) => {

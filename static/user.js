@@ -77,7 +77,7 @@ function uploadAndShowFile() {
       console.error("Error:", error);
 
       // alerts the user of an error while uploading order
-      window.alert("There was a problem submitting your order\nPlease try again");
+      openSubmissionErrorModal();
     });
 }
 
@@ -111,8 +111,8 @@ function openOrderSuccessModal() {
   const lineOne = document.querySelector('#line1');
   const lineTwo = document.querySelector('#line2');
 
-  lineOne.innerHTML = 'Your order was successfully sent for review';
-  lineTwo.innerHTML = 'Please monitor your email for admin approval';
+  lineOne.innerHTML = "Your order was successfully sent for review";
+  lineTwo.innerHTML = "Please monitor your email for admin approval";
 
   successModal.style.display = "block";
 
@@ -129,8 +129,8 @@ function openCancelOrderModal() {
   const lineOne = document.querySelector('#line1');
   const lineTwo = document.querySelector('#line2');
 
-  lineOne.innerHTML = 'Your order was cancelled';
-  lineTwo.innerHTML = '';
+  lineOne.innerHTML = "Your order was cancelled";
+  lineTwo.innerHTML = "";
 
   cancelOrderModal.style.display = "block";
 
@@ -180,14 +180,32 @@ function openNoFileSelectedModal() {
   const lineOne = document.querySelector('#line1');
   const lineTwo = document.querySelector('#line2');
 
-  lineOne.innerHTML = 'No file selected';
-  lineTwo.innerHTML = 'Please select a file to upload';
+  lineOne.innerHTML = "No file selected";
+  lineTwo.innerHTML = "Please select a file to upload";
 
   noFileModal.style.display = "block";
 
   noFileOkButton.onclick = function() {
     // close (hide) no file modal
     noFileModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user if there is an issue with submission
+function openSubmissionErrorModal() {
+  const submissionErrorModal = document.querySelector(".multi-purpose-modal");
+  const submissionErrorOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "There was a problem submitting your order";
+  lineTwo.innerHTML = "Please try again";
+
+  submissionErrorModal.style.display = "block";
+
+  submissionErrorOkButton.onclick = function() {
+    // close (hide) cancel order modal
+    submissionErrorModal.style.display = "none";
   }
 }
 

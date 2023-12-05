@@ -37,7 +37,7 @@ function uploadAndShowFile() {
 
   if (!file) {
     console.error("No file selected.");
-    noFileSelectedModal();
+    openNoFileSelectedModal();
     return;
   }
 
@@ -61,9 +61,17 @@ function uploadAndShowFile() {
       // Handle the response data as needed
       showFileInfo(fileInput);
 
-      // Demo price to test modal. Send actual cost from gcode parse
-      let printPrice = "2.34";
-      openReviewModal(printPrice);
+
+      // Demo variables to test modal. Parse g code and send actual values
+      let originalPrice = "2.34"; // the cost as configured
+      let supportsPrice = "3.85"; // cost if prusa recommends adding supports
+      let supportsRecommened = true; // flag to catch descripenscy
+
+      if (supportsRecommened) {
+        openSupportRecommendedModal(originalPrice, supportsPrice);
+      } else {
+        openReviewModal(printPrice);
+      }
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -80,7 +88,7 @@ function openReviewModal(cost) {
   const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
 
   let priceString = document.querySelector(".print-cost");
-  priceString.innerHTML = "Print Cost: " + cost;
+  priceString.innerHTML = "Print Cost: $" + cost;
   priceModal.style.display = "block";
 
   reviewModalApproveButton.onclick = function() {
@@ -132,8 +140,41 @@ function openCancelOrderModal() {
   }
 }
 
+// Displays a message to the user when prusaslicer recommends supports and allows them to chose to add
+function openSupportRecommendedModal(costOriginal, costSupport) {
+  const supportRecommendedModal = document.querySelector(".support-recommended-modal");
+  const addSupportButton = document.querySelector("#support-recommended-support-button");
+  const noSupportButton = document.querySelector("#support-recommended-no-support-button");
+  const cancelButton = document.querySelector("#support-recommended-cancel-button");
+
+  const costSupportString = document.querySelector("#support-modal-string");
+  const costNoSupportString = document.querySelector("#no-support-modal-string");
+  costSupportString.innerHTML = "Cost with added supports: $" + costSupport + " (recommended!)";
+  costNoSupportString.innerHTML = "Cost without supports: $" + costOriginal;
+  
+  supportRecommendedModal.style.display = "block";
+
+  addSupportButton.onclick = function() {
+    // close (hide) modal
+    supportRecommendedModal.style.display = "none";
+    openReviewModal(costSupport);
+  }
+
+  noSupportButton.onclick = function() {
+    // close (hide) modal
+    supportRecommendedModal.style.display = "none";
+    openReviewModal(costOriginal);
+  }
+
+  cancelButton.onclick = function() {
+    // close (hide) modal
+    supportRecommendedModal.style.display = "none";
+    openCancelOrderModal();
+  }
+}
+
 // Displays a message to the user that no file was selected for upload
-function noFileSelectedModal() {
+function openNoFileSelectedModal() {
   const noFileModal = document.querySelector(".multi-purpose-modal");
   const noFileOkButton = document.querySelector("#multi-purpose-ok-button");
   const lineOne = document.querySelector('#line1');

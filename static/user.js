@@ -1,8 +1,23 @@
-// toggles dark mode on an off in form
-const darkModeToggle = document.querySelector("input[name=dark-mode]");
-darkModeToggle.addEventListener("change", function () {
-  const modeIcon = document.querySelector(".mode-icon")
-  if (this.checked) {
+// toggles dark/light mode (switch)
+// const darkModeToggle = document.querySelector("input[name=dark-mode]");
+// darkModeToggle.addEventListener("change", function () {
+//   const modeIcon = document.querySelector(".mode-icon")
+//   if (this.checked) {
+//     console.log("dark mode active");
+//     insertGoogleIcon(modeIcon, "dark_mode", "white");
+//     darkMode(".order-form");
+//   } else {
+//     console.log("light mode active");
+//     insertGoogleIcon(modeIcon, "light_mode", "black");
+//     darkMode(".order-form");
+//   }
+// });
+
+// toggles dark/light mode (no switch)
+const darkModeToggle = document.querySelector("button[id=dark-mode-toggle]");
+darkModeToggle.onclick = function () {
+  const modeIcon = document.querySelector("#dark-mode-toggle");
+  if (modeIcon.innerHTML.includes("light_mode")) {
     console.log("dark mode active");
     insertGoogleIcon(modeIcon, "dark_mode", "white");
     darkMode(".order-form");
@@ -11,7 +26,7 @@ darkModeToggle.addEventListener("change", function () {
     insertGoogleIcon(modeIcon, "light_mode", "black");
     darkMode(".order-form");
   }
-});
+};
 
 // dark mode color scheme toggle
 function darkMode(selector) {
@@ -119,6 +134,9 @@ function openOrderSuccessModal() {
   orderSuccessOkButton.onclick = function() {
     // close (hide) order success modal
     successModal.style.display = "none";
+
+    // reset the form
+    document.querySelector(".order-form").reset()
   }
 }
 

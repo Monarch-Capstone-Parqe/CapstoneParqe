@@ -22,7 +22,7 @@
  
   <form class="order-form">
       <!-- dark mode switch -->
-      <div class="dark-mode-toggle">
+      <!-- <div class="dark-mode-toggle-container">
         <div class="mode-icon">
           <span class="material-symbols-outlined">
             light_mode
@@ -32,7 +32,20 @@
           <input type="checkbox" name="dark-mode">
           <span class="slider round"></span>
         </label>
+      </div> -->
+
+      <div class="dark-mode-toggle-container">
+        <div class="mode-icon">
+          <button id="dark-mode-toggle">
+            <span class="material-symbols-outlined">light_mode</span>
+          </button>
+        </div>
+        <!-- <label class="switch">
+          <input type="checkbox" name="dark-mode">
+          <span class="slider round"></span>
+        </label> -->
       </div>
+
       <div class="form-group">
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" />
@@ -104,6 +117,45 @@
       <input type="submit" id="submit-button" value="Submit" />
     </div>
   </form>
+
+  <!-- Review Order Modal -->
+  <div class="review-order-modal">
+    <div class="review-order-modal-content">
+      <p class="print-cost"></p>
+      <p>Press Approve to submit order for admin review, or Cancel to cancel</p>
+      <div class="modal-button-container">
+        <button class="review-modal-button" id="review-modal-approve-button">Approve</button>
+        <button class="review-modal-button" id="review-modal-cancel-button">Cancel</button>
+    </div>
+    </div>
+  </div>
+
+  <!-- Multi-Purpose Modal -->
+  <div class="multi-purpose-modal">
+    <div class="multi-purpose-modal-content">
+      <p id="line1"></p>
+      <p id="line2"></p>
+      <div class="modal-button-container">
+        <button class="multi-purpose-modal-button" id="multi-purpose-ok-button">Ok</button>
+    </div>
+    </div>
+  </div>
+
+  <!-- Support Recommended Modal -->
+  <div class="support-recommended-modal">
+    <div class="support-recommended-modal-content">
+      <p>PrusaSlicer recommends this model prints with supports active!</p>
+      <p>Failure to add supports may cause issues with your print!</p>
+      <p id="support-modal-string"></p>
+      <p id="no-support-modal-string"></p>
+      <div class="modal-button-container">
+        <button class="support-recommended-button" id="support-recommended-support-button">Add Supports</button>
+        <button class="support-recommended-button" id="support-recommended-no-support-button">No Supports</button>
+        <button class="support-recommended-button" id="support-recommended-cancel-button">Cancel</button>
+    </div>
+    </div>
+  </div>
+
 </main>
 
 {% endblock %}

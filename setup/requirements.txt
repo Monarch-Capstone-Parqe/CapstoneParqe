@@ -4,3 +4,6 @@ validate-email-address==1
 loguru==0.7.0
 psycopg2-binary==2.9.9
 sqlalchemy==2.0.23
+python-dotenv==1.0.0
+authlib==1.2.1
+requests==2.31.0

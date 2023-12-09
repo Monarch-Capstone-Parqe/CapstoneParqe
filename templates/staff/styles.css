@@ -1,0 +1,16 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0; /* Optional: Set a background color */
+}
+
+#login-container {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}

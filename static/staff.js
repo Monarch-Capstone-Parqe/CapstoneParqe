@@ -1,6 +1,3 @@
-
-//todo create job objects
-//
 function approve(id)
 {
 //update status of job
@@ -44,13 +41,13 @@ function refreshJobs()
 //populate sections with new data, connected to objects
 //remove jobs that have been updated already
     console.log("refresh")
-    fetch("/staff/orders", {
+    fetch("/staff/orders?type=pending", {
         method: "GET",
     })
     .then((response) => response.json())
     .then((data) => {
         console.log(data)
-        for(const order of data.pending_orders) {
+        for(const order of data.orders) {
             renderJob(order)
         }
     })
@@ -79,7 +76,14 @@ function renderJob(order)
 
     let job = document.createElement('p');
     job.class = 'data-formatting';
-    job.textContent = "Email: " + order.email + ", Price: " + order.price + ", File Name: " + order.file_name;
+    job.textContent = "Email: " + order.email + 
+                        ", Price: " + order.price + 
+                        ", Layer Height: " + order.layer_height + 
+                        ", Nozzle Width: " + order.nozzle_width +
+                        ", Infill: " + order.infill +
+                        ", Supports: " + order.supports +
+                        ", Pieces: " + order.pieces + 
+                        ", Note: " + order.note;
 
     let approveButton = document.createElement('button');
     approveButton.classList.add('approve-button');

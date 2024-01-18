@@ -1,16 +1,10 @@
+  import * as GCodePreview from 'gcode-preview';
 
-import * as GCodePreview from './node_modules/gcode-preview/dist/gcode-preview.js';
-  
-  const preview = window.preview(new GCodePreview.init(
-  {
-      canvas: document.querySelector('canvas'),
-      extrusionColor: 'hotpink'
-  }
-  ));
+
   
   // draw a diagonal line
-  const gcode = 'G0 X0 Y0 Z0.2\nG1 X42 Y42 E10';
-  preview.processGCode(gcode);
+ 
+
 //todo create job objects
 //
 function approve(name)
@@ -40,7 +34,7 @@ console.log("refresh")
 
 //Function to create job sections with input variables
 //Variables will be received from database
-function renderJob(name, cost, etc)
+function renderJob(name, cost, etc, gcode)
 {
     let jobsBox = document.getElementById('jobs-box');
     if(jobsBox.childElementCount == 2) {
@@ -69,12 +63,22 @@ function renderJob(name, cost, etc)
         deny(name)
     });
     denyButton.textContent = 'Deny Job';
+    
+    let gcodePrev = document.createElement('canvas');
+    gcodePrev.classList.add('canvas');
+    gcodePrev.id = "canvas"
 
     dataBox.appendChild(job);
     dataBox.appendChild(approveButton);
     dataBox.appendChild(denyButton);
-    dataBox.appendChild(preview);
+    dataBox.appendChild(gcodePrev);
     jobsBox.appendChild(dataBox);
+
+    const preview = GCodePreview.init({
+      canvas: gcodePrev,
+      extrusionColor: 'hotpink'
+    });
+    preview.processGCode(gcode);
 
 
 }
@@ -91,5 +95,5 @@ function removeJob(name) {
     }
 }
 
-renderJob("Bruh", "$0.34", "etc etc..");
-renderJob("Matt", "$0.34", "etc etc..");
+renderJob("Bruh", "$0.34", "etc etc..","G0 X0 Y0 Z0.2\nG1 X42 Y42 E10");
+renderJob("Matt", "$0.34", "etc etc..","G0 X0 Y0 Z0.2\nG1 X42 Y92 E10\nG0 X0 Y0 Z0.2\nG1 X42 Y42 E10");

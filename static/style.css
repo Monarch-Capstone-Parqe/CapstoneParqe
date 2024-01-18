@@ -195,10 +195,24 @@ input:checked + .slider:before {
   margin-bottom: 10px;
 }
 
-.dark-mode { 
+.dark-mode-form { 
   background-color: rgb(23, 23, 23);
   color: white; 
 } 
+
+.dark-mode-body { 
+  background-color: rgb(47, 47, 47);
+  color: white; 
+}
+
+.dark-mode-header-box {
+  background-color: rgb(82, 106, 27);
+}
+
+.dark-mode-header-text {
+  color: rgb(23, 23, 23);
+  text-shadow: none;
+}
 
 .mode-icon {
   display: inline-block;

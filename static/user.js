@@ -21,17 +21,31 @@ darkModeToggle.onclick = function () {
     console.log("dark mode active");
     insertGoogleIcon(modeIcon, "dark_mode", "white");
     darkMode(".order-form");
+    darkMode("body");
+    darkMode(".header-box");
+    darkMode(".header-text");
   } else {
     console.log("light mode active");
     insertGoogleIcon(modeIcon, "light_mode", "black");
     darkMode(".order-form");
+    darkMode("body");
+    darkMode(".header-box");
+    darkMode(".header-text");
   }
 };
 
 // dark mode color scheme toggle
 function darkMode(selector) {
   const element = document.querySelector(selector);
-  element.classList.toggle("dark-mode");
+  if (selector === ".order-form") {
+    element.classList.toggle("dark-mode-form");
+  } else if (selector === "body") {
+    element.classList.toggle("dark-mode-body");
+  } else if (selector === ".header-box") {
+    element.classList.toggle("dark-mode-header-box");
+  } else if (selector === ".header-text") {
+    element.classList.toggle("dark-mode-header-text");
+  }
 }
 
 let submitButton = document.querySelector("#submit-button");

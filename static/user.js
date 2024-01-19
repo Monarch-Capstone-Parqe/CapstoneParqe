@@ -1,3 +1,39 @@
+// toggles dark/light mode (switch)
+// const darkModeToggle = document.querySelector("input[name=dark-mode]");
+// darkModeToggle.addEventListener("change", function () {
+//   const modeIcon = document.querySelector(".mode-icon")
+//   if (this.checked) {
+//     console.log("dark mode active");
+//     insertGoogleIcon(modeIcon, "dark_mode", "white");
+//     darkMode(".order-form");
+//   } else {
+//     console.log("light mode active");
+//     insertGoogleIcon(modeIcon, "light_mode", "black");
+//     darkMode(".order-form");
+//   }
+// });
+
+// toggles dark/light mode (no switch)
+const darkModeToggle = document.querySelector("button[id=dark-mode-toggle]");
+darkModeToggle.onclick = function () {
+  const modeIcon = document.querySelector("#dark-mode-toggle");
+  if (modeIcon.innerHTML.includes("light_mode")) {
+    console.log("dark mode active");
+    insertGoogleIcon(modeIcon, "dark_mode", "white");
+    darkMode(".order-form");
+  } else {
+    console.log("light mode active");
+    insertGoogleIcon(modeIcon, "light_mode", "black");
+    darkMode(".order-form");
+  }
+};
+
+// dark mode color scheme toggle
+function darkMode(selector) {
+  const element = document.querySelector(selector);
+  element.classList.toggle("dark-mode");
+}
+
 let submitButton = document.querySelector("#submit-button");
 submitButton.onclick = function (event) {
   event.preventDefault();
@@ -16,7 +52,7 @@ function uploadAndShowFile() {
 
   if (!file) {
     console.error("No file selected.");
-    displayUploadStatus("noFile");
+    openNoFileSelectedModal();
     return;
   }
 
@@ -39,12 +75,156 @@ function uploadAndShowFile() {
       console.log(data);
       // Handle the response data as needed
       showFileInfo(fileInput);
-      displayUploadStatus("success");
+
+
+      // Demo variables to test modal. Parse g code and send actual values
+      let originalPrice = "2.34"; // the cost as configured
+      let supportsPrice = "3.85"; // cost if prusa recommends adding supports
+      let supportsRecommened = true; // flag to catch descripenscy
+
+      if (supportsRecommened) {
+        openSupportRecommendedModal(originalPrice, supportsPrice);
+      } else {
+        openReviewModal(originalPrice);
+      }
     })
     .catch((error) => {
       console.error("Error:", error);
-      displayUploadStatus("failure");
+
+      // alerts the user of an error while uploading order
+      openSubmissionErrorModal();
     });
+}
+
+// Displays print cost to user upon form submission, requires approval or cancel before being sent for review
+function openReviewModal(cost) {
+  const priceModal = document.querySelector(".review-order-modal");
+  const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
+  const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
+
+  let priceString = document.querySelector(".print-cost");
+  priceString.innerHTML = "Print Cost: $" + cost;
+  priceModal.style.display = "block";
+
+  reviewModalApproveButton.onclick = function() {
+    // close (hide) review modal
+    priceModal.style.display = "none";
+    openOrderSuccessModal();
+  }
+
+  reviewModalCancelButton.onclick = function() {
+    // close (hide) review modal
+    priceModal.style.display = "none";
+    openCancelOrderModal();
+  }
+}
+
+// Displays a message to the user that there print was successful uploaded for review and informs next steps
+function openOrderSuccessModal() {
+  const successModal = document.querySelector(".multi-purpose-modal");
+  const orderSuccessOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "Your order was successfully sent for review";
+  lineTwo.innerHTML = "Please monitor your email for admin approval";
+
+  successModal.style.display = "block";
+
+  orderSuccessOkButton.onclick = function() {
+    // close (hide) order success modal
+    successModal.style.display = "none";
+
+    // reset the form
+    document.querySelector(".order-form").reset()
+  }
+}
+
+// Displays a message to the user that there order was cancelled
+function openCancelOrderModal() {
+  const cancelOrderModal = document.querySelector(".multi-purpose-modal");
+  const orderCancelOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "Your order was cancelled";
+  lineTwo.innerHTML = "";
+
+  cancelOrderModal.style.display = "block";
+
+  orderCancelOkButton.onclick = function() {
+    // close (hide) cancel order modal
+    cancelOrderModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user when prusaslicer recommends supports and allows them to chose to add
+function openSupportRecommendedModal(costOriginal, costSupport) {
+  const supportRecommendedModal = document.querySelector(".support-recommended-modal");
+  const addSupportButton = document.querySelector("#support-recommended-support-button");
+  const noSupportButton = document.querySelector("#support-recommended-no-support-button");
+  const cancelButton = document.querySelector("#support-recommended-cancel-button");
+
+  const costSupportString = document.querySelector("#support-modal-string");
+  const costNoSupportString = document.querySelector("#no-support-modal-string");
+  costSupportString.innerHTML = "Cost with added supports: $" + costSupport + " (recommended!)";
+  costNoSupportString.innerHTML = "Cost without supports: $" + costOriginal;
+  
+  supportRecommendedModal.style.display = "block";
+
+  addSupportButton.onclick = function() {
+    // close (hide) modal
+    supportRecommendedModal.style.display = "none";
+    openReviewModal(costSupport);
+  }
+
+  noSupportButton.onclick = function() {
+    // close (hide) modal
+    supportRecommendedModal.style.display = "none";
+    openReviewModal(costOriginal);
+  }
+
+  cancelButton.onclick = function() {
+    // close (hide) modal
+    supportRecommendedModal.style.display = "none";
+    openCancelOrderModal();
+  }
+}
+
+// Displays a message to the user that no file was selected for upload
+function openNoFileSelectedModal() {
+  const noFileModal = document.querySelector(".multi-purpose-modal");
+  const noFileOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "No file selected";
+  lineTwo.innerHTML = "Please select a file to upload";
+
+  noFileModal.style.display = "block";
+
+  noFileOkButton.onclick = function() {
+    // close (hide) no file modal
+    noFileModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user if there is an issue with submission
+function openSubmissionErrorModal() {
+  const submissionErrorModal = document.querySelector(".multi-purpose-modal");
+  const submissionErrorOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "There was a problem submitting your order";
+  lineTwo.innerHTML = "Please try again";
+
+  submissionErrorModal.style.display = "block";
+
+  submissionErrorOkButton.onclick = function() {
+    // close (hide) submission error modal
+    submissionErrorModal.style.display = "none";
+  }
 }
 
 // downloads the inputted file into user local directory
@@ -76,28 +256,9 @@ function showFileInfo(fileInput) {
   }
 }
 
-// notifies the user of web api of status of their file upload in the html form
-function displayUploadStatus(status) {
-  const statusMessageContainer = document.querySelector(".status-message-container");
-  statusMessageContainer.innerHTML = '';
-  document.querySelector(".upload-form").reset();
-
-  if (status === "success") {
-    insertGoogleIcon(statusMessageContainer, "check", "lime");
-  } else if (status === "failure"){
-    insertGoogleIcon(statusMessageContainer, "close", "red");
-  } else {
-    insertGoogleIcon(statusMessageContainer, "question_mark", "yellow");
-  }
-
-  // status after a given amount of milliseconds
-  setTimeout(function() {
-    statusMessageContainer.innerHTML = '';
-  }, 2000);
-}
-
 // inserts a google icon into an element. Input parameters for element, icon name, and desired color
 function insertGoogleIcon(element, iconName, color) {
   element.style.color = color;
-  element.innerHTML = '<span class="material-symbols-outlined">'+iconName+'</span>';
+  element.innerHTML =
+    '<span class="material-symbols-outlined">' + iconName + "</span>";
 }

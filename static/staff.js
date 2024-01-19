@@ -16,14 +16,15 @@ function approve(id)
     removeJob(id);
 }
 
-function deny(id)
+function deny(id, message)
 {
 //update status of job
 //remove from view
     console.log("deny");
     const formData = new FormData();
-    formData.append("id", id)
-    formData.append("status", "denied")
+    formData.append("id", id);
+    formData.append("status", "denied");
+    formData.append("message", message);
     fetch("/staff/return_orders", {
         method: "PUT",
         body: formData
@@ -65,8 +66,8 @@ function renderJob(order)
         return
     }
     let jobsBox = document.getElementById('jobs-box');
-    if(jobsBox.childElementCount == 2) {
-        let toHide = document.getElementById("no-jobs-message");
+    if(jobsBox.childElementCount == 3) {
+        let toHide = document.getElementById('no-jobs-message');
         toHide.style.display = "none";
     }
 
@@ -95,7 +96,7 @@ function renderJob(order)
     let denyButton = document.createElement('button');
     denyButton.classList.add('deny-button');
     denyButton.addEventListener('click', () => {
-        deny(order.id)
+        openRejectModal(order.id)
     });
     denyButton.textContent = 'Deny Job';
 
@@ -110,11 +111,47 @@ function removeJob(id) {
     let toRemove = document.getElementById(id);
     if(toRemove != null) {
         let parent = toRemove.parentNode;
-        parent.removeChild(toRemove);    if(parent.childElementCount == 2) {
+        parent.removeChild(toRemove);    
+        if(parent.childElementCount == 3) {
             let toDisplay = document.getElementById("no-jobs-message");
             toDisplay.style.display = 'block';
         }
     }
+}
+
+//Function to display modal to input reason when an order is denied
+function openRejectModal(id) {
+    const rejectModal = document.querySelector('.reject-order-modal');
+    const rejectModalSubmitButton = document.getElementById('reject-modal-submit-button');
+    const rejectModalCancelButton = document.getElementById('reject-modal-cancel-button');
+
+    rejectModal.style.display = 'block';
+
+    rejectModalSubmitButton.onclick = function() {
+        const textInput = document.getElementById('reject-modal-input');
+        const input = textInput.value;
+        console.log("INPUT: " + input)
+        if (input.length == 0) {
+            textInput.classList.add('reject-modal-input-error');
+            textInput.placeholder = 'Please enter a reason to continue..';
+        }
+        else {
+            
+            rejectModal.style.display = 'none';
+            textInput.classList.remove('reject-modal-input-error');
+            textInput.placeholder = 'Type here..';
+            textInput.value = '';
+            deny(id, input);
+        }
+    }
+
+    rejectModalCancelButton.onclick = function() {
+        const textInput = document.getElementById('reject-modal-input');
+        rejectModal.style.display = 'none';
+        textInput.classList.remove('reject-modal-input-error');
+        textInput.placeholder = 'Type here..';
+        textInput.value = '';
+    } 
 }
 
 //renderJob("Matt", "$0.34", "etc etc..");

@@ -213,11 +213,14 @@ def return_orders():
     try:
         id = request.form['id']
         status = request.form['status']
+        message = request.form['message']
 
         email = session['user']['userinfo']['email']
 
         if(status == 'denied'):
             database.delete_order(id)
+            if not send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, session['email'], "Your 3D design submission to the EPL has been denied for the following reasons: " + message):
+                return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
         if(status == 'approved'):
             database.approve_order(id, email)
         return jsonify({'message': 'Update received'}), HTTPStatus.OK

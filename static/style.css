@@ -191,8 +191,9 @@ input:checked + .slider:before {
 
 .dark-mode-toggle-container {
   width: 55px;
-  margin-left: auto;
-  margin-bottom: 10px;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
 }
 
 .dark-mode-form { 
@@ -206,14 +207,10 @@ input:checked + .slider:before {
 }
 
 .dark-mode-header-box {
-  /* background-color: rgb(144, 184, 51); */
   background-color: rgb(0, 0, 0);
 }
 
 .dark-mode-header-text {
-  /* color: rgb(144, 184, 51); */
-  /* text-shadow: none; */
-
   /* creates a neon effect */
   text-shadow: 
   0 0 10px rgb(109, 141, 36),

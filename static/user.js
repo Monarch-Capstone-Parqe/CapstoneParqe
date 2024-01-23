@@ -24,6 +24,9 @@ darkModeToggle.onclick = function () {
     darkMode("body");
     darkMode(".header-box");
     darkMode(".header-text");
+    darkMode(".multi-purpose-modal-content");
+    darkMode(".review-order-modal-content");
+    darkMode(".support-recommended-modal-content");
   } else {
     console.log("light mode active");
     insertGoogleIcon(modeIcon, "light_mode", "black");
@@ -31,6 +34,9 @@ darkModeToggle.onclick = function () {
     darkMode("body");
     darkMode(".header-box");
     darkMode(".header-text");
+    darkMode(".multi-purpose-modal-content");
+    darkMode(".review-order-modal-content");
+    darkMode(".support-recommended-modal-content");
   }
 };
 
@@ -45,6 +51,12 @@ function darkMode(selector) {
     element.classList.toggle("dark-mode-header-box");
   } else if (selector === ".header-text") {
     element.classList.toggle("dark-mode-header-text");
+  } else if (selector === ".multi-purpose-modal-content") {
+    element.classList.toggle("dark-mode-multi-purpose-modal");
+  } else if (selector === ".review-order-modal-content") {
+    element.classList.toggle("dark-mode-review-order-modal");
+  } else if (selector === ".support-recommended-modal-content") {
+    element.classList.toggle("dark-mode-support-recommended-modal");
   }
 }
 

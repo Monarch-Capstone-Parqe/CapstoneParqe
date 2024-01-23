@@ -73,10 +73,10 @@ function renderJob(order)
 
     let dataBox = document.createElement('section')
     dataBox.id = order.id;
-    dataBox.class = 'boxed-data';
+    dataBox.classList.add('boxed-data');
 
     let job = document.createElement('p');
-    job.class = 'data-formatting';
+    job.classList.add('data-formatting');
     job.textContent = "Email: " + order.email + 
                         ", Price: " + order.price + 
                         ", Layer Height: " + order.layer_height + 
@@ -87,18 +87,20 @@ function renderJob(order)
                         ", Note: " + order.note;
 
     let approveButton = document.createElement('button');
-    approveButton.classList.add('approve-button');
+    approveButton.classList.add('staff-button');
+    approveButton.id = 'approve-button'
     approveButton.addEventListener('click', () => {
         approve(order.id);
     });
-    approveButton.textContent = 'Approve Job';
+    approveButton.textContent = 'Approve';
 
     let denyButton = document.createElement('button');
-    denyButton.classList.add('deny-button');
+    denyButton.classList.add('staff-button');
+    denyButton.id = 'deny-button'
     denyButton.addEventListener('click', () => {
         openRejectModal(order.id)
     });
-    denyButton.textContent = 'Deny Job';
+    denyButton.textContent = 'Deny';
 
     dataBox.appendChild(job);
     dataBox.appendChild(approveButton);

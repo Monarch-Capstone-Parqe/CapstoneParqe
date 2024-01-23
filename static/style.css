@@ -421,10 +421,9 @@ button[id="dark-mode-toggle"]:hover {
 .boxed-data {
   background-color: white;
   background-size: 100%;
-  width: 85%;
-  margin-bottom: 30px;
-  margin-top: 20px;
-  border: 1px solid black;
+  border: 1px solid #213921;
+  width: 100%;
+  display: inline-flex;
 }
 
 .jobs-box-header {
@@ -434,32 +433,32 @@ button[id="dark-mode-toggle"]:hover {
 }
 
 .data-formatting {
-  display: table-cell;
   color: black;
   margin: 0;
-  text-align: left;
   margin-left: auto;
   margin-right: auto;
-  padding-top: 30px;
+  padding-top: 20px;
   padding-left: 20px;
   padding-right: 20px;
-  padding-bottom: 30px;
-  vertical-align: top;
+  padding-bottom: 20px;
   font-size: 1em;
 }
 
-.approve-button
+.staff-button
 {
-    background-color: Green;
-    border-radius: 25px;
-    color: white;
+  background-color: #6d8d24;
+  color: white;
+  width: 10%;
+  border: 1px;
+  cursor: pointer;
 }
 
-.deny-button
-{
-    background-color: Red;
-    border-radius: 25px;
-    color: white;
+#approve-button:hover {
+  background-color: #cfd82d;
+}
+
+#deny-button:hover {
+  background-color: #213921;
 }
 
 /************** reject order modal **************/
@@ -483,14 +482,13 @@ button[id="dark-mode-toggle"]:hover {
   padding: 20px;
   border: 1px solid #888;
   width: 500px;
+  height: 175px;
+  text-align: center;
 }
+
 
 .reject-modal-input-error {
   background-color: #e88282;
-}
-
-.reject-order-modal-content .modal-button-container {
-  text-align: center;
 }
 
 .reject-order-modal-content .reject-modal-button {
@@ -501,7 +499,14 @@ button[id="dark-mode-toggle"]:hover {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  width: 100px;
+  width: 8vw;
+  height: 3vh;
+}
+
+.reject-order-modal-content .reject-modal-input {
+  width: 25vw;
+  height: 8vh;
+  resize: none;
 }
 
 .reject-order-modal-content button[id="reject-modal-submit-button"] {

@@ -19,6 +19,8 @@ darkModeToggle.onclick = function () {
     // light mode psu logo
     image.src = lightSrc;
   }
+    // individual elements to toggle dark mode on by selector
+    // must have an associated "dark-mode" css class to work
     toggleDarkMode(".order-form");
     toggleDarkMode("body");
     toggleDarkMode(".header-box");

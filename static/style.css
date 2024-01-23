@@ -43,6 +43,12 @@ body {
   padding: 0;
 }
 
+.psu-logo {
+  display: block;
+  width: 300px;
+  height: 100%;
+}
+
 .header-box {
   display: table;
   background-color: rgba(109, 141, 36, 1); /* PSU Green */
@@ -211,13 +217,16 @@ input:checked + .slider:before {
 }
 
 .dark-mode-header-text {
+  color: white;
+  text-shadow: none;
+
   /* creates a neon effect */
-  text-shadow: 
+  /* text-shadow: 
   0 0 10px rgb(109, 141, 36),
   0 0 20px rgb(109, 141, 36), 
   0 0 30px rgb(109, 141, 36), 
   0 0 40px rgb(109, 141, 36), 
-  0 0 50px rgb(109, 141, 36);
+  0 0 50px rgb(109, 141, 36); */
 }
 
 .dark-mode-multi-purpose-modal {

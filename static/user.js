@@ -1,37 +1,53 @@
-// toggles dark/light mode (switch)
-// const darkModeToggle = document.querySelector("input[name=dark-mode]");
-// darkModeToggle.addEventListener("change", function () {
-//   const modeIcon = document.querySelector(".mode-icon")
-//   if (this.checked) {
-//     console.log("dark mode active");
-//     insertGoogleIcon(modeIcon, "dark_mode", "white");
-//     darkMode(".order-form");
-//   } else {
-//     console.log("light mode active");
-//     insertGoogleIcon(modeIcon, "light_mode", "black");
-//     darkMode(".order-form");
-//   }
-// });
-
-// toggles dark/light mode (no switch)
+// toggles dark/light mode for entire page
 const darkModeToggle = document.querySelector("button[id=dark-mode-toggle]");
 darkModeToggle.onclick = function () {
   const modeIcon = document.querySelector("#dark-mode-toggle");
+
+  // allows for toggle of psu logo image with light/dark mode and flask
+  const image = document.querySelector(".psu-logo");
+  const darkSrc = image.getAttribute("dark-src");
+  const lightSrc = image.getAttribute("light-src");
+
   if (modeIcon.innerHTML.includes("light_mode")) {
     console.log("dark mode active");
     insertGoogleIcon(modeIcon, "dark_mode", "white");
-    darkMode(".order-form");
+    // dark most psu logo
+    image.src = darkSrc;
   } else {
     console.log("light mode active");
     insertGoogleIcon(modeIcon, "light_mode", "black");
-    darkMode(".order-form");
+    // light mode psu logo
+    image.src = lightSrc;
   }
+    // individual elements to toggle dark mode on by selector
+    // must have an associated "dark-mode" css class to work
+    toggleDarkMode(".order-form");
+    toggleDarkMode("body");
+    toggleDarkMode(".header-box");
+    toggleDarkMode(".header-text");
+    toggleDarkMode(".multi-purpose-modal-content");
+    toggleDarkMode(".review-order-modal-content");
+    toggleDarkMode(".support-recommended-modal-content");
 };
 
-// dark mode color scheme toggle
-function darkMode(selector) {
+// dark mode color scheme toggle for individual selectors
+function toggleDarkMode(selector) {
   const element = document.querySelector(selector);
-  element.classList.toggle("dark-mode");
+  if (selector === ".order-form") {
+    element.classList.toggle("dark-mode-form");
+  } else if (selector === "body") {
+    element.classList.toggle("dark-mode-body");
+  } else if (selector === ".header-box") {
+    element.classList.toggle("dark-mode-header-box");
+  } else if (selector === ".header-text") {
+    element.classList.toggle("dark-mode-header-text");
+  } else if (selector === ".multi-purpose-modal-content") {
+    element.classList.toggle("dark-mode-multi-purpose-modal");
+  } else if (selector === ".review-order-modal-content") {
+    element.classList.toggle("dark-mode-review-order-modal");
+  } else if (selector === ".support-recommended-modal-content") {
+    element.classList.toggle("dark-mode-support-recommended-modal");
+  } 
 }
 
 let submitButton = document.querySelector("#submit-button");

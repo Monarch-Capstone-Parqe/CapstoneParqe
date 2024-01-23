@@ -45,8 +45,9 @@ body {
 
 .psu-logo {
   display: block;
-  width: 300px;
+  width: 350px;
   height: 100%;
+  padding: 10px;
 }
 
 .header-box {

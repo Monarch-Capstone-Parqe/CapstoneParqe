@@ -17,6 +17,12 @@
 const darkModeToggle = document.querySelector("button[id=dark-mode-toggle]");
 darkModeToggle.onclick = function () {
   const modeIcon = document.querySelector("#dark-mode-toggle");
+
+  // allows for toggle of psu logo image with light/dark mode and flask
+  const image = document.querySelector(".psu-logo");
+  const darkSrc = image.getAttribute("dark-src");
+  const lightSrc = image.getAttribute("light-src");
+
   if (modeIcon.innerHTML.includes("light_mode")) {
     console.log("dark mode active");
     insertGoogleIcon(modeIcon, "dark_mode", "white");
@@ -27,6 +33,8 @@ darkModeToggle.onclick = function () {
     darkMode(".multi-purpose-modal-content");
     darkMode(".review-order-modal-content");
     darkMode(".support-recommended-modal-content");
+    // dark most psu logo
+    image.src = darkSrc;
   } else {
     console.log("light mode active");
     insertGoogleIcon(modeIcon, "light_mode", "black");
@@ -37,6 +45,8 @@ darkModeToggle.onclick = function () {
     darkMode(".multi-purpose-modal-content");
     darkMode(".review-order-modal-content");
     darkMode(".support-recommended-modal-content");
+    // light mode psu logo
+    image.src = lightSrc;
   }
 };
 
@@ -57,7 +67,7 @@ function darkMode(selector) {
     element.classList.toggle("dark-mode-review-order-modal");
   } else if (selector === ".support-recommended-modal-content") {
     element.classList.toggle("dark-mode-support-recommended-modal");
-  }
+  } 
 }
 
 let submitButton = document.querySelector("#submit-button");

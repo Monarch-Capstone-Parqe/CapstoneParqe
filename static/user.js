@@ -26,32 +26,25 @@ darkModeToggle.onclick = function () {
   if (modeIcon.innerHTML.includes("light_mode")) {
     console.log("dark mode active");
     insertGoogleIcon(modeIcon, "dark_mode", "white");
-    darkMode(".order-form");
-    darkMode("body");
-    darkMode(".header-box");
-    darkMode(".header-text");
-    darkMode(".multi-purpose-modal-content");
-    darkMode(".review-order-modal-content");
-    darkMode(".support-recommended-modal-content");
     // dark most psu logo
     image.src = darkSrc;
   } else {
     console.log("light mode active");
     insertGoogleIcon(modeIcon, "light_mode", "black");
-    darkMode(".order-form");
-    darkMode("body");
-    darkMode(".header-box");
-    darkMode(".header-text");
-    darkMode(".multi-purpose-modal-content");
-    darkMode(".review-order-modal-content");
-    darkMode(".support-recommended-modal-content");
     // light mode psu logo
     image.src = lightSrc;
   }
+    toggleDarkMode(".order-form");
+    toggleDarkMode("body");
+    toggleDarkMode(".header-box");
+    toggleDarkMode(".header-text");
+    toggleDarkMode(".multi-purpose-modal-content");
+    toggleDarkMode(".review-order-modal-content");
+    toggleDarkMode(".support-recommended-modal-content");
 };
 
-// dark mode color scheme toggle
-function darkMode(selector) {
+// dark mode color scheme toggle for individual selectors
+function toggleDarkMode(selector) {
   const element = document.querySelector(selector);
   if (selector === ".order-form") {
     element.classList.toggle("dark-mode-form");

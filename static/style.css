@@ -27,6 +27,26 @@ legend {
   src: url("fonts/Acumin-RPro.otf");
 }
 
+@font-face {
+  font-family: "Acumin-ECBPro";
+  src: url("fonts/Acumin-ECBPro.otf");
+}
+
+@font-face {
+  font-family: "Acumin-LtPro";
+  src: url("fonts/Acumin-LtPro.otf");
+}
+
+@font-face {
+  font-family: "Acumin-BdPro";
+  src: url("fonts/Acumin-BdPro.otf");
+}
+
+@font-face {
+  font-family: "Acumin-ItPro";
+  src: url("fonts/Acumin-ItPro.otf");
+}
+
 /* Google Font */
 .material-symbols-outlined {
   font-variation-settings:
@@ -392,76 +412,171 @@ button[id="dark-mode-toggle"]:hover {
 /************** end support recommended modal code **************/
 
 /* Staff API Section */
-#jobs-box {
-  border: 5px solid rgba(109, 141, 36, 1); 
-  width: 95svw;
+.page-header {
+  width: 100%;
+  background-color: #6d810e;
+  height: 38px;
+  margin-bottom: 30px;
 }
 
-#subheader-text {
-  display: table-cell;
-  color: white;
-  text-shadow: 1px 1px 2px rgb(0, 0, 0);
-  margin: 0 auto;
-  text-align: left;
+.psu-logo-staff {
+  height: 27.14px;
+  width: 160px;
+  margin-left: 36px;
+  margin-top: 6px;
+}
+
+.staff-header-box {
+  background-size: 100%;
+  width: 100%;
+  height: 200px;
+  margin-top: 80px;
+  margin-bottom: 80px;
   margin-left: auto;
   margin-right: auto;
-  padding-top: 30px;
+}
+
+.staff-header-content {
+  color: black;
+  margin: 0;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
   padding-left: 20px;
   padding-right: 20px;
-  padding-bottom: 20px;
-  vertical-align: top;
-  font-size: 1.25em;
+  vertical-align: middle;
+  font-size: 6em; 
+  font-family: "Acumin-ECBPro"
 }
 
 .jobs-box-container {
-  display: flex;
-  justify-content: center;
-}
-
-.boxed-data {
-  background-color: white;
-  background-size: 100%;
-  border: 1px solid #213921;
-  width: 100%;
-  display: inline-flex;
+  width: 70%;
+  margin: 0 auto;
 }
 
 .jobs-box-header {
-  background: 100%;
-  background-color: rgba(109, 141, 36, 1);
-  width: 95svw;
+  height: 25%;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.boxed-data {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.jobs-box-header-content {
+  color: black;
+  font-size: 1.75em;
+  margin: 0 auto;
+  margin-left: 20px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-family: 'Acumin-ECBPro';
+}
+
+.jobs-box-header-underline {
+  height: 1px;
+  background-color: #404040;
+  width: 75%;
+}
+
+.boxed-data-underline {
+  height: 1px;
+  background-color: #404040;
+  width: 70%;
 }
 
 .data-formatting {
-  color: black;
+  color: #404040;
   margin: 0;
-  margin-left: auto;
-  margin-right: auto;
-  padding-top: 20px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 20px;
-  font-size: 1em;
+  margin-left: 20px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-family: 'Acumin-LtPro';
 }
 
-.staff-button
-{
-  background-color: #6d8d24;
-  color: white;
-  width: 10%;
-  border: 1px;
+.first-text {
+  color: #404040;
+  margin: 0 auto;
+  font-size: 1.05em;
+  font-family: 'Acumin-ItPro';
+}
+
+.emphasis-text {
+  color: #404040;
+  margin: 0 auto;
+  margin-left: 20px;
+  font-size: 1.05em;
+  font-family: 'Acumin-ItPro';
+}
+
+.staff-buttons {
+  display: flex;
+  width: 200px;
+  height: 50px;
+  margin-left: 20px;
+}
+
+.staff-buttons button[id='approve-button']{
+  color: black;
+  background-color: white;
+  width: 100px;
+  height: 100%;
+  font-size: 1.3em;
+  border: 2px solid #6d8d24;
   cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  margin-right: 10px;
+  transition: 0.3s;
+}
+
+.staff-buttons button[id='deny-button'] {
+  color: black;
+  background-color: white;
+  width: 100px;
+  height: 100%;
+  font-size: 1.3em;
+  border: 2px solid #a10e0e;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  margin-left: 10px;
+  transition: 0.3s;
 }
 
 #approve-button:hover {
-  background-color: #cfd82d;
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 #deny-button:hover {
-  background-color: #213921;
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 /************** reject order modal **************/
+@keyframes shake {
+  0% {
+    margin-left: 0rem;
+  }
+  25% {
+    margin-left: 0.5rem;
+  }
+  75% {
+    margin-left: -0.5rem;
+  }
+  100% {
+    margin-left: 0rem;
+  }
+}
 
 .reject-order-modal {
   display: none;
@@ -482,51 +597,71 @@ button[id="dark-mode-toggle"]:hover {
   padding: 20px;
   border: 1px solid #888;
   width: 500px;
-  height: 175px;
+  font-size: 1.15em;
+  height: auto;
   text-align: center;
+  font-family: "Acumin-LtPro";
 }
 
 
 .reject-modal-input-error {
+  animation: shake 0.2s ease-in-out 0s 2;
   background-color: #e88282;
 }
 
 .reject-order-modal-content .reject-modal-button {
   display: inline-block;
-  color: white;
+  color: black;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 20px;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
-  width: 8vw;
-  height: 3vh;
+  width: 100px;
+  height: 50px;
 }
 
 .reject-order-modal-content .reject-modal-input {
-  width: 25vw;
-  height: 8vh;
+  width: 80%;
+  height: 100px;
+  margin-top: 10px;
+  border: 1px solid #404040;
+  font-size: 1em;
   resize: none;
 }
 
 .reject-order-modal-content button[id="reject-modal-submit-button"] {
-  background-color: #0b8109;
-  margin-right: 2px;
+  border: 2px solid #6d8d24;
+  background-color: white;
+  margin-right: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
 }
 
 .reject-order-modal-content button[id="reject-modal-submit-button"]:hover {
-  background-color: #085c07;
-  margin-right: 2px;
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 .reject-order-modal-content button[id="reject-modal-cancel-button"] {
-  background-color: #a10e0e;
-  margin-left: 2px;
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
 }
 
 .reject-order-modal-content button[id="reject-modal-cancel-button"]:hover {
-  background-color: #710909;
-  margin-left: 2px;
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 

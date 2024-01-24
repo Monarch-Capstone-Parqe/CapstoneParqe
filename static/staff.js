@@ -71,49 +71,59 @@ function renderJob(order)
         toHide.style.display = "none";
     }
 
-    let dataBox = document.createElement('section')
+    let dataBox = document.createElement('section');
     dataBox.id = order.id;
     dataBox.classList.add('boxed-data');
 
     let job = document.createElement('p');
     job.classList.add('data-formatting');
-    job.textContent = "Email: " + order.email + 
-                        ", Price: " + order.price + 
-                        ", Layer Height: " + order.layer_height + 
-                        ", Nozzle Width: " + order.nozzle_width +
-                        ", Infill: " + order.infill +
-                        ", Supports: " + order.supports +
-                        ", Pieces: " + order.pieces + 
-                        ", Note: " + order.note;
+
+    job.innerHTML = '<span class="first-text">Email: </span>' + order.email + 
+                        '<span class="emphasis-text">Price: </span>' + order.price + 
+                        '<span class="emphasis-text">Layer Height: </span>'+ order.layer_height + 
+                        '<span class="emphasis-text">Nozzle Width: </span>' + order.nozzle_width +
+                        '<span class="emphasis-text">Infill: </span>' + order.infill +
+                        '<span class="emphasis-text">Supports: </span>' + order.supports +
+                        '<span class="emphasis-text">Pieces: </span>' + order.pieces + 
+                        '<span class="emphasis-text">Note: </span>' + order.note;
+
+    let buttonBox = document.createElement('section');
+    buttonBox.classList.add('staff-buttons');
 
     let approveButton = document.createElement('button');
-    approveButton.classList.add('staff-button');
     approveButton.id = 'approve-button'
     approveButton.addEventListener('click', () => {
         approve(order.id);
     });
-    approveButton.textContent = 'Approve';
+    approveButton.textContent = 'APPROVE';
 
     let denyButton = document.createElement('button');
-    denyButton.classList.add('staff-button');
     denyButton.id = 'deny-button'
     denyButton.addEventListener('click', () => {
         openRejectModal(order.id)
     });
-    denyButton.textContent = 'Deny';
+    denyButton.textContent = 'DENY';
+
+    let underline = document.createElement('div');
+    underline.classList.add('boxed-data-underline');
+    underline.id = 'underline' + order.id;
 
     dataBox.appendChild(job);
-    dataBox.appendChild(approveButton);
-    dataBox.appendChild(denyButton);
+    dataBox.appendChild(buttonBox);
+    buttonBox.appendChild(approveButton);
+    buttonBox.appendChild(denyButton);
     jobsBox.appendChild(dataBox);
+    jobsBox.appendChild(underline);
 }
 
 //Function to remove a job by id from the page
 function removeJob(id) {
     let toRemove = document.getElementById(id);
+    let removeUnderline = document.getElementById('underline' + id);
     if(toRemove != null) {
         let parent = toRemove.parentNode;
-        parent.removeChild(toRemove);    
+        parent.removeChild(toRemove);
+        parent.removeChild(removeUnderline);    
         if(parent.childElementCount == 3) {
             let toDisplay = document.getElementById("no-jobs-message");
             toDisplay.style.display = 'block';
@@ -156,5 +166,4 @@ function openRejectModal(id) {
     } 
 }
 
-//renderJob("Matt", "$0.34", "etc etc..");
 let intervalId = setInterval(refreshJobs, 10000);

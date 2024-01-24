@@ -3,8 +3,10 @@ import subprocess
 from http import HTTPStatus
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_session import Session
+from flask_redmail import RedMail
+import jwt
 import database
-from util import get_price, send_email, gen_file_uuid, validate_data
+from util import get_price, gen_file_uuid, validate_data
 from loguru import logger  
 from functools import wraps
 import config.variables as variables
@@ -16,7 +18,7 @@ database.check_db_connect()
 database.create_tables()
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
-app.secret_key = variables.APP_SECRET_KEY
+app.config["SECRET_KEY"] = variables.APP_SECRET_KEY
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
@@ -32,6 +34,13 @@ oauth.register(
     },
     server_metadata_url=f'https://{variables.AUTH0_DOMAIN}/.well-known/openid-configuration',
 )
+
+app.config["EMAIL_HOST"] = "smtp.gmail.com"
+app.config["EMAIL_PORT"] = 587
+app.config["EMAIL_SENDER"] = variables.EPL_EMAIL
+app.config["EMAIL_USERNAME"] = variables.EPL_EMAIL
+app.config["EMAIL_PASSWORD"] = variables.EPL_EMAIL_APP_PASSWORD
+email = RedMail(app)
 
 logger.add("app.log", rotation="500 MB", level="INFO") 
 
@@ -51,10 +60,7 @@ def requires_auth(f):
 @app.route('/staff')
 @requires_auth
 def staff_home():
-    return render_template(
-        "staff/index.html",
-        session=session["user"]
-    )
+    return render_template("staff/index.html")
 
 @app.route("/staff/callback", methods=["GET", "POST"])
 def callback():
@@ -85,6 +91,23 @@ def logout():
         )
     )
 
+@app.route("/verify_email/<token>")
+def verify_email(token):
+    try:
+        data = jwt.decode(token, app.config["SECRET_KEY"], algorithms="HS256")
+        session['verified'] = True
+        return redirect(url_for('success_page'))  # Redirect to a success page after email verification
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token has expired"}), HTTPStatus.BAD_REQUEST
+    except jwt.InvalidTokenError as e:
+        print(f"Invalid token: {e}")
+        return jsonify({"error": "Invalid token"}), HTTPStatus.BAD_REQUEST
+
+@app.route("/success")
+def success_page():
+    return "Email verified successfully. You can now proceed to the success page."
+
 # User uploads model and prefernces
 # Parse, store, and return the results to the user
 @app.route('/upload_model', methods=['POST'])
@@ -109,6 +132,23 @@ def upload_model():
         if data['note'] == '':
             data['note'] = None
 
+        # Verify email
+        token = jwt.encode(payload={"email": data['email']}, key=app.config["SECRET_KEY"], algorithm="HS256")
+        verification_url = url_for('verify_email', token=token, _external=True)
+        html_template = render_template('verify_email_template.html', verification_url=verification_url)
+
+        try:
+            email.send(
+            subject="Verify email",
+            receivers=data['email'],
+            html=html_template,
+            body_params={
+                "token": token
+            }
+        )
+        except Exception as e:  # Specify the exception type you want to catch
+            print(f"Email sending failed. Error: {e}")
+        
       # Save the model with a unique name in the uploads directory
         _, ext = os.path.splitext(data['file'].filename)
         uuid = gen_file_uuid()
@@ -117,8 +157,8 @@ def upload_model():
         gcode_path = f'uploads/{uuid}.gcode'
 
         # Generate G-code
-        #TODO: Apply default config file and user prefernces
-        command = f'./prusa.AppImage --export-gcode {model_path}'
+        dont_arrange_flag = "--dont-arrange" if data["pieces"] else ""
+        command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {data["layerHeight"]} --nozzle-diameter {data["nozzleWidth"]} --infill-overlap {data["infill"]} --support-material-style {data["supports"]} {dont_arrange_flag} --load my_config.ini'
         prusa_output = subprocess.getoutput(command)
         # Remove the original file
         os.remove(model_path)
@@ -139,7 +179,12 @@ def upload_model():
         for key, value in data.items():
             session[key] = value
 
-        # TODO: If supports are off, turn them on and fetch price
+        # TODO: Check if prusa recommends supports
+        if data['supports'] == 'none' and any('Consider enabling supports' in suggestion for suggestion in suggestions):
+            command = f'./prusa.AppImage --export-gcode {model_path}'
+            prusa_output = subprocess.getoutput(command)
+
+
         response_data = {'suggestions': suggestions, 'price': price}
         return jsonify(response_data), HTTPStatus.CREATED
     
@@ -147,29 +192,22 @@ def upload_model():
         logger.error(f"Error in upload_model route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
-app.route('/upload_model/publish', methods=['POST'])
-def upload_model():
+app.route('/upload_model/confirm', methods=['POST'])
+def confirm_order():
     supports = request.form.get('supports', None)
-    
+    #myconfig.ini
     validation_result = validate_data({'supports' : supports})
     if validation_result:
         return jsonify({"error": "Validation failed", "errors": validation_result}), HTTPStatus.BAD_REQUEST
     
     # TODO: set final decison on supports, update price if needed
 
-    # Send email to the user to verify its valid
-    if not send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, session['email'], "Welcome to EPL."):
-        # TODO: Clear session if email is invalid
-        return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
-
     # Store the order
     database.insert_order(session['email'], session['file_name'], session['layer_height'],
         session['nozzle_width'], session['infill'], session['supports'],
         session['pieces'], session['note'])
 
-    # Email the staff that a new order has been submitted
-    for staff_email in database.get_staff_emails():
-        send_email(staff_email, "A new order is pending.")
+    # TODO: Email the staff that a new order has been submitted
 
     response_data = {'message': 'Order Made, please await an approval email.'}
     return jsonify(response_data), HTTPStatus.CREATED

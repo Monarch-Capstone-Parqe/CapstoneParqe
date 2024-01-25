@@ -6,7 +6,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: '[name].bundle.js',
+    filename: 'staff.bundle.js',
   },
   resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json']

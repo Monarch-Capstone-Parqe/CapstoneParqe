@@ -1,3 +1,5 @@
+import * as GCodePreview from 'gcode-preview';
+
 //Maximum number of orders able to render on a page
 let maxRender = 10;
 

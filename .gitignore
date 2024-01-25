@@ -6,3 +6,7 @@ app.log
 /flask_session
 /static/node_modules
 /.vs
+/static/dist
+/static/benchy.gcode
+/hello.sh
+/static/package-lock.json

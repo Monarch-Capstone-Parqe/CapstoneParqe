@@ -1,4 +1,4 @@
- import * as GCodePreview from 'gcode-preview';
+import * as GCodePreview from 'gcode-preview';
 
 function approve(id)
 {
@@ -120,8 +120,8 @@ function renderJob(order)
     gcodePrev.id = "canvas"
 
     dataBox.appendChild(job);
-    dataBox.appendChild(buttonBox);
     dataBox.appendChild(gcodePrev);
+    dataBox.appendChild(buttonBox);
     buttonBox.appendChild(approveButton);
     buttonBox.appendChild(denyButton);
     jobsBox.appendChild(dataBox);

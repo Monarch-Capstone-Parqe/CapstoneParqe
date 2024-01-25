@@ -59,9 +59,9 @@ function refreshJobs()
     });
 }
 
+//retrieve gcode from the browser
 let response = await fetch("/static/benchy.gcode");
    let gcode = await response.text() ;
-   console.log(gcode);
 
 
 //Function to create job sections with input variables
@@ -115,6 +115,7 @@ function renderJob(order)
     underline.classList.add('boxed-data-underline');
     underline.id = 'underline' + order.id;
 
+    //gcode-preview canvas
     let gcodePrev = document.createElement('canvas');
     gcodePrev.classList.add('canvas');
     gcodePrev.id = "canvas"
@@ -127,7 +128,7 @@ function renderJob(order)
     jobsBox.appendChild(dataBox);
     jobsBox.appendChild(underline);
       
-    
+   //Process the gcode after the canvas is initialized
     const preview = GCodePreview.init({
       canvas: gcodePrev,
       extrusionColor: 'hotpink'

@@ -1,6 +1,3 @@
-
-//todo create job objects
-//
 function approve(id)
 {
 //update status of job
@@ -19,14 +16,15 @@ function approve(id)
     removeJob(id);
 }
 
-function deny(id)
+function deny(id, message)
 {
 //update status of job
 //remove from view
     console.log("deny");
     const formData = new FormData();
-    formData.append("id", id)
-    formData.append("status", "denied")
+    formData.append("id", id);
+    formData.append("status", "denied");
+    formData.append("message", message);
     fetch("/staff/return_orders", {
         method: "PUT",
         body: formData
@@ -44,13 +42,13 @@ function refreshJobs()
 //populate sections with new data, connected to objects
 //remove jobs that have been updated already
     console.log("refresh")
-    fetch("/staff/orders", {
+    fetch("/staff/orders?type=pending", {
         method: "GET",
     })
     .then((response) => response.json())
     .then((data) => {
         console.log(data)
-        for(const order of data.pending_orders) {
+        for(const order of data.orders) {
             renderJob(order)
         }
     })
@@ -68,50 +66,104 @@ function renderJob(order)
         return
     }
     let jobsBox = document.getElementById('jobs-box');
-    if(jobsBox.childElementCount == 2) {
-        let toHide = document.getElementById("no-jobs-message");
+    if(jobsBox.childElementCount == 3) {
+        let toHide = document.getElementById('no-jobs-message');
         toHide.style.display = "none";
     }
 
-    let dataBox = document.createElement('section')
+    let dataBox = document.createElement('section');
     dataBox.id = order.id;
-    dataBox.class = 'boxed-data';
+    dataBox.classList.add('boxed-data');
 
     let job = document.createElement('p');
-    job.class = 'data-formatting';
-    job.textContent = "Email: " + order.email + ", Price: " + order.price + ", File Name: " + order.file_name;
+    job.classList.add('data-formatting');
+
+    job.innerHTML = '<span class="first-text">Email: </span>' + order.email + 
+                        '<span class="emphasis-text">Price: </span>' + order.price + 
+                        '<span class="emphasis-text">Layer Height: </span>'+ order.layer_height + 
+                        '<span class="emphasis-text">Nozzle Width: </span>' + order.nozzle_width +
+                        '<span class="emphasis-text">Infill: </span>' + order.infill +
+                        '<span class="emphasis-text">Supports: </span>' + order.supports +
+                        '<span class="emphasis-text">Pieces: </span>' + order.pieces + 
+                        '<span class="emphasis-text">Note: </span>' + order.note;
+
+    let buttonBox = document.createElement('section');
+    buttonBox.classList.add('staff-buttons');
 
     let approveButton = document.createElement('button');
-    approveButton.classList.add('approve-button');
+    approveButton.id = 'approve-button'
     approveButton.addEventListener('click', () => {
         approve(order.id);
     });
-    approveButton.textContent = 'Approve Job';
+    approveButton.textContent = 'APPROVE';
 
     let denyButton = document.createElement('button');
-    denyButton.classList.add('deny-button');
+    denyButton.id = 'deny-button'
     denyButton.addEventListener('click', () => {
-        deny(order.id)
+        openRejectModal(order.id)
     });
-    denyButton.textContent = 'Deny Job';
+    denyButton.textContent = 'DENY';
+
+    let underline = document.createElement('div');
+    underline.classList.add('boxed-data-underline');
+    underline.id = 'underline' + order.id;
 
     dataBox.appendChild(job);
-    dataBox.appendChild(approveButton);
-    dataBox.appendChild(denyButton);
+    dataBox.appendChild(buttonBox);
+    buttonBox.appendChild(approveButton);
+    buttonBox.appendChild(denyButton);
     jobsBox.appendChild(dataBox);
+    jobsBox.appendChild(underline);
 }
 
 //Function to remove a job by id from the page
 function removeJob(id) {
     let toRemove = document.getElementById(id);
+    let removeUnderline = document.getElementById('underline' + id);
     if(toRemove != null) {
         let parent = toRemove.parentNode;
-        parent.removeChild(toRemove);    if(parent.childElementCount == 2) {
+        parent.removeChild(toRemove);
+        parent.removeChild(removeUnderline);    
+        if(parent.childElementCount == 3) {
             let toDisplay = document.getElementById("no-jobs-message");
             toDisplay.style.display = 'block';
         }
     }
 }
 
-//renderJob("Matt", "$0.34", "etc etc..");
+//Function to display modal to input reason when an order is denied
+function openRejectModal(id) {
+    const rejectModal = document.querySelector('.reject-order-modal');
+    const rejectModalSubmitButton = document.getElementById('reject-modal-submit-button');
+    const rejectModalCancelButton = document.getElementById('reject-modal-cancel-button');
+
+    rejectModal.style.display = 'block';
+
+    rejectModalSubmitButton.onclick = function() {
+        const textInput = document.getElementById('reject-modal-input');
+        const input = textInput.value;
+        console.log("INPUT: " + input)
+        if (input.length == 0) {
+            textInput.classList.add('reject-modal-input-error');
+            textInput.placeholder = 'Please enter a reason to continue..';
+        }
+        else {
+            
+            rejectModal.style.display = 'none';
+            textInput.classList.remove('reject-modal-input-error');
+            textInput.placeholder = 'Type here..';
+            textInput.value = '';
+            deny(id, input);
+        }
+    }
+
+    rejectModalCancelButton.onclick = function() {
+        const textInput = document.getElementById('reject-modal-input');
+        rejectModal.style.display = 'none';
+        textInput.classList.remove('reject-modal-input-error');
+        textInput.placeholder = 'Type here..';
+        textInput.value = '';
+    } 
+}
+
 let intervalId = setInterval(refreshJobs, 10000);

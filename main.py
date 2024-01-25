@@ -131,6 +131,11 @@ def upload_model():
         lines = prusa_output.split('\n')
         suggestions = [line for line in lines if uuid not in line and '=>' not in line]
         price = get_price(gcode_path)
+
+        if(data['pieces'] == 'single'):
+            data['pieces'] = False
+        else:
+            data['pieces'] = True
         
         # Replace the original file with the path to the gcode
         data['file'] = gcode_path
@@ -138,6 +143,8 @@ def upload_model():
          # Store key-value pairs in the session
         for key, value in data.items():
             session[key] = value
+        
+        session['price'] = price
 
         # TODO: If supports are off, turn them on and fetch price
         response_data = {'suggestions': suggestions, 'price': price}
@@ -163,9 +170,9 @@ def upload_model():
         return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
 
     # Store the order
-    database.insert_order(session['email'], session['file_name'], session['layer_height'],
-        session['nozzle_width'], session['infill'], session['supports'],
-        session['pieces'], session['note'])
+    database.insert_order(session['email'], session['file'], session['price'], session['note'], session['layerHeight'],
+        session['nozzleWidth'], session['infill'], session['supports'],
+        session['pieces'])
 
     # Email the staff that a new order has been submitted
     for staff_email in database.get_staff_emails():
@@ -206,11 +213,14 @@ def return_orders():
     try:
         id = request.form['id']
         status = request.form['status']
+        message = request.form['message']
 
         email = session['user']['userinfo']['email']
 
         if(status == 'denied'):
             database.delete_order(id)
+            if not send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, session['email'], "Your 3D design submission to the EPL has been denied for the following reason(s): " + message):
+                return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
         if(status == 'approved'):
             database.approve_order(id, email)
         return jsonify({'message': 'Update received'}), HTTPStatus.OK

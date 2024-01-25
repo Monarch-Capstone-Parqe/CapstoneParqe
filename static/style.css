@@ -643,6 +643,11 @@ button[id="dark-mode-toggle"]:hover {
   text-underline-offset: -1%;
   text-decoration-thickness: 1px;
 }
+.canvas {
+  width: 200px;
+  height: 100px;
+}
+
 
 .load-more-button-box {
   width: 100%;

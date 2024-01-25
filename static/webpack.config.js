@@ -20,6 +20,12 @@ module.exports = {
              loader: 'babel-loader',
              }
         }],
-  }
+  },
+  target : 'node', 
+  resolve: {
+  fallback: {
+    fs: false
+   }
+  } 
 }
 

@@ -1,7 +1,4 @@
   import * as GCodePreview from 'gcode-preview';
-
-
-  
   // draw a diagonal line
  
 
@@ -94,6 +91,10 @@ function removeJob(name) {
         }
     }
 }
+   let response = await fetch("/static/benchy.gcode");
+   let benchyExample = await response.text() ;
+   console.log(benchyExample);
+    
 
-renderJob("Bruh", "$0.34", "etc etc..","G0 X0 Y0 Z0.2\nG1 X42 Y42 E10");
+renderJob("Bruh", "$0.34", "etc etc..", benchyExample);
 renderJob("Matt", "$0.34", "etc etc..","G0 X0 Y0 Z0.2\nG1 X42 Y92 E10\nG0 X0 Y0 Z0.2\nG1 X42 Y42 E10");

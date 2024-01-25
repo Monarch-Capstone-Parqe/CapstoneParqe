@@ -1,3 +1,5 @@
+ import * as GCodePreview from 'gcode-preview';
+
 function approve(id)
 {
 //update status of job
@@ -57,6 +59,11 @@ function refreshJobs()
     });
 }
 
+let response = await fetch("/static/benchy.gcode");
+   let gcode = await response.text() ;
+   console.log(gcode);
+
+
 //Function to create job sections with input variables
 //Variables will be received from database
 function renderJob(order)
@@ -108,12 +115,24 @@ function renderJob(order)
     underline.classList.add('boxed-data-underline');
     underline.id = 'underline' + order.id;
 
+    let gcodePrev = document.createElement('canvas');
+    gcodePrev.classList.add('canvas');
+    gcodePrev.id = "canvas"
+
     dataBox.appendChild(job);
     dataBox.appendChild(buttonBox);
+    dataBox.appendChild(gcodePrev);
     buttonBox.appendChild(approveButton);
     buttonBox.appendChild(denyButton);
     jobsBox.appendChild(dataBox);
     jobsBox.appendChild(underline);
+      
+    
+    const preview = GCodePreview.init({
+      canvas: gcodePrev,
+      extrusionColor: 'hotpink'
+    });
+    preview.processGCode(gcode);
 }
 
 //Function to remove a job by id from the page

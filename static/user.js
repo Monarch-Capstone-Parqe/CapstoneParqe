@@ -70,7 +70,7 @@ function uploadAndShowFile() {
 
   if (layerHeight < 0.15) {
     console.error("Layer height outside range");
-    openLayerHeightRangeModal();
+    openLayerHeightErrorModal();
     return;
   }
 
@@ -238,7 +238,7 @@ function openSubmissionErrorModal() {
 }
 
 // Displays a message to the user that no file was selected for upload
-function openLayerHeightRangeModal() {
+function openLayerHeightErrorModal() {
   const layerErrorModal = document.querySelector(".multi-purpose-modal");
   const layerErrorOkButton = document.querySelector("#multi-purpose-ok-button");
   const lineOne = document.querySelector('#line1');

@@ -276,3 +276,16 @@ function insertGoogleIcon(element, iconName, color) {
   element.innerHTML =
     '<span class="material-symbols-outlined">' + iconName + "</span>";
 }
+
+// sets default layer height based on nozzle width selection
+// defaults: 0.6mm nozzle -> 0.3mm layer height, 0.4mm nozzle -> 0.2mm layer height
+const nozzleChange = document.querySelector("#nozzle-width");
+let layerChange = document.querySelector("#layer-height");
+nozzleChange.addEventListener('change', function() {
+  if (nozzleChange.value === "0.6") {
+    layerChange.value = 0.3;
+  } else {
+    layerChange.value = 0.2;
+  }
+})
+

@@ -62,8 +62,7 @@ function uploadAndShowFile() {
   const layerHeight = document.querySelector("#layer-height").value;
   const nozzleWidth = document.querySelector("#nozzle-width").value;
   const infill = document.querySelector("#infill").value;
-  const supports = document.querySelector("#supports").value;
-  const pieces = document.querySelector("#pieces").value;
+  const quanity = document.querySelector("#quanity").value;
   const note = document.querySelector("#note").value;
 
   if (!file) {
@@ -78,8 +77,7 @@ function uploadAndShowFile() {
   formData.append("layer height", layerHeight);
   formData.append("nozzle width", nozzleWidth);
   formData.append("infill", infill);
-  formData.append("supports", supports);
-  formData.append("pieces", pieces);
+  formData.append("quanity", quanity);
   formData.append("note", note);
 
   fetch("/upload_model", {

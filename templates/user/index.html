@@ -68,19 +68,17 @@
     <fieldset>
       <legend>Configuration</legend>
       <div class="form-group">
-        <label for="layer-height">Layer Height:</label>
-        <select id="layer-height" name="layer-height">
-          <option value="0.2">0.2mm (default)</option>
-          <option value="0.1">0.1mm</option>
-          <option value="0.3">0.3mm</option>
-          <option value="0.4">0.4mm</option>
+        <label for="nozzle-width">Nozzle Width:</label>
+        <select id="nozzle-width" name="nozzle-width">
+          <option value="0.4" selected>0.4mm</option>
+          <option value="0.6">0.6mm</option>
         </select>
       </div>
       <div class="form-group">
-        <label for="nozzle-width">Nozzle Width:</label>
-        <select id="nozzle-width" name="nozzle-width">
-          <option value="0.2">0.2mm (default)</option>
+        <label for="layer-height">Layer Height:</label>
+        <select id="layer-height" name="layer-height">
           <option value="0.1">0.1mm</option>
+          <option value="0.2" selected>0.2mm</option>
           <option value="0.3">0.3mm</option>
           <option value="0.4">0.4mm</option>
         </select>
@@ -88,8 +86,8 @@
       <div class="form-group">
         <label for="infill">Infill:</label>
         <select id="infill" name="infill">
-          <option value="20">20% (default)</option>
           <option value="10">10%</option>
+          <option value="20" selected>20%</option>
           <option value="30">30%</option>
           <option value="40">40%</option>
           <option value="50">50%</option>

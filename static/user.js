@@ -27,7 +27,6 @@ darkModeToggle.onclick = function () {
     toggleDarkMode(".header-text");
     toggleDarkMode(".multi-purpose-modal-content");
     toggleDarkMode(".review-order-modal-content");
-    toggleDarkMode(".support-recommended-modal-content");
 };
 
 // dark mode color scheme toggle for individual selectors
@@ -45,8 +44,6 @@ function toggleDarkMode(selector) {
     element.classList.toggle("dark-mode-multi-purpose-modal");
   } else if (selector === ".review-order-modal-content") {
     element.classList.toggle("dark-mode-review-order-modal");
-  } else if (selector === ".support-recommended-modal-content") {
-    element.classList.toggle("dark-mode-support-recommended-modal");
   } 
 }
 
@@ -92,15 +89,8 @@ function uploadAndShowFile() {
 
 
       // Demo variables to test modal. Parse g code and send actual values
-      let originalPrice = "2.34"; // the cost as configured
-      let supportsPrice = "3.85"; // cost if prusa recommends adding supports
-      let supportsRecommened = true; // flag to catch descripenscy
-
-      if (supportsRecommened) {
-        openSupportRecommendedModal(originalPrice, supportsPrice);
-      } else {
-        openReviewModal(originalPrice);
-      }
+      let price = "2.34"; // the cost as configured
+      openReviewModal(price);
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -172,38 +162,38 @@ function openCancelOrderModal() {
   }
 }
 
-// Displays a message to the user when prusaslicer recommends supports and allows them to chose to add
-function openSupportRecommendedModal(costOriginal, costSupport) {
-  const supportRecommendedModal = document.querySelector(".support-recommended-modal");
-  const addSupportButton = document.querySelector("#support-recommended-support-button");
-  const noSupportButton = document.querySelector("#support-recommended-no-support-button");
-  const cancelButton = document.querySelector("#support-recommended-cancel-button");
+// // Displays a message to the user when prusaslicer recommends supports and allows them to chose to add
+// function openSupportRecommendedModal(costOriginal, costSupport) {
+//   const supportRecommendedModal = document.querySelector(".support-recommended-modal");
+//   const addSupportButton = document.querySelector("#support-recommended-support-button");
+//   const noSupportButton = document.querySelector("#support-recommended-no-support-button");
+//   const cancelButton = document.querySelector("#support-recommended-cancel-button");
 
-  const costSupportString = document.querySelector("#support-modal-string");
-  const costNoSupportString = document.querySelector("#no-support-modal-string");
-  costSupportString.innerHTML = "Cost with added supports: $" + costSupport + " (recommended!)";
-  costNoSupportString.innerHTML = "Cost without supports: $" + costOriginal;
+//   const costSupportString = document.querySelector("#support-modal-string");
+//   const costNoSupportString = document.querySelector("#no-support-modal-string");
+//   costSupportString.innerHTML = "Cost with added supports: $" + costSupport + " (recommended!)";
+//   costNoSupportString.innerHTML = "Cost without supports: $" + costOriginal;
   
-  supportRecommendedModal.style.display = "block";
+//   supportRecommendedModal.style.display = "block";
 
-  addSupportButton.onclick = function() {
-    // close (hide) modal
-    supportRecommendedModal.style.display = "none";
-    openReviewModal(costSupport);
-  }
+//   addSupportButton.onclick = function() {
+//     // close (hide) modal
+//     supportRecommendedModal.style.display = "none";
+//     openReviewModal(costSupport);
+//   }
 
-  noSupportButton.onclick = function() {
-    // close (hide) modal
-    supportRecommendedModal.style.display = "none";
-    openReviewModal(costOriginal);
-  }
+//   noSupportButton.onclick = function() {
+//     // close (hide) modal
+//     supportRecommendedModal.style.display = "none";
+//     openReviewModal(costOriginal);
+//   }
 
-  cancelButton.onclick = function() {
-    // close (hide) modal
-    supportRecommendedModal.style.display = "none";
-    openCancelOrderModal();
-  }
-}
+//   cancelButton.onclick = function() {
+//     // close (hide) modal
+//     supportRecommendedModal.style.display = "none";
+//     openCancelOrderModal();
+//   }
+// }
 
 // Displays a message to the user that no file was selected for upload
 function openNoFileSelectedModal() {

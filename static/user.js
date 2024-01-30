@@ -68,6 +68,12 @@ function uploadAndShowFile() {
     return;
   }
 
+  if (layerHeight < 0.15) {
+    console.error("Layer height outside range");
+    openLayerHeightRangeModal();
+    return;
+  }
+
   const formData = new FormData();
   formData.append("email", email);
   formData.append("file", file);
@@ -228,6 +234,24 @@ function openSubmissionErrorModal() {
   submissionErrorOkButton.onclick = function() {
     // close (hide) submission error modal
     submissionErrorModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user that no file was selected for upload
+function openLayerHeightRangeModal() {
+  const layerErrorModal = document.querySelector(".multi-purpose-modal");
+  const layerErrorOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "The layer height value you entered is outside the allowed range";
+  lineTwo.innerHTML = "Minimum layer height: 0.15 mm";
+
+  layerErrorModal.style.display = "block";
+
+  layerErrorOkButton.onclick = function() {
+    // close (hide) no file modal
+    layerErrorModal.style.display = "none";
   }
 }
 

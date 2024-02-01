@@ -49,7 +49,8 @@ def create_tables():
                             "pieces BOOLEAN NOT NULL,"            
                             "price NUMERIC(6,2) NOT NULL,"
                             "date DATE DEFAULT CURRENT_DATE,"
-                            "approved_by INTEGER REFERENCES staff(id) DEFAULT NULL)"))
+                            "approved_by INTEGER REFERENCES staff(id) DEFAULT NULL,"
+                            "denied_by INTEGER REFERENCES staff(id) DEFAULT NULL)"))
         
         conn.commit()
 
@@ -75,15 +76,34 @@ def get_orders():
 
 def get_pending_orders():
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM orders WHERE approved_by IS NULL ORDER BY date")).fetchall()
+        result = conn.execute(text("SELECT * FROM orders WHERE approved_by IS NULL AND denied_BY IS NULL ORDER BY date")).fetchall()
         orders = []
         for row in result:
             row_as_dict = row._mapping
-            #if(row_as_dict.approved_by != None):
-                #continue
             orders.append(dict(row_as_dict))
 
         return orders
+    
+def get_approved_orders(): 
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM orders WHERE approved_by IS NOT NULL AND denied_by IS NULL ORDER BY date")).fetchall()
+        orders = []
+        for row in result:
+            row_as_dict = row._mapping
+            orders.append(dict(row_as_dict))
+
+        return orders
+    
+def get_denied_orders():
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM orders WHERE denied_by IS NOT NULL AND approved_by IS NULL ORDER BY date")).fetchall()
+        orders = []
+        for row in result:
+            row_as_dict = row._mapping
+            orders.append(dict(row_as_dict))
+
+        return orders
+    
 
 def delete_order(match):
     with engine.connect() as conn: 
@@ -105,7 +125,21 @@ def approve_order(match, email):
                             {"staff_id": staff_id, "match": match})
         
         conn.commit()
-    
+
+def deny_order(match, email):
+    with engine.connect() as conn:
+        staff_id_result = conn.execute(text("SELECT id FROM staff WHERE email=:email"),
+                                    {"email": email})
+        staff_id_dict = []
+        for row in staff_id_result:
+            row_as_dict = row._mapping
+            staff_id_dict.append(dict(row_as_dict))
+        staff_id = staff_id_dict[0]['id']
+        conn.execute(text("UPDATE orders SET denied_by=:staff_id WHERE id=:match"),
+                            {"staff_id": staff_id, "match": match})
+        
+        conn.commit()
+
 def add_staff(email):
     with engine.connect() as conn:
         # Check if the admin exists, if not, add to the staff table

@@ -146,6 +146,10 @@ def upload_model():
         
         session['price'] = price
 
+        database.insert_order(session['email'], session['file'], session['price'], session['note'], session['layerHeight'],
+        session['nozzleWidth'], session['infill'], session['supports'],
+        session['pieces'])
+
         # TODO: If supports are off, turn them on and fetch price
         response_data = {'suggestions': suggestions, 'price': price}
         return jsonify(response_data), HTTPStatus.CREATED
@@ -197,6 +201,10 @@ def get_orders():
         orders = database.get_orders()
     elif order_type == 'pending':
         orders = database.get_pending_orders()
+    elif order_type == 'approved':
+        orders = database.get_approved_orders()
+    elif order_type == 'denied':
+        orders = database.get_denied_orders()
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 
@@ -218,7 +226,7 @@ def return_orders():
         email = session['user']['userinfo']['email']
 
         if(status == 'denied'):
-            database.delete_order(id)
+            database.deny_order(id, email)
             if not send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, session['email'], "Your 3D design submission to the EPL has been denied for the following reason(s): " + message):
                 return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
         if(status == 'approved'):

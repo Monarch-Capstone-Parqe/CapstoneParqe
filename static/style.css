@@ -400,6 +400,8 @@ button[id="dark-mode-toggle"]:hover {
   background-color: #6d810e;
   height: 38px;
   margin-bottom: 30px;
+  display: flex;
+  flex-direction: row;
 }
 
 .psu-logo-staff {
@@ -407,6 +409,14 @@ button[id="dark-mode-toggle"]:hover {
   width: 160px;
   margin-left: 36px;
   margin-top: 6px;
+}
+
+.staff-header-button {
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  justify-self: flex-end;
 }
 
 .staff-header-box {
@@ -544,6 +554,11 @@ button[id="dark-mode-toggle"]:hover {
   text-underline-offset: -1%;
   text-decoration-thickness: 1px;
 }
+.canvas {
+  width: 200px;
+  height: 80px;
+}
+
 
 /************** reject order modal **************/
 @keyframes shake {

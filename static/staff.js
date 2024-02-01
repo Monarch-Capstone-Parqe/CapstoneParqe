@@ -1,3 +1,7 @@
+import * as GCodePreview from 'gcode-preview';
+
+let page = 0;
+
 function approve(id)
 {
 //update status of job
@@ -35,12 +39,9 @@ function deny(id, message)
     removeJob(id);
 }
 
-function refreshJobs()
+function refreshPendingJobs()
 {
-//get new jobs from database
-//create job objects
-//populate sections with new data, connected to objects
-//remove jobs that have been updated already
+//get pending jobs from database
     console.log("refresh")
     fetch("/staff/orders?type=pending", {
         method: "GET",
@@ -56,6 +57,49 @@ function refreshJobs()
         console.error("Error: ", error);
     });
 }
+
+function refreshApprovedJobs()
+{
+//get approved jobs from database
+    console.log("refresh")
+    fetch("/staff/orders?type=approved", {
+        method: "GET",
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data)
+        for(const order of data.orders) {
+            renderJob(order)
+        }
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
+}
+
+function getDeniedJobs()
+{
+//get denied jobs from database
+    console.log("refresh")
+    fetch("/staff/orders?type=denied", {
+        method: "GET",
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data)
+        for(const order of data.orders) {
+            renderJob(order)
+        }
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
+}
+
+//retrieve gcode from the browser
+/*let response = await fetch("/static/benchy.gcode");
+   let gcode = await response.text() ;
+*/
 
 //Function to create job sections with input variables
 //Variables will be received from database
@@ -108,12 +152,25 @@ function renderJob(order)
     underline.classList.add('boxed-data-underline');
     underline.id = 'underline' + order.id;
 
+    //gcode-preview canvas
+    /*let gcodePrev = document.createElement('canvas');
+    gcodePrev.classList.add('canvas');
+    gcodePrev.id = "canvas"*/
+
     dataBox.appendChild(job);
+    //dataBox.appendChild(gcodePrev);
     dataBox.appendChild(buttonBox);
     buttonBox.appendChild(approveButton);
     buttonBox.appendChild(denyButton);
     jobsBox.appendChild(dataBox);
     jobsBox.appendChild(underline);
+      
+   //Process the gcode after the canvas is initialized
+    /*const preview = GCodePreview.init({
+      canvas: gcodePrev,
+      extrusionColor: 'hotpink'
+    });
+    preview.processGCode(gcode);*/
 }
 
 //Function to remove a job by id from the page

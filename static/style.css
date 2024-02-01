@@ -629,6 +629,19 @@ button[id="dark-mode-toggle"]:hover {
   transition: 0.3s;
 }
 
+.staff-buttons button[id='preview-button']{
+  color: black;
+  background-color: white;
+  width: 100px;
+  height: 100%;
+  font-size: 1.3em;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  margin-right: 10px;
+  transition: 0.3s;
+}
+
 #approve-button:hover {
   color: white;
   background-color: #6d8d24;
@@ -644,9 +657,13 @@ button[id="dark-mode-toggle"]:hover {
   text-underline-offset: -1%;
   text-decoration-thickness: 1px;
 }
-.canvas {
-  width: 200px;
-  height: 100px;
+
+#preview-button:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 

@@ -59,10 +59,10 @@ function refreshJobs()
     });
 }
 
-//retrieve gcode from the browser
-let response = await fetch("/static/benchy.gcode");
-   let gcode = await response.text() ;
 
+//retrieve placeholder gcode from the browser
+let response = await fetch("/static/benchy.gcode");
+let gcode = await response.text() ;
 
 //Function to create job sections with input variables
 //Variables will be received from database
@@ -111,29 +111,28 @@ function renderJob(order)
     });
     denyButton.textContent = 'DENY';
 
+    let previewButton = document.createElement('button');
+    previewButton.id = 'preview-button'
+    previewButton.addEventListener('click', () => {
+        openPreview(gcode)
+    });
+    previewButton.textContent = 'VIEW GCODE';
+
     let underline = document.createElement('div');
     underline.classList.add('boxed-data-underline');
     underline.id = 'underline' + order.id;
 
-    //gcode-preview canvas
-    let gcodePrev = document.createElement('canvas');
-    gcodePrev.classList.add('canvas');
-    gcodePrev.id = "canvas"
+
 
     dataBox.appendChild(job);
-    dataBox.appendChild(gcodePrev);
     dataBox.appendChild(buttonBox);
+    buttonBox.appendChild(previewButton);
     buttonBox.appendChild(approveButton);
     buttonBox.appendChild(denyButton);
     jobsBox.appendChild(dataBox);
     jobsBox.appendChild(underline);
       
-   //Process the gcode after the canvas is initialized
-    const preview = GCodePreview.init({
-      canvas: gcodePrev,
-      extrusionColor: 'hotpink'
-    });
-    preview.processGCode(gcode);
+
 }
 
 //Function to remove a job by id from the page
@@ -184,6 +183,27 @@ function openRejectModal(id) {
         textInput.placeholder = 'Type here..';
         textInput.value = '';
     } 
+}
+
+
+
+function openPreview(gcode)
+{
+    const previewModal = document.querySelector('.gcode-preview-modal');
+    const closeButton = document.getElementById('preview-close-button');
+    previewModal.style.display = 'block';
+    //gcode-preview canvas
+    let gcodePrev = document.getElementById('preview-canvas');
+    gcodePrev.id = "preview-canvas"
+    //Process the gcode after the canvas is initialized
+    const preview = GCodePreview.init({
+      canvas: gcodePrev,
+      extrusionColor: 'hotpink'
+    });
+    preview.processGCode(gcode);
+    closeButton.onclick = function() {
+        previewModal.style.display = 'none';
+    }
 }
 
 let intervalId = setInterval(refreshJobs, 10000);

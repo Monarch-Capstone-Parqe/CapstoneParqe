@@ -91,23 +91,6 @@ def logout():
         )
     )
 
-@app.route("/verify_email/<token>")
-def verify_email(token):
-    try:
-        data = jwt.decode(token, app.config["SECRET_KEY"], algorithms="HS256")
-        session['verified'] = True
-        return redirect(url_for('success_page'))  # Redirect to a success page after email verification
-
-    except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Token has expired"}), HTTPStatus.BAD_REQUEST
-    except jwt.InvalidTokenError as e:
-        print(f"Invalid token: {e}")
-        return jsonify({"error": "Invalid token"}), HTTPStatus.BAD_REQUEST
-
-@app.route("/success")
-def success_page():
-    return "Email verified successfully. You can now proceed to the success page."
-
 # User uploads model and prefernces
 # Parse, store, and return the results to the user
 @app.route('/upload_model', methods=['POST'])
@@ -119,8 +102,7 @@ def upload_model():
             'layerHeight': request.form.get('layer height', None),
             'nozzleWidth': request.form.get('nozzle width', None),
             'infill': request.form.get('infill', None),
-            'supports': request.form.get('supports', None),
-            'pieces': request.form.get('pieces', None),
+            'count': request.form.get('count', None),
             'note': request.form.get('note', None)
         }
 
@@ -131,8 +113,44 @@ def upload_model():
         # Check if note is empty string
         if data['note'] == '':
             data['note'] = None
+        
+      # Save the model with a unique name in the uploads directory
+        _, ext = os.path.splitext(data['file'].filename)
+        uuid = gen_file_uuid()
+        model_path = f'uploads/{uuid}{ext}'
+        gcode_path = f'uploads/{uuid}.gcode'
 
-        # Verify email
+        try:
+            # Attempt to save the file
+            data['file'].save(model_path)
+
+            # Generate G-code
+            command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {data["layerHeight"]} --nozzle-diameter {data["nozzleWidth"]} --infill-overlap {data["infill"]} --support-material-style {data["supports"]} --dont-arrange --load my_config.ini'
+            prusa_output = subprocess.getoutput(command)
+            # Remove the original file
+            os.remove(model_path)
+
+            # Check if G-code was generated successfully
+            if not os.path.exists(gcode_path):
+                return jsonify({"error": f"Failed to generate G-code. Check your file.", "log" : prusa_output}), HTTPStatus.BAD_REQUEST
+
+        except Exception as e:
+            print(f"Error: {e}")
+        
+        price = get_price(gcode_path)
+        
+        # Store key-value pairs in the session
+        session['email'] = data['email']
+        session['gcode_path'] = gcode_path
+        session['layerHeight'] = data['layerHeight']
+        session['nozzleWidth'] = data['nozzleWidth']
+        session['infill'] = data['infill']
+        session['count'] = data['count']
+        session['note'] = data['note']
+        session['price'] = price
+        session['prusa_output'] = prusa_output
+
+        # Send email
         token = jwt.encode(payload={"email": data['email']}, key=app.config["SECRET_KEY"], algorithm="HS256")
         verification_url = url_for('verify_email', token=token, _external=True)
         html_template = render_template('verify_email_template.html', verification_url=verification_url)
@@ -146,71 +164,37 @@ def upload_model():
                 "token": token
             }
         )
-        except Exception as e:  # Specify the exception type you want to catch
+        except Exception as e:
             print(f"Email sending failed. Error: {e}")
-        
-      # Save the model with a unique name in the uploads directory
-        _, ext = os.path.splitext(data['file'].filename)
-        uuid = gen_file_uuid()
-        model_path = f'uploads/{uuid}{ext}'
-        data['file'].save(model_path)
-        gcode_path = f'uploads/{uuid}.gcode'
+            return jsonify({"error": "Invalid email"}), HTTPStatus.BAD_REQUEST
 
-        # Generate G-code
-        dont_arrange_flag = "--dont-arrange" if data["pieces"] else ""
-        command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {data["layerHeight"]} --nozzle-diameter {data["nozzleWidth"]} --infill-overlap {data["infill"]} --support-material-style {data["supports"]} {dont_arrange_flag} --load my_config.ini'
-        prusa_output = subprocess.getoutput(command)
-        # Remove the original file
-        os.remove(model_path)
-
-         # Check if G-code was generated successfully
-        if not os.path.exists(gcode_path):
-            return jsonify({"error": f"Failed to generate G-code. Check your file."}), HTTPStatus.BAD_REQUEST
-        
-        # Grab Prusa suggestions
-        lines = prusa_output.split('\n')
-        suggestions = [line for line in lines if uuid not in line and '=>' not in line]
-        price = get_price(gcode_path)
-        
-        # Replace the original file with the path to the gcode
-        data['file'] = gcode_path
-
-         # Store key-value pairs in the session
-        for key, value in data.items():
-            session[key] = value
-
-        # TODO: Check if prusa recommends supports
-        if data['supports'] == 'none' and any('Consider enabling supports' in suggestion for suggestion in suggestions):
-            command = f'./prusa.AppImage --export-gcode {model_path}'
-            prusa_output = subprocess.getoutput(command)
-
-
-        response_data = {'suggestions': suggestions, 'price': price}
-        return jsonify(response_data), HTTPStatus.CREATED
+        return HTTPStatus.CREATED
     
     except Exception as e:
         logger.error(f"Error in upload_model route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
-app.route('/upload_model/confirm', methods=['POST'])
-def confirm_order():
-    supports = request.form.get('supports', None)
-    #myconfig.ini
-    validation_result = validate_data({'supports' : supports})
-    if validation_result:
-        return jsonify({"error": "Validation failed", "errors": validation_result}), HTTPStatus.BAD_REQUEST
+
+app.route("/confirm_order/<token>")
+def confirm_order(token):
+    try:
+        _ = jwt.decode(token, app.config["SECRET_KEY"], algorithms="HS256")
+        session['verified'] = True
+
+        # Store the order
+        database.insert_order(session['email'], session['file'], session['layer_height'],
+        session['nozzle_width'], session['infill'], session['count'], session['note'], session['price'], session['prusa_output'])
     
-    # TODO: set final decison on supports, update price if needed
+        return redirect(url_for('success_page'))  # Redirect to a success page after email verification
 
-    # Store the order
-    database.insert_order(session['email'], session['file_name'], session['layer_height'],
-        session['nozzle_width'], session['infill'], session['supports'],
-        session['pieces'], session['note'])
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token has expired"}), HTTPStatus.BAD_REQUEST
+    except jwt.InvalidTokenError as e:
+        return jsonify({"error": "Invalid token"}), HTTPStatus.BAD_REQUEST
 
-    # TODO: Email the staff that a new order has been submitted
-
-    response_data = {'message': 'Order Made, please await an approval email.'}
-    return jsonify(response_data), HTTPStatus.CREATED
+@app.route("/success")
+def success_page():
+    return "Email verified successfully. You can now proceed to the success page."
 
 @app.route('/staff/orders', methods=['GET'])
 @requires_auth

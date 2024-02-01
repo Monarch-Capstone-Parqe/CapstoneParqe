@@ -154,4 +154,16 @@ def get_staff_emails():
         result = conn.execute(text("SELECT email FROM staff")).fetchall()
         staff_emails = [row[0] for row in result]
         return staff_emails
+    
+def get_staff_email(id):
+    with engine.connect() as conn:
+        staff_email_result = conn.execute(text("SELECT email FROM staff WHERE id=:id"),
+                                    {"id": id})
+        staff_email_dict = []
+        for row in staff_email_result:
+            row_as_dict = row._mapping
+            staff_email_dict.append(dict(row_as_dict))
+        staff_email = staff_email_dict[0]['email']
+        return staff_email;
+        
 

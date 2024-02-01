@@ -47,6 +47,11 @@ legend {
   src: url("fonts/Acumin-ItPro.otf");
 }
 
+@font-face {
+  font-family: "Acumin-WProL";
+  src: url("fonts/Acumin-WProL.otf");
+}
+
 /* Google Font */
 .material-symbols-outlined {
   font-variation-settings:
@@ -401,7 +406,7 @@ button[id="dark-mode-toggle"]:hover {
   height: 38px;
   margin-bottom: 30px;
   display: flex;
-  flex-direction: row;
+  justify-content: space-between;
 }
 
 .psu-logo-staff {
@@ -411,12 +416,29 @@ button[id="dark-mode-toggle"]:hover {
   margin-top: 6px;
 }
 
+.staff-header-buttons {
+  display: flex;
+  height: 38px;
+}
+
 .staff-header-button {
   color: white;
   background: none;
   border: none;
   cursor: pointer;
-  justify-self: flex-end;
+  padding-top: 9px;
+  padding-left: 15px;
+  padding-right: 15px;
+  font-family: "Acumin-WProL";
+  font-size: 0.87em;
+  letter-spacing: 1.15px;
+}
+
+.staff-header-button:hover {
+  background-color: #001a33;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 .staff-header-box {

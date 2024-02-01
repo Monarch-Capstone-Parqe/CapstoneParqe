@@ -203,8 +203,14 @@ def get_orders():
         orders = database.get_pending_orders()
     elif order_type == 'approved':
         orders = database.get_approved_orders()
+        for order in orders:
+            staff_email = database.get_staff_email(order['approved_by'])
+            order['approved_by'] = staff_email
     elif order_type == 'denied':
         orders = database.get_denied_orders()
+        for order in orders:
+            staff_email = database.get_staff_email(order['denied_by'])
+            order['denied_by'] = staff_email
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 
@@ -221,11 +227,13 @@ def return_orders():
     try:
         id = request.form['id']
         status = request.form['status']
-        message = request.form['message']
 
         email = session['user']['userinfo']['email']
 
+        print(request.form)
+
         if(status == 'denied'):
+            message = request.form['message']
             database.deny_order(id, email)
             if not send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, session['email'], "Your 3D design submission to the EPL has been denied for the following reason(s): " + message):
                 return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST

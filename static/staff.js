@@ -495,5 +495,26 @@ function insertDeniedTableRow(order) {
     deniedCell.classList.add('table-data');
 }
 
+
+
+function openPreview(gcode)
+{
+    const previewModal = document.querySelector('.gcode-preview-modal');
+    const closeButton = document.getElementById('preview-close-button');
+    previewModal.style.display = 'block';
+    //gcode-preview canvas
+    let gcodePrev = document.getElementById('preview-canvas');
+    gcodePrev.id = "preview-canvas"
+    //Process the gcode after the canvas is initialized
+    const preview = GCodePreview.init({
+      canvas: gcodePrev,
+      extrusionColor: 'hotpink'
+    });
+    preview.processGCode(gcode);
+    closeButton.onclick = function() {
+        previewModal.style.display = 'none';
+    }
+}
+
 //Interval refreshing orders from database continuously to keep the page up to date
 let intervalId = setInterval(refreshOrdersWrapper, 10000);

@@ -1,37 +1,50 @@
-// toggles dark/light mode (switch)
-// const darkModeToggle = document.querySelector("input[name=dark-mode]");
-// darkModeToggle.addEventListener("change", function () {
-//   const modeIcon = document.querySelector(".mode-icon")
-//   if (this.checked) {
-//     console.log("dark mode active");
-//     insertGoogleIcon(modeIcon, "dark_mode", "white");
-//     darkMode(".order-form");
-//   } else {
-//     console.log("light mode active");
-//     insertGoogleIcon(modeIcon, "light_mode", "black");
-//     darkMode(".order-form");
-//   }
-// });
-
-// toggles dark/light mode (no switch)
+// toggles dark/light mode for entire page
 const darkModeToggle = document.querySelector("button[id=dark-mode-toggle]");
 darkModeToggle.onclick = function () {
   const modeIcon = document.querySelector("#dark-mode-toggle");
+
+  // allows for toggle of psu logo image with light/dark mode and flask
+  const image = document.querySelector(".psu-logo");
+  const darkSrc = image.getAttribute("dark-src");
+  const lightSrc = image.getAttribute("light-src");
+
   if (modeIcon.innerHTML.includes("light_mode")) {
     console.log("dark mode active");
     insertGoogleIcon(modeIcon, "dark_mode", "white");
-    darkMode(".order-form");
+    // dark most psu logo
+    image.src = darkSrc;
   } else {
     console.log("light mode active");
     insertGoogleIcon(modeIcon, "light_mode", "black");
-    darkMode(".order-form");
+    // light mode psu logo
+    image.src = lightSrc;
   }
+    // individual elements to toggle dark mode on by selector
+    // must have an associated "dark-mode" css class to work
+    toggleDarkMode(".order-form");
+    toggleDarkMode("body");
+    toggleDarkMode(".header-box");
+    toggleDarkMode(".header-text");
+    toggleDarkMode(".multi-purpose-modal-content");
+    toggleDarkMode(".review-order-modal-content");
 };
 
-// dark mode color scheme toggle
-function darkMode(selector) {
+// dark mode color scheme toggle for individual selectors
+function toggleDarkMode(selector) {
   const element = document.querySelector(selector);
-  element.classList.toggle("dark-mode");
+  if (selector === ".order-form") {
+    element.classList.toggle("dark-mode-form");
+  } else if (selector === "body") {
+    element.classList.toggle("dark-mode-body");
+  } else if (selector === ".header-box") {
+    element.classList.toggle("dark-mode-header-box");
+  } else if (selector === ".header-text") {
+    element.classList.toggle("dark-mode-header-text");
+  } else if (selector === ".multi-purpose-modal-content") {
+    element.classList.toggle("dark-mode-multi-purpose-modal");
+  } else if (selector === ".review-order-modal-content") {
+    element.classList.toggle("dark-mode-review-order-modal");
+  } 
 }
 
 let submitButton = document.querySelector("#submit-button");
@@ -46,13 +59,18 @@ function uploadAndShowFile() {
   const layerHeight = document.querySelector("#layer-height").value;
   const nozzleWidth = document.querySelector("#nozzle-width").value;
   const infill = document.querySelector("#infill").value;
-  const supports = document.querySelector("#supports").value;
-  const pieces = document.querySelector("#pieces").value;
+  const quanity = document.querySelector("#quanity").value;
   const note = document.querySelector("#note").value;
 
   if (!file) {
     console.error("No file selected.");
     openNoFileSelectedModal();
+    return;
+  }
+
+  if (layerHeight < 0.15) {
+    console.error("Layer height outside range");
+    openLayerHeightErrorModal();
     return;
   }
 
@@ -62,8 +80,7 @@ function uploadAndShowFile() {
   formData.append("layer height", layerHeight);
   formData.append("nozzle width", nozzleWidth);
   formData.append("infill", infill);
-  formData.append("supports", supports);
-  formData.append("pieces", pieces);
+  formData.append("quanity", quanity);
   formData.append("note", note);
 
   fetch("/upload_model", {
@@ -78,15 +95,8 @@ function uploadAndShowFile() {
 
 
       // Demo variables to test modal. Parse g code and send actual values
-      let originalPrice = "2.34"; // the cost as configured
-      let supportsPrice = "3.85"; // cost if prusa recommends adding supports
-      let supportsRecommened = true; // flag to catch descripenscy
-
-      if (supportsRecommened) {
-        openSupportRecommendedModal(originalPrice, supportsPrice);
-      } else {
-        openReviewModal(originalPrice);
-      }
+      let price = "2.34"; // the cost as configured
+      openReviewModal(price);
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -158,38 +168,38 @@ function openCancelOrderModal() {
   }
 }
 
-// Displays a message to the user when prusaslicer recommends supports and allows them to chose to add
-function openSupportRecommendedModal(costOriginal, costSupport) {
-  const supportRecommendedModal = document.querySelector(".support-recommended-modal");
-  const addSupportButton = document.querySelector("#support-recommended-support-button");
-  const noSupportButton = document.querySelector("#support-recommended-no-support-button");
-  const cancelButton = document.querySelector("#support-recommended-cancel-button");
+// // Displays a message to the user when prusaslicer recommends supports and allows them to chose to add
+// function openSupportRecommendedModal(costOriginal, costSupport) {
+//   const supportRecommendedModal = document.querySelector(".support-recommended-modal");
+//   const addSupportButton = document.querySelector("#support-recommended-support-button");
+//   const noSupportButton = document.querySelector("#support-recommended-no-support-button");
+//   const cancelButton = document.querySelector("#support-recommended-cancel-button");
 
-  const costSupportString = document.querySelector("#support-modal-string");
-  const costNoSupportString = document.querySelector("#no-support-modal-string");
-  costSupportString.innerHTML = "Cost with added supports: $" + costSupport + " (recommended!)";
-  costNoSupportString.innerHTML = "Cost without supports: $" + costOriginal;
+//   const costSupportString = document.querySelector("#support-modal-string");
+//   const costNoSupportString = document.querySelector("#no-support-modal-string");
+//   costSupportString.innerHTML = "Cost with added supports: $" + costSupport + " (recommended!)";
+//   costNoSupportString.innerHTML = "Cost without supports: $" + costOriginal;
   
-  supportRecommendedModal.style.display = "block";
+//   supportRecommendedModal.style.display = "block";
 
-  addSupportButton.onclick = function() {
-    // close (hide) modal
-    supportRecommendedModal.style.display = "none";
-    openReviewModal(costSupport);
-  }
+//   addSupportButton.onclick = function() {
+//     // close (hide) modal
+//     supportRecommendedModal.style.display = "none";
+//     openReviewModal(costSupport);
+//   }
 
-  noSupportButton.onclick = function() {
-    // close (hide) modal
-    supportRecommendedModal.style.display = "none";
-    openReviewModal(costOriginal);
-  }
+//   noSupportButton.onclick = function() {
+//     // close (hide) modal
+//     supportRecommendedModal.style.display = "none";
+//     openReviewModal(costOriginal);
+//   }
 
-  cancelButton.onclick = function() {
-    // close (hide) modal
-    supportRecommendedModal.style.display = "none";
-    openCancelOrderModal();
-  }
-}
+//   cancelButton.onclick = function() {
+//     // close (hide) modal
+//     supportRecommendedModal.style.display = "none";
+//     openCancelOrderModal();
+//   }
+// }
 
 // Displays a message to the user that no file was selected for upload
 function openNoFileSelectedModal() {
@@ -224,6 +234,24 @@ function openSubmissionErrorModal() {
   submissionErrorOkButton.onclick = function() {
     // close (hide) submission error modal
     submissionErrorModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user that no file was selected for upload
+function openLayerHeightErrorModal() {
+  const layerErrorModal = document.querySelector(".multi-purpose-modal");
+  const layerErrorOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "The layer height value you entered is outside the allowed range";
+  lineTwo.innerHTML = "Minimum layer height: 0.15 mm";
+
+  layerErrorModal.style.display = "block";
+
+  layerErrorOkButton.onclick = function() {
+    // close (hide) no file modal
+    layerErrorModal.style.display = "none";
   }
 }
 
@@ -262,3 +290,16 @@ function insertGoogleIcon(element, iconName, color) {
   element.innerHTML =
     '<span class="material-symbols-outlined">' + iconName + "</span>";
 }
+
+// sets default layer height based on nozzle width selection
+// defaults: 0.6mm nozzle -> 0.3mm layer height, 0.4mm nozzle -> 0.2mm layer height
+const nozzleChange = document.querySelector("#nozzle-width");
+let layerChange = document.querySelector("#layer-height");
+nozzleChange.addEventListener('change', function() {
+  if (nozzleChange.value === "0.6") {
+    layerChange.value = 0.3;
+  } else {
+    layerChange.value = 0.2;
+  }
+})
+

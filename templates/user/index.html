@@ -11,9 +11,18 @@
   <img
     class="psu-logo"
     src="{{ url_for('static', filename='images/psu_logo.png') }}"
+    dark-src="{{ url_for('static', filename='images/psu_logo_dark.png') }}"
+    light-src="{{ url_for('static', filename='images/psu_logo.png') }}"
     alt="Portland State Logo"
-    width="200px"
+    height="300px"
   />
+  <div class="dark-mode-toggle-container">
+    <div class="mode-icon">
+      <button id="dark-mode-toggle" type="button">
+        <span class="material-symbols-outlined">light_mode</span>
+      </button>
+    </div>
+  </div>
   <div class="header-box">
     <h1 class="header-text">
       PrusaSlicer Automated Routing and Quoting Engine
@@ -21,30 +30,6 @@
   </div>
  
   <form class="order-form">
-      <!-- dark mode switch -->
-      <!-- <div class="dark-mode-toggle-container">
-        <div class="mode-icon">
-          <span class="material-symbols-outlined">
-            light_mode
-            </span>
-        </div>
-        <label class="switch">
-          <input type="checkbox" name="dark-mode">
-          <span class="slider round"></span>
-        </label>
-      </div> -->
-
-      <div class="dark-mode-toggle-container">
-        <div class="mode-icon">
-          <button id="dark-mode-toggle">
-            <span class="material-symbols-outlined">light_mode</span>
-          </button>
-        </div>
-        <!-- <label class="switch">
-          <input type="checkbox" name="dark-mode">
-          <span class="slider round"></span>
-        </label> -->
-      </div>
 
       <div class="form-group">
         <label for="email">Email:</label>
@@ -59,28 +44,25 @@
     <fieldset>
       <legend>Configuration</legend>
       <div class="form-group">
-        <label for="layer-height">Layer Height:</label>
-        <select id="layer-height" name="layer-height"">
-          <option value="0.2">0.2mm (default)</option>
-          <option value="0.1">0.1mm</option>
-          <option value="0.3">0.3mm</option>
-          <option value="0.4">0.4mm</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="nozzle-width">Nozzle Width:</label>
+        <label for="nozzle-width">Nozzle Width: (mm)</label>
         <select id="nozzle-width" name="nozzle-width">
-          <option value="0.2">0.2mm (default)</option>
-          <option value="0.1">0.1mm</option>
-          <option value="0.3">0.3mm</option>
-          <option value="0.4">0.4mm</option>
+          <option value="0.4" selected>0.4</option>
+          <option value="0.6">0.6</option>
         </select>
       </div>
       <div class="form-group">
-        <label for="infill">Infill:</label>
+        <label for="layer-height">Layer Height: (mm)</label>
+        <input type="number" id="layer-height" name="layer-height" value="0.2" min="0.15">
+      </div>
+      <div class="form-group">
+        <label for="infill">Infill Density:</label>
         <select id="infill" name="infill">
-          <option value="20">20% (default)</option>
+          <option value="0">0%</option>
+          <option value="5">5%</option>
           <option value="10">10%</option>
+          <option value="15">15%</option>
+          <option value="20" selected>20%</option>
+          <option value="25">25%</option>
           <option value="30">30%</option>
           <option value="40">40%</option>
           <option value="50">50%</option>
@@ -92,25 +74,35 @@
         </select>
       </div>
       <div class="form-group">
-        <label for="supports">Supports:</label>
-        <select id="supports" name="supports">
-          <option value="none">none (default)</option>
-          <option value="organic">tree</option>
-          <option value="grid">grid</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="pieces">Pieces:</label>
-        <select id="pieces" name="pieces">
-          <option value="single">single (default)</option>
-          <option value="multi">multi</option>
+        <label for="quanity">Quanity:</label>
+        <select id="quanity" name="quanity">
+          <option value="1" selected>1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+          <option value="11">11</option>
+          <option value="12">12</option>
+          <option value="13">13</option>
+          <option value="14">14</option>
+          <option value="15">15</option>
+          <option value="16">16</option>
+          <option value="17">17</option>
+          <option value="18">18</option>
+          <option value="19">19</option>
+          <option value="20">20</option>
         </select>
       </div>
     </fieldset>
 
     <div class="form-group">
       <label for="note">Note:</label>
-      <textarea id="note" name="note" placeholder="Additional info about your order"></textarea>
+      <textarea id="note" name="note" placeholder="Is there anything important you need to tell us about this print?"></textarea>
     </div>
     
     <div class="form-group">
@@ -142,7 +134,7 @@
   </div>
 
   <!-- Support Recommended Modal -->
-  <div class="support-recommended-modal">
+  <!-- <div class="support-recommended-modal">
     <div class="support-recommended-modal-content">
       <p>PrusaSlicer recommends this model prints with supports active!</p>
       <p>Failure to add supports may cause issues with your print!</p>
@@ -154,7 +146,7 @@
         <button class="support-recommended-button" id="support-recommended-cancel-button">Cancel</button>
     </div>
     </div>
-  </div>
+  </div> -->
 
 </main>
 

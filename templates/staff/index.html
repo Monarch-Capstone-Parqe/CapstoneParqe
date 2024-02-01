@@ -10,30 +10,32 @@
 {% block body %}
 <body onload="refreshJobs()">
 <main>
-  <img
-    class="psu-logo"
-    src="{{ url_for('static', filename='images/psu_logo.png') }}"
-    alt="Portland State Logo"
-    width="200px"
-  />
-  <div class="header-box">
-    <h1 class="header-text">PrusaSlicer Automated Routing and Quoting Engine Staff Page</h1>
+  <div class="page-header">
+    <img
+      class="psu-logo-staff"
+      src="{{ url_for('static', filename='images/psu_logo_svg.svg') }}"
+      alt="Portland State Logo"
+    />
   </div>
-  <div class="jobs-box-container">
-    <section id="jobs-box">
-      <h1 id ="subheader-text" class="jobs-box-header">Print jobs to be approved</h1>
-      <p id="no-jobs-message">Nothing to display here!</p>
-      <!-- <section id = "boxed-data">
-        <h1 id ="data-formatting"> John Doe  1/1/2000  cost, size, etc.</h1>
-        <button id="approve-button" onclick="approve()">Approve Job</button>
-        <button id="deny-button" onclick="deny()">Deny Job</button>
-      </section>
-      <section id = "boxed-data">
-          <h1 id ="data-formatting"> John Doe  1/2/2000  cost, size</h1>
-          <button id="approve-button" onclick="approve()">Approve Job</button>
-          <button id="deny-button" onclick="deny()">Deny Job</button>
-      </section> -->
-    </section>
+  <div class="staff-header-box">
+    <h1 class="staff-header-content">PARQE STAFF PAGE</h1>
+  </div>
+  <div class="jobs-box-container" id="jobs-box">
+      <div class="jobs-box-header">
+        <h1 id ="subheader-text" class="jobs-box-header-content">JOBS IN QUEUE</h1>
+        <div class="jobs-box-header-underline"></div>
+      </div>
+      <p id="no-jobs-message" class="data-formatting">No jobs in queue.</p>
+      <div class="reject-order-modal">
+        <div class="reject-order-modal-content">
+          <p>Please state why this order was not approved, your message will be relayed to the submitter via email: </p>
+          <textarea placeholder="Type here.." class="reject-modal-input" id="reject-modal-input"></textarea>
+          <div class="modal-button-container">
+            <button class="reject-modal-button" id="reject-modal-submit-button">SUBMIT</button>
+            <button class="reject-modal-button" id="reject-modal-cancel-button">CANCEL</button>
+          </div>
+        </div>
+      </div>
   </div>
 </main>
 

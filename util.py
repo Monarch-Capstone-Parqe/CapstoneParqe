@@ -11,8 +11,8 @@ form_types = {
     'file': [FileStorage, lambda filename: '.' in filename and filename.rsplit('.', 1)[1].lower() in {'stl', 'stp', 'step', '3mf'}],
     'layerHeight': [float, lambda value: value in {0.1, 0.2, 0.3, 0.4}],
     'nozzleWidth': [float, lambda value: value in {0.1, 0.2, 0.3, 0.4}],
-    'infill': [int, lambda infill_num: 0 < infill_num <= 100],
-    'count': [int, lambda infill_num: 0 < infill_num <= 10],
+    'infill': [float, lambda infill_num: 0 < infill_num <= 100],
+    'quantity': [int, lambda infill_num: 0 < infill_num <= 10],
     'note': [lambda value: value is None or isinstance(value, str)]
 }
 

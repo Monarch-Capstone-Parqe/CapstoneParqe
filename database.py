@@ -33,6 +33,9 @@ def check_db_connect():
 # Create PARQE tables
 def create_tables():
     with engine.connect() as conn:
+        conn.execute(text("DROP TABLE IF EXISTS staff, orders CASCADE"))
+        conn.commit()
+
         conn.execute(text("CREATE TABLE IF NOT EXISTS staff("
                             "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                             "email VARCHAR UNIQUE NOT NULL)"))
@@ -40,26 +43,26 @@ def create_tables():
         conn.execute(text("CREATE TABLE IF NOT EXISTS orders("
                             "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                             "email VARCHAR NOT NULL,"
-                            "file_name VARCHAR NOT NULL,"
-                            "note VARCHAR,"
                             "layer_height VARCHAR NOT NULL,"      
                             "nozzle_width VARCHAR NOT NULL,"      
-                            "infill INTEGER NOT NULL,"            
-                            "supports VARCHAR NOT NULL,"          
-                            "pieces BOOLEAN NOT NULL,"            
+                            "infill NUMERIC(3,2) NOT NULL,"          
+                            "quantity INTEGER NOT NULL," 
+                            "note VARCHAR,"
+                            "gcode_path VARCHAR NOT NULL,"
+                            "prusa_output VARCHAR NOT NULL,"
                             "price NUMERIC(6,2) NOT NULL,"
                             "date DATE DEFAULT CURRENT_DATE,"
                             "approved_by INTEGER REFERENCES staff(id) DEFAULT NULL)"))
         
         conn.commit()
 
-def insert_order(email, file_name, price, note=None, layer_height=None, nozzle_width=None, infill=None, supports=None, pieces=None):
+def insert_order(email, layer_height=None, nozzle_width=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None):
     with engine.connect() as conn:
-        conn.execute(text("INSERT INTO orders(email, file_name, note, layer_height, nozzle_width, infill, supports, pieces, price, date) "
-                          "VALUES (:email, :file_name, :note, :layer_height, :nozzle_width, :infill, :supports, :pieces, :price, :date)"),
-                     {"email": email, "file_name": file_name, "note": note, "layer_height": layer_height, 
-                      "nozzle_width": nozzle_width, "infill": infill, "supports": supports, "pieces": pieces, 
-                      "price": price, "date": date.today()})
+        conn.execute(text("INSERT INTO orders(email, layer_height, nozzle_width, infill, quantity, note, prusa_output, gcode_path, price, date) "
+                          "VALUES (:email, :layer_height, :nozzle_width, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :date)"),
+                     {"email": email, "layer_height": layer_height, "nozzle_width": nozzle_width,
+                      "infill": infill, "quantity": quantity, "note": note,
+                      "prusa_output": prusa_output, "gcode_path": gcode_path, "price": price, "date": date.today()})
 
         conn.commit()
 

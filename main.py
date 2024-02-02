@@ -93,16 +93,16 @@ def logout():
 
 # User uploads model and prefernces
 # Parse, store, and return the results to the user
-@app.route('/upload_model', methods=['POST'])
-def upload_model():
+@app.route('/order', methods=['POST'])
+def order():
     try:
         data = {
             'email': request.form.get('email', None),
             'file': request.files.get('file', None),
-            'layerHeight': request.form.get('layer height', None),
-            'nozzleWidth': request.form.get('nozzle width', None),
+            'layer_height': request.form.get('layer height', None),
+            'nozzle_width': request.form.get('nozzle width', None),
             'infill': request.form.get('infill', None),
-            'count': request.form.get('count', None),
+            'quantity': request.form.get('quantity', None),
             'note': request.form.get('note', None)
         }
 
@@ -125,7 +125,7 @@ def upload_model():
             data['file'].save(model_path)
 
             # Generate G-code
-            command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {data["layerHeight"]} --nozzle-diameter {data["nozzleWidth"]} --infill-overlap {data["infill"]} --support-material-style {data["supports"]} --dont-arrange --load my_config.ini'
+            command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {data["layer_height"]} --nozzle-diameter {data["nozzle_width"]} --infill-overlap {data["infill"]} --dont-arrange --load config.ini'
             prusa_output = subprocess.getoutput(command)
             # Remove the original file
             os.remove(model_path)
@@ -138,27 +138,22 @@ def upload_model():
             print(f"Error: {e}")
         
         price = get_price(gcode_path)
-
-        if(data['pieces'] == 'single'):
-            data['pieces'] = False
-        else:
-            data['pieces'] = True
         
         # Store key-value pairs in the session
         session['email'] = data['email']
         session['gcode_path'] = gcode_path
-        session['layerHeight'] = data['layerHeight']
-        session['nozzleWidth'] = data['nozzleWidth']
+        session['layer_height'] = data['layer_height']
+        session['nozzle_width'] = data['nozzle_width']
         session['infill'] = data['infill']
-        session['count'] = data['count']
+        session['quantity'] = data['quantity']
         session['note'] = data['note']
         session['price'] = price
         session['prusa_output'] = prusa_output
 
         # Send email
         token = jwt.encode(payload={"email": data['email']}, key=app.config["SECRET_KEY"], algorithm="HS256")
-        verification_url = url_for('verify_email', token=token, _external=True)
-        html_template = render_template('verify_email_template.html', verification_url=verification_url)
+        verification_url = url_for('confirm_order', token=token, _external=True)
+        html_template = render_template('confirm_order.html', verification_url=verification_url)
 
         try:
             email.send(
@@ -173,33 +168,42 @@ def upload_model():
             print(f"Email sending failed. Error: {e}")
             return jsonify({"error": "Invalid email"}), HTTPStatus.BAD_REQUEST
 
-        return HTTPStatus.CREATED
+        return jsonify('Model uploaded'), HTTPStatus.CREATED
     
     except Exception as e:
-        logger.error(f"Error in upload_model route: {e}")
+        logger.error(f"Error in order route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
-
-app.route("/confirm_order/<token>")
+@app.route("/confirm_order/<token>")
 def confirm_order(token):
     try:
         _ = jwt.decode(token, app.config["SECRET_KEY"], algorithms="HS256")
         session['verified'] = True
 
         # Store the order
-        database.insert_order(session['email'], session['file'], session['layer_height'],
-        session['nozzle_width'], session['infill'], session['count'], session['note'], session['price'], session['prusa_output'])
-    
-        return redirect(url_for('success_page'))  # Redirect to a success page after email verification
+        database.insert_order(
+            session['email'],
+            session['layerHeight'],  
+            session['nozzleWidth'], 
+            session['infill'],
+            session['quantity'],
+            session['note'],
+            session['prusa_output'],
+            session['gcode_path'],
+            session['price']
+        )
+
+        
+        return redirect(url_for('order_confirmed'))
 
     except jwt.ExpiredSignatureError:
         return jsonify({"error": "Token has expired"}), HTTPStatus.BAD_REQUEST
     except jwt.InvalidTokenError as e:
         return jsonify({"error": "Invalid token"}), HTTPStatus.BAD_REQUEST
 
-@app.route("/success")
-def success_page():
-    return "Email verified successfully. You can now proceed to the success page."
+@app.route("/order_confirmed")
+def order_confirmed():
+    return "Order confirmed."
 
 @app.route('/staff/orders', methods=['GET'])
 @requires_auth

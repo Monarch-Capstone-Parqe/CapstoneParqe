@@ -1,7 +1,7 @@
 import os
 import subprocess
 from http import HTTPStatus
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_file
 from flask_session import Session
 from flask_redmail import RedMail
 import jwt
@@ -205,9 +205,9 @@ def confirm_order(token):
 def order_confirmed():
     return "Order confirmed."
 
-@app.route('/staff/orders', methods=['GET'])
+@app.route('/staff/get_orders/<order_type>', methods=['GET'])
 @requires_auth
-def get_orders():
+def get_orders(order_type):
     """
     Retrieve orders based on the specified type.
 
@@ -215,8 +215,6 @@ def get_orders():
         A JSON response containing the retrieved orders.
     """
     
-    order_type = request.args.get('type', 'all')
-
     if order_type == 'all':
         orders = database.get_orders()
     elif order_type == 'pending':
@@ -224,11 +222,26 @@ def get_orders():
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 
-    # Remove file name from return data
-    for order in orders:
-        del order['file_name']
-
     return jsonify({'orders': orders}), HTTPStatus.OK
+
+@app.route('/staff/get_gcode/<gcode_path>', methods=['GET'])
+@requires_auth
+def get_gcode(gcode_path):
+    """
+    Retrieve orders based on the specified type.
+
+    Returns:
+        A JSON response containing the retrieved orders.
+    """
+    
+    try:
+        return send_file(gcode_path, as_attachment=True)
+    except FileNotFoundError:
+        return jsonify({'error': 'File not found'}), HTTPStatus.NOT_FOUND
+    except Exception as e:
+        logger.error(f"Error in get_gcode route: {e}")
+        return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
+
 
 @app.route('/staff/return_orders', methods=['PUT'])
 @requires_auth

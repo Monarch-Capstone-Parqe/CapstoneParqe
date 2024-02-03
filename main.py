@@ -5,8 +5,8 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 from flask_session import Session
 from flask_redmail import RedMail
 import jwt
-import database
-from util import get_price, gen_file_uuid, validate_data
+import database as db
+from util import get_price, gen_file_uuid, process_order_data
 from loguru import logger  
 from functools import wraps
 import config.variables as variables
@@ -14,8 +14,8 @@ from urllib.parse import quote_plus, urlencode
 from authlib.integrations.flask_client import OAuth
 
 # Init db
-database.check_db_connect()
-database.create_tables()
+db.check_db_connect()
+db.create_tables()
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.config["SECRET_KEY"] = variables.APP_SECRET_KEY
@@ -91,41 +91,30 @@ def logout():
         )
     )
 
-# User uploads model and prefernces
-# Parse, store, and return the results to the user
+# User uploads model and prefrences
 @app.route('/order', methods=['POST'])
 def order():
     try:
-        data = {
-            'email': request.form.get('email', None),
-            'file': request.files.get('file', None),
-            'layer_height': request.form.get('layer height', None),
-            'nozzle_width': request.form.get('nozzle width', None),
-            'infill': request.form.get('infill', None),
-            'quantity': request.form.get('quantity', None),
-            'note': request.form.get('note', None)
-        }
+        errors = process_order_data(request.form, session)
+        if errors:
+            return jsonify({"Error": "Invalid/Incomplete input", "Log": errors}), HTTPStatus.BAD_REQUEST
 
-        validation_result = validate_data(data)
-        if validation_result:
-            return jsonify({"error": "Validation failed", "errors": validation_result}), HTTPStatus.BAD_REQUEST
+        # Check the file
+        if request.files.get('file').mimetype not in {'model/stl', 'model/stp', 'model/step', 'application/3mf'}:
+            return jsonify({"Error": "Invalid file format"}), HTTPStatus.BAD_REQUEST
 
-        # Check if note is empty string
-        if data['note'] == '':
-            data['note'] = None
-        
-      # Save the model with a unique name in the uploads directory
-        _, ext = os.path.splitext(data['file'].filename)
+        # Save the model with a unique name in the uploads directory
+        _, ext = os.path.splitext(request.files.get('file').filename)
         uuid = gen_file_uuid()
         model_path = f'uploads/{uuid}{ext}'
         gcode_path = f'uploads/{uuid}.gcode'
 
         try:
-            # Attempt to save the file
-            data['file'].save(model_path)
+            # Save the file to disk
+            request.files.get('file').save(model_path)
 
             # Generate G-code
-            command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {data["layer_height"]} --nozzle-diameter {data["nozzle_width"]} --infill-overlap {data["infill"]} --dont-arrange --load config.ini'
+            command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {session["layer_height"]} --nozzle-diameter {session["nozzle_width"]} --infill-overlap {session["infill"]} --dont-arrange --load prusa_config.ini'
             prusa_output = subprocess.getoutput(command)
             # Remove the original file
             os.remove(model_path)
@@ -136,29 +125,22 @@ def order():
 
         except Exception as e:
             print(f"Error: {e}")
-        
+
         price = get_price(gcode_path)
-        
-        # Store key-value pairs in the session
-        session['email'] = data['email']
+
         session['gcode_path'] = gcode_path
-        session['layer_height'] = data['layer_height']
-        session['nozzle_width'] = data['nozzle_width']
-        session['infill'] = data['infill']
-        session['quantity'] = data['quantity']
-        session['note'] = data['note']
         session['price'] = price
         session['prusa_output'] = prusa_output
 
         # Send email
-        token = jwt.encode(payload={"email": data['email']}, key=app.config["SECRET_KEY"], algorithm="HS256")
+        token = jwt.encode(payload={"email": session['email']}, key=app.config["SECRET_KEY"], algorithm="HS256")
         verification_url = url_for('confirm_order', token=token, _external=True)
         html_template = render_template('confirm_order.html', verification_url=verification_url)
 
         try:
             email.send(
             subject="Verify email",
-            receivers=data['email'],
+            receivers=session['email'],
             html=html_template,
             body_params={
                 "token": token
@@ -181,10 +163,10 @@ def confirm_order(token):
         session['verified'] = True
 
         # Store the order
-        database.insert_order(
+        db.insert_order(
             session['email'],
-            session['layerHeight'],  
-            session['nozzleWidth'], 
+            session['layer_height'],  
+            session['nozzle_width'], 
             session['infill'],
             session['quantity'],
             session['note'],
@@ -192,7 +174,6 @@ def confirm_order(token):
             session['gcode_path'],
             session['price']
         )
-
         
         return redirect(url_for('order_confirmed'))
 
@@ -216,9 +197,9 @@ def get_orders(order_type):
     """
     
     if order_type == 'all':
-        orders = database.get_orders()
+        orders = db.get_orders()
     elif order_type == 'pending':
-        orders = database.get_pending_orders()
+        orders = db.get_pending_orders()
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 
@@ -246,20 +227,32 @@ def get_gcode(gcode_path):
 @app.route('/staff/return_orders', methods=['PUT'])
 @requires_auth
 def return_orders():
-    # TODO: Provide a reason for denial and update user on statusvia email
+    # TODO: Provide a reason for denial and update user on status via email
     try:
-        id = request.form['id']
-        status = request.form['status']
-        message = request.form['message']
+        # Grab order details
+        order_id = request.form['id']
+        order_status = request.form['status']
+        order_comment = request.form['comment']
+        order_email = db.get_email_by_order_id(order_id)
+        staff_email = session['user']['userinfo']['email']
 
-        email = session['user']['userinfo']['email']
+        if(order_status == 'denied'):
+            db.delete_order(order_id)
+        elif(order_status == 'approved'):
+            db.approve_order(order_id, staff_email)
+        else:
+            return jsonify({'error': f'"{order_status}" is an invalid status.'}), HTTPStatus.BAD_REQUEST
+        
+        # Email buyer
+        email.send(
+        subject="Verify email",
+        receivers=order_email,
+        html="html_template",
+        body_params={
+            "token": order_comment
+        }
+        )
 
-        if(status == 'denied'):
-            database.delete_order(id)
-            if not send_email(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD, session['email'], "Your 3D design submission to the EPL has been denied for the following reason(s): " + message):
-                return jsonify({'error': 'f"Failed to verify {email}"'}), HTTPStatus.BAD_REQUEST
-        if(status == 'approved'):
-            database.approve_order(id, email)
         return jsonify({'message': 'Update received'}), HTTPStatus.OK
     
     except Exception as e:

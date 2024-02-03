@@ -124,3 +124,16 @@ def get_staff_emails():
         staff_emails = [row[0] for row in result]
         return staff_emails
 
+def get_email_by_order_id(order_id):
+    """
+    Retrieve the email associated with the given order ID.
+
+    Parameters:
+        order_id (int): The primary key of the order.
+
+    Returns:
+        str: The email associated with the given order ID.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT email FROM orders WHERE id = :order_id"), {"order_id": order_id}).scalar()
+        return result if result else None

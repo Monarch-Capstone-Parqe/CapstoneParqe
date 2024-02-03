@@ -77,8 +77,8 @@ function uploadAndShowFile() {
   const formData = new FormData();
   formData.append("email", email);
   formData.append("file", file);
-  formData.append("layer height", layerHeight);
-  formData.append("nozzle width", nozzleWidth);
+  formData.append("layer_height", layerHeight);
+  formData.append("nozzle_width", nozzleWidth);
   formData.append("infill", infill);
   formData.append("quantity", quantity);
   formData.append("note", note);

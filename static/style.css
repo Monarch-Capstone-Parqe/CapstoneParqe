@@ -467,6 +467,7 @@ button[id="dark-mode-toggle"]:hover {
 .jobs-box-container {
   width: 70%;
   margin: 0 auto;
+  margin-bottom: 150px;
 }
 
 .jobs-box-header {
@@ -579,6 +580,32 @@ button[id="dark-mode-toggle"]:hover {
 .canvas {
   width: 200px;
   height: 80px;
+}
+
+.load-more-button-box {
+  width: 100%;
+  margin-top: 30px;
+  text-align: center;
+}
+
+#load-more-button {
+  color: black;
+  background-color: white;
+  width: 200px;
+  height: 50px;
+  font-size: 1.3em;
+  border: 2px solid #404040;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  transition: 0.3s;
+}
+
+#load-more-button:hover {
+  color: white;
+  background-color: #404040;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 

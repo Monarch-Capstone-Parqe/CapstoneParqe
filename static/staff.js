@@ -1,3 +1,5 @@
+let maxRender = 10;
+
 function approve(id)
 {
 //update status of job
@@ -45,8 +47,14 @@ function refreshPendingJobs()
     .then((response) => response.json())
     .then((data) => {
         console.log(data)
-        for(const order of data.orders) {
-            renderPendingJob(order)
+        for(let i = 0; i < maxRender && i < data.orders.length; i++) {
+           /* for(const order of data.orders) {
+                renderDeniedJob(order)
+            }           */
+            renderPendingJob(data.orders[i]);
+        }
+        if(data.orders.length > maxRender) {
+            renderLoadMoreButton();
         }
     })
     .catch((error) => {
@@ -64,8 +72,14 @@ function refreshApprovedJobs()
     .then((response) => response.json())
     .then((data) => {
         console.log(data)
-        for(const order of data.orders) {
-            renderApprovedJob(order)
+        for(let i = 0; i < maxRender && i < data.orders.length; i++) {
+           /* for(const order of data.orders) {
+                renderDeniedJob(order)
+            }           */
+            renderApprovedJob(data.orders[i]);
+        }
+        if(data.orders.length > maxRender) {
+            renderLoadMoreButton();
         }
     })
     .catch((error) => {
@@ -83,8 +97,14 @@ function refreshDeniedJobs()
     .then((response) => response.json())
     .then((data) => {
         console.log(data)
-        for(const order of data.orders) {
-            renderDeniedJob(order)
+        for(let i = 0; i < maxRender && i < data.orders.length; i++) {
+           /* for(const order of data.orders) {
+                renderDeniedJob(order)
+            }           */
+            renderDeniedJob(data.orders[i]);
+        }
+        if(data.orders.length > maxRender) {
+            renderLoadMoreButton();
         }
     })
     .catch((error) => {
@@ -94,10 +114,7 @@ function refreshDeniedJobs()
 
 function refreshJobsWrapper()
 {
-    if(window.name == '') {
-        window.name = 'pending';
-    }
-    if(window.name == 'pending') {
+    if(window.name == '' || window.name == 'pending') {
         refreshPendingJobs();
     }
     else if(window.name == 'approved') {
@@ -169,7 +186,6 @@ function renderPendingJob(order)
 }
 
 function renderApprovedJob(order) {
-    console.log(order);
     const exists = document.getElementById(order.id)
     if(exists) {
         return
@@ -245,6 +261,38 @@ function renderDeniedJob(order) {
     jobsBox.appendChild(underline); 
 }
 
+function renderLoadMoreButton() {
+    const exists = document.getElementById('load-more-button');
+    if(exists) {
+        return;
+    }
+    const jobsBox = document.getElementById('jobs-box');
+    let loadMoreButtonBox = document.createElement('section');
+    loadMoreButtonBox.classList.add('load-more-button-box');
+
+    let loadMoreButton = document.createElement('button');
+    loadMoreButton.id = 'load-more-button';
+    loadMoreButton.addEventListener('click', () => {
+        maxRender += 10;
+        loadMoreButtonBox.parentNode.removeChild(loadMoreButtonBox);
+        refreshJobsWrapper();
+    });
+    loadMoreButton.textContent = 'LOAD MORE';
+
+    loadMoreButtonBox.append(loadMoreButton);
+    jobsBox.append(loadMoreButtonBox);
+}
+
+function removeLoadMoreButton() {
+    const toRemove = document.getElementById('load-more-button');
+    if(!toRemove) {
+        return;
+    }
+
+    const toRemoveParent = toRemove.parentNode;
+    toRemoveParent.parentNode.removeChild(toRemoveParent);
+}
+
 //Function to remove a job by id from the page
 function removeJob(id) {
     let toRemove = document.getElementById(id);
@@ -275,6 +323,7 @@ function removeAllJobs() {
             toDisplay.style.display = 'block';
         }
     }
+    removeLoadMoreButton();
 }
 
 //Function to display modal to input reason when an order is denied
@@ -314,6 +363,9 @@ function openRejectModal(id) {
 
 //Renders approved job content
 function openApprovedPage() {
+    window.name = 'approved';
+    maxRender = 10;
+
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
@@ -321,11 +373,13 @@ function openApprovedPage() {
     jobsBoxHeaderContent.innerText = 'APPROVED JOBS';
     noJobsMessage.innerText = 'No jobs have been approved.';
 
-    window.name = 'approved';
     refreshJobsWrapper(); 
 }
 
 function openPendingPage() {
+    window.name = 'pending';
+    maxRender = 10;
+
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
@@ -333,11 +387,13 @@ function openPendingPage() {
     jobsBoxHeaderContent.innerText = 'PENDING JOBS';
     noJobsMessage.innerText = 'No jobs are currently pending.';
 
-    window.name = 'pending';
     refreshJobsWrapper(); 
 }
 
 function openDeniedPage() {
+    window.name = 'denied';
+    maxRender = 10;
+
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
@@ -345,7 +401,6 @@ function openDeniedPage() {
     jobsBoxHeaderContent.innerText = 'DENIED JOBS';
     noJobsMessage.innerText = 'No jobs have been denied.';
 
-    window.name = 'denied';
     refreshJobsWrapper(); 
 }
 

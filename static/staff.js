@@ -306,6 +306,7 @@ function removeJob(id) {
             toDisplay.style.display = 'block';
         }
     }
+    removeLoadMoreButton();
 }
 
 function removeAllJobs() {

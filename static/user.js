@@ -59,7 +59,7 @@ function uploadAndShowFile() {
   const layerHeight = document.querySelector("#layer-height").value;
   const nozzleWidth = document.querySelector("#nozzle-width").value;
   const infill = document.querySelector("#infill").value;
-  const quanity = document.querySelector("#quanity").value;
+  const quantity = document.querySelector("#quantity").value;
   const note = document.querySelector("#note").value;
 
   if (email === "") {
@@ -83,10 +83,10 @@ function uploadAndShowFile() {
   const formData = new FormData();
   formData.append("email", email);
   formData.append("file", file);
-  formData.append("layer height", layerHeight);
   formData.append("nozzle width", nozzleWidth);
+  formData.append("layer height", layerHeight);
   formData.append("infill", infill);
-  formData.append("quanity", quanity);
+  formData.append("quantity", quantity);
   formData.append("note", note);
 
   fetch("/upload_model", {
@@ -99,10 +99,7 @@ function uploadAndShowFile() {
       // Handle the response data as needed
       showFileInfo(fileInput);
 
-
-      // Demo variables to test modal. Parse g code and send actual values
-      let price = "2.34"; // the cost as configured
-      openReviewModal(price);
+      openReviewModal(email, fileInput, nozzleWidth, layerHeight, infill, quantity, note);
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -113,24 +110,30 @@ function uploadAndShowFile() {
 }
 
 // Displays print cost to user upon form submission, requires approval or cancel before being sent for review
-function openReviewModal(cost) {
-  const priceModal = document.querySelector(".review-order-modal");
+function openReviewModal(email, file, nozzleWidth, layerHeight, infill, quantity, note) {
+  const reviewModal = document.querySelector(".review-order-modal");
   const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
   const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
 
-  let priceString = document.querySelector(".print-cost");
-  priceString.innerHTML = "Print Cost: $" + cost;
-  priceModal.style.display = "block";
+  let orderReview = document.querySelector(".order-review");
+  orderReview.innerHTML = "Email:         " + email + "<br>";
+  orderReview.innerHTML += "File:         " + file.files.item(0).name + "<br>";
+  orderReview.innerHTML += "Nozzle Width: " + nozzleWidth + "mm<br>";
+  orderReview.innerHTML += "Layer Height: " + layerHeight + "mm<br>";
+  orderReview.innerHtml += "Infill:       " + infill + "%<br>";
+  orderReview.innerHTML += "Quantity:     " + quantity + "<br>";
+  orderReview.innerHtml += "Note:         " + note + "<br>";
+  reviewModal.style.display = "block";
 
   reviewModalApproveButton.onclick = function() {
     // close (hide) review modal
-    priceModal.style.display = "none";
+    reviewModal.style.display = "none";
     openOrderSuccessModal();
   }
 
   reviewModalCancelButton.onclick = function() {
     // close (hide) review modal
-    priceModal.style.display = "none";
+    reviewModal.style.display = "none";
     openCancelOrderModal();
   }
 }
@@ -143,7 +146,7 @@ function openOrderSuccessModal() {
   const lineTwo = document.querySelector('#line2');
 
   lineOne.innerHTML = "Your order was successfully sent for review";
-  lineTwo.innerHTML = "Please monitor your email for admin approval";
+  lineTwo.innerHTML = "Please monitor your email for admin approval and payment link";
 
   successModal.style.display = "block";
 

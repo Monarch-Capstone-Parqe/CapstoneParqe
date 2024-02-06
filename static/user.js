@@ -62,6 +62,12 @@ function uploadAndShowFile() {
   const quanity = document.querySelector("#quanity").value;
   const note = document.querySelector("#note").value;
 
+  if (email === "") {
+    console.error("Email field empty");
+    openEmptyEmailFieldModal();
+    return;
+  }
+
   if (!file) {
     console.error("No file selected.");
     openNoFileSelectedModal();
@@ -250,8 +256,26 @@ function openLayerHeightErrorModal() {
   layerErrorModal.style.display = "block";
 
   layerErrorOkButton.onclick = function() {
-    // close (hide) no file modal
+    // close (hide) modal
     layerErrorModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user if the email field is blank on the order form
+function openEmptyEmailFieldModal() {
+  const emptyEmailFieldModal = document.querySelector(".multi-purpose-modal");
+  const emptyEmailFieldOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "The email field cannot be empty";
+  lineTwo.innerHTML = "Please enter a valid email";
+
+  emptyEmailFieldModal.style.display = "block";
+
+  emptyEmailFieldOkButton.onclick = function() {
+    // close (hide) modal
+    emptyEmailFieldModal.style.display = "none";
   }
 }
 

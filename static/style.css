@@ -800,7 +800,7 @@ button[id="dark-mode-toggle"]:hover {
 
 /************** gcode preview modal **************/
 
-.gcode-preview-modal {
+.gcode-preview-modal{
   display: none;
   position: fixed;
   z-index: 1;
@@ -818,7 +818,7 @@ button[id="dark-mode-toggle"]:hover {
   margin: 15% auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 500px;
+  width: 800px;
   font-size: 1.15em;
   height: auto;
   text-align: center;
@@ -827,8 +827,8 @@ button[id="dark-mode-toggle"]:hover {
 
 
 .gcode-preview-modal-content .preview-canvas {
-  width: 75%;
-  height: 75%;
+  width: 700px ; 
+  height: 300px;
 }
 
 .gcode-preview-modal-content .preview-close-button{
@@ -839,7 +839,7 @@ button[id="dark-mode-toggle"]:hover {
   margin-top: 20px;
   border: none;
   cursor: pointer;
-  width: 100px;
+  width: 150px;
   height: 50px;
 }
 

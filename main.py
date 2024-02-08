@@ -146,10 +146,6 @@ def upload_model():
         
         session['price'] = price
 
-        database.insert_order(session['email'], session['file'], session['price'], session['note'], session['layerHeight'],
-        session['nozzleWidth'], session['infill'], session['supports'],
-        session['pieces'])
-
         # TODO: If supports are off, turn them on and fetch price
         response_data = {'suggestions': suggestions, 'price': price}
         return jsonify(response_data), HTTPStatus.CREATED
@@ -227,10 +223,7 @@ def return_orders():
     try:
         id = request.form['id']
         status = request.form['status']
-
         email = session['user']['userinfo']['email']
-
-        print(request.form)
 
         if(status == 'denied'):
             message = request.form['message']

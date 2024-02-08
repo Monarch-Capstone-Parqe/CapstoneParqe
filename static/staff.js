@@ -495,5 +495,35 @@ function insertDeniedTableRow(order) {
     deniedCell.classList.add('table-data');
 }
 
+
+
+function openPreview(gcode)
+{
+    const previewModal = document.querySelector('.gcode-preview-modal');
+    const closeButton = document.getElementById('preview-close-button');
+    previewModal.style.display = 'block';
+    //gcode-preview canvas
+    let gcodePrev = document.getElementById('preview-canvas');
+    gcodePrev.id = "preview-canvas"
+    //Process the gcode after the canvas is initialized
+    const preview = GCodePreview.init({
+      canvas: gcodePrev,
+      buildVolume: { x: 300, y: 300, z: 0 },
+      drawBuildVolume: { x: 300, y: 300, z: 0 },
+      initialCameraPosition: [90, 75, 150],
+      renderExtrusion: false,
+      renderTravel: false,
+      renderTubes: false,
+      extrusionColor: 'hotpink',
+      backgroundColor: '#eee',
+      travelColor: new THREE.Color('lime')
+    });
+
+    preview.processGCode(gcode);
+    closeButton.onclick = function() {
+        previewModal.style.display = 'none';
+    }
+}
+
 //Interval refreshing orders from database continuously to keep the page up to date
 let intervalId = setInterval(refreshOrdersWrapper, 10000);

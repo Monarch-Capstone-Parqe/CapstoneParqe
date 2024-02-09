@@ -3,10 +3,9 @@ import subprocess
 from http import HTTPStatus
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_file
 from flask_session import Session
-from flask_redmail import RedMail
 import jwt
 import database as db
-from util import get_price, gen_file_uuid, process_order_data
+from util import get_price, gen_file_uuid, process_order_data, send_email
 from loguru import logger  
 from functools import wraps
 import config.variables as variables
@@ -34,13 +33,6 @@ oauth.register(
     },
     server_metadata_url=f'https://{variables.AUTH0_DOMAIN}/.well-known/openid-configuration',
 )
-
-app.config["EMAIL_HOST"] = "smtp.gmail.com"
-app.config["EMAIL_PORT"] = 587
-app.config["EMAIL_SENDER"] = variables.EPL_EMAIL
-app.config["EMAIL_USERNAME"] = variables.EPL_EMAIL
-app.config["EMAIL_PASSWORD"] = variables.EPL_EMAIL_APP_PASSWORD
-email = RedMail(app)
 
 logger.add("app.log", rotation="500 MB", level="INFO") 
 
@@ -114,7 +106,7 @@ def order():
             request.files.get('file').save(model_path)
 
             # Generate G-code
-            command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {session["layer_height"]} --nozzle-diameter {session["nozzle_width"]} --infill-overlap {session["infill"]} --dont-arrange --load prusa_config.ini'
+            command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {session["layer_height"]} --nozzle-diameter {session["nozzle_size"]} --infill-overlap {session["infill"]} --dont-arrange --load EPL_0.20mm_SPEED.ini'
             prusa_output = subprocess.getoutput(command)
             # Remove the original file
             os.remove(model_path)
@@ -135,20 +127,8 @@ def order():
         # Send email
         token = jwt.encode(payload={"email": session['email']}, key=app.config["SECRET_KEY"], algorithm="HS256")
         verification_url = url_for('confirm_order', token=token, _external=True)
-        html_template = render_template('confirm_order.html', verification_url=verification_url)
-
-        try:
-            email.send(
-            subject="Verify email",
-            receivers=session['email'],
-            html=html_template,
-            body_params={
-                "token": token
-            }
-        )
-        except Exception as e:
-            print(f"Email sending failed. Error: {e}")
-            return jsonify({"error": "Invalid email"}), HTTPStatus.BAD_REQUEST
+        message = f"Press here to confirm your order: {verification_url}"
+        send_email(session['email'], "EPL Verify Purchase", message)
 
         return jsonify('Model uploaded'), HTTPStatus.CREATED
     
@@ -166,7 +146,7 @@ def confirm_order(token):
         db.insert_order(
             session['email'],
             session['layer_height'],  
-            session['nozzle_width'], 
+            session['nozzle_size'], 
             session['infill'],
             session['quantity'],
             session['note'],
@@ -227,7 +207,6 @@ def get_gcode(gcode_path):
 @app.route('/staff/return_orders', methods=['PUT'])
 @requires_auth
 def return_orders():
-    # TODO: Provide a reason for denial and update user on status via email
     try:
         # Grab order details
         order_id = request.form['id']
@@ -243,15 +222,8 @@ def return_orders():
         else:
             return jsonify({'error': f'"{order_status}" is an invalid status.'}), HTTPStatus.BAD_REQUEST
         
-        # Email buyer
-        email.send(
-        subject="Verify email",
-        receivers=order_email,
-        html="html_template",
-        body_params={
-            "token": order_comment
-        }
-        )
+        message = f"Your order has been {order_status}. {order_comment}"
+        send_email(order_email, "EPL Verify Purchase", message)
 
         return jsonify({'message': 'Update received'}), HTTPStatus.OK
     

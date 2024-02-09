@@ -57,7 +57,7 @@ function uploadAndShowFile() {
   const fileInput = document.querySelector("#file-input");
   const file = fileInput.files[0];
   const layerHeight = document.querySelector("#layer-height").value;
-  const nozzleWidth = document.querySelector("#nozzle-width").value;
+  const nozzleSize = document.querySelector("#nozzle-size").value;
   const infill = document.querySelector("#infill").value;
   const quantity = document.querySelector("#quantity").value;
   const note = document.querySelector("#note").value;
@@ -78,7 +78,7 @@ function uploadAndShowFile() {
   formData.append("email", email);
   formData.append("file", file);
   formData.append("layer_height", layerHeight);
-  formData.append("nozzle_width", nozzleWidth);
+  formData.append("nozzle_size", nozzleSize);
   formData.append("infill", infill);
   formData.append("quantity", quantity);
   formData.append("note", note);
@@ -293,7 +293,7 @@ function insertGoogleIcon(element, iconName, color) {
 
 // sets default layer height based on nozzle width selection
 // defaults: 0.6mm nozzle -> 0.3mm layer height, 0.4mm nozzle -> 0.2mm layer height
-const nozzleChange = document.querySelector("#nozzle-width");
+const nozzleChange = document.querySelector("#nozzle-size");
 let layerChange = document.querySelector("#layer-height");
 nozzleChange.addEventListener('change', function() {
   if (nozzleChange.value === "0.6") {

@@ -1,7 +1,7 @@
 import psycopg2 as ps
 import sqlalchemy as db
 from sqlalchemy import Table, Column, String, MetaData, create_engine, text, insert
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 #from sqlalchemy.orm import sessionmaker
 from datetime import date
 import config.variables as variables
@@ -44,7 +44,7 @@ def create_tables():
                             "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                             "email VARCHAR NOT NULL,"
                             "layer_height VARCHAR NOT NULL,"      
-                            "nozzle_width VARCHAR NOT NULL,"      
+                            "nozzle_size VARCHAR NOT NULL,"      
                             "infill NUMERIC(3,2) NOT NULL,"          
                             "quantity INTEGER NOT NULL," 
                             "note VARCHAR,"
@@ -56,11 +56,11 @@ def create_tables():
         
         conn.commit()
 
-def insert_order(email, layer_height=None, nozzle_width=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None):
+def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None):
     with engine.connect() as conn:
-        conn.execute(text("INSERT INTO orders(email, layer_height, nozzle_width, infill, quantity, note, prusa_output, gcode_path, price, date) "
-                          "VALUES (:email, :layer_height, :nozzle_width, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :date)"),
-                     {"email": email, "layer_height": layer_height, "nozzle_width": nozzle_width,
+        conn.execute(text("INSERT INTO orders(email, layer_height, nozzle_size, infill, quantity, note, prusa_output, gcode_path, price, date) "
+                          "VALUES (:email, :layer_height, :nozzle_size, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :date)"),
+                     {"email": email, "layer_height": layer_height, "nozzle_size": nozzle_size,
                       "infill": infill, "quantity": quantity, "note": note,
                       "prusa_output": prusa_output, "gcode_path": gcode_path, "price": price, "date": date.today()})
 
@@ -137,3 +137,14 @@ def get_email_by_order_id(order_id):
     with engine.connect() as conn:
         result = conn.execute(text("SELECT email FROM orders WHERE id = :order_id"), {"order_id": order_id}).scalar()
         return result if result else None
+    
+def add_staff_member(email):
+    """Add a new staff member to the 'staff' table."""
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("INSERT INTO staff(email) VALUES (:email)"), {"email": email})
+            conn.commit()
+        return True
+    except IntegrityError:
+        print("Email already exists in the 'staff' table.")
+        return False

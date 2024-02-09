@@ -1,5 +1,9 @@
 let maxRender = 10;
 
+window.addEventListener("hashchange", () => {
+    initialLoad();
+})
+
 function approve(id)
 {
 //update status of job
@@ -114,13 +118,13 @@ function refreshDeniedJobs()
 
 function refreshJobsWrapper()
 {
-    if(window.name == '' || window.name == 'pending') {
+    if(window.location.hash == 'pending') {
         refreshPendingJobs();
     }
-    else if(window.name == 'approved') {
+    else if(window.location.hash == 'approved') {
         refreshApprovedJobs();
     }
-    else if(window.name == 'denied') {
+    else if(window.location.hash == 'denied') {
         refreshDeniedJobs();
     }
 }
@@ -364,7 +368,7 @@ function openRejectModal(id) {
 
 //Renders approved job content
 function openApprovedPage() {
-    window.name = 'approved';
+    window.location.hash = 'approved';
     maxRender = 10;
 
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
@@ -378,7 +382,7 @@ function openApprovedPage() {
 }
 
 function openPendingPage() {
-    window.name = 'pending';
+    window.location.hash = 'pending';
     maxRender = 10;
 
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
@@ -392,7 +396,7 @@ function openPendingPage() {
 }
 
 function openDeniedPage() {
-    window.name = 'denied';
+    window.location.hash = 'denied';
     maxRender = 10;
 
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
@@ -406,16 +410,17 @@ function openDeniedPage() {
 }
 
 function initialLoad() {
-    if(window.name == '') {
-        window.name = 'pending';
+    console.log(window.location.hash);
+    if(window.location.hash == '') {
+        window.location.hash = 'pending';
     }
-    if(window.name == 'pending') {
+    if(window.location.hash == '#pending') {
         openPendingPage();
     }
-    if(window.name == 'approved') {
+    else if(window.location.hash == '#approved') {
         openApprovedPage();
     }
-    if(window.name == 'denied') {
+    else if(window.location.hash == '#denied') {
         openDeniedPage();
     }
 }

@@ -56,6 +56,7 @@ function uploadAndShowFile() {
   const email = document.querySelector("#email").value;
   const fileInput = document.querySelector("#file-input");
   const file = fileInput.files[0];
+  const filamentType = document.querySelector("#filament-type").value;
   const layerHeight = document.querySelector("#layer-height").value;
   const nozzleWidth = document.querySelector("#nozzle-width").value;
   const infill = document.querySelector("#infill").value;
@@ -93,7 +94,7 @@ function uploadAndShowFile() {
       // Handle the response data as needed
       showFileInfo(fileInput);
 
-      openReviewModal(email, fileInput, nozzleWidth, layerHeight, infill, quantity, note);
+      openReviewModal(email, fileInput, filamentType, nozzleWidth, layerHeight, infill, quantity, note);
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -104,19 +105,20 @@ function uploadAndShowFile() {
 }
 
 // Displays print cost to user upon form submission, requires approval or cancel before being sent for review
-function openReviewModal(email, file, nozzleWidth, layerHeight, infill, quantity, note) {
+function openReviewModal(email, file, filamentType, nozzleWidth, layerHeight, infill, quantity, note) {
   const reviewModal = document.querySelector(".review-order-modal");
   const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
   const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
 
   let orderReview = document.querySelector(".order-review");
-  orderReview.innerHTML = "Email:         " + email + "<br>";
-  orderReview.innerHTML += "File:         " + file.files.item(0).name + "<br>";
-  orderReview.innerHTML += "Nozzle Width: " + nozzleWidth + "mm<br>";
+  orderReview.innerHTML = "Email: " + email + "<br>";
+  orderReview.innerHTML += "File: " + file.files.item(0).name + "<br>";
+  orderReview.innerHTML += "Filament Type: " + filamentType + "<br>";
+  orderReview.innerHTML += "Nozzle Size: " + nozzleWidth + "mm<br>";
   orderReview.innerHTML += "Layer Height: " + layerHeight + "mm<br>";
-  orderReview.innerHtml += "Infill:       " + infill + "%<br>";
-  orderReview.innerHTML += "Quantity:     " + quantity + "<br>";
-  orderReview.innerHtml += "Note:         " + note + "<br>";
+  orderReview.innerHTML += "Infill: " + infill + "%<br>";
+  orderReview.innerHTML += "Quantity: " + quantity + "<br>";
+  orderReview.innerHtml += "Note: " + note + "<br>";
   reviewModal.style.display = "block";
 
   reviewModalApproveButton.onclick = function() {

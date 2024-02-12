@@ -74,12 +74,6 @@ function uploadAndShowFile() {
     return;
   }
 
-  if (layerHeight < 0.15) {
-    console.error("Layer height outside range");
-    openLayerHeightErrorModal();
-    return;
-  }
-
   const formData = new FormData();
   formData.append("email", email);
   formData.append("file", file);

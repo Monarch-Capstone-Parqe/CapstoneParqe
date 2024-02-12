@@ -12,6 +12,7 @@ import config.variables as variables
 from urllib.parse import quote_plus, urlencode
 from authlib.integrations.flask_client import OAuth
 
+
 # Init db
 db.check_db_connect()
 db.create_tables()
@@ -91,12 +92,12 @@ def order():
         if errors:
             return jsonify({"Error": "Invalid/Incomplete input", "Log": errors}), HTTPStatus.BAD_REQUEST
 
-        # Check the file
-        if request.files.get('file').mimetype not in {'model/stl', 'model/stp', 'model/step', 'application/3mf'}:
-            return jsonify({"Error": "Invalid file format"}), HTTPStatus.BAD_REQUEST
-
-        # Save the model with a unique name in the uploads directory
+        # Grab the extension and verify it
         _, ext = os.path.splitext(request.files.get('file').filename)
+        if ext not in {'.stl', '.stp', '.step', '.3mf'}:
+            return jsonify({"Error": "Invalid file format"}), HTTPStatus.BAD_REQUEST
+        
+        # Save the model with a unique name in the uploads directory
         uuid = gen_file_uuid()
         model_path = f'uploads/{uuid}{ext}'
         gcode_path = f'uploads/{uuid}.gcode'

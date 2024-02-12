@@ -52,6 +52,19 @@ def create_tables():
                             "approved_by INTEGER REFERENCES staff(id) DEFAULT NULL,"
                             "denied_by INTEGER REFERENCES staff(id) DEFAULT NULL)"))
         
+        conn.execute(text("CREATE TABLE IF NOT EXISTS filaments("
+                          "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                          "type VARCHAR NOT NULL,"
+                          "in_stock BOOLEAN NOT NULL)"))
+        
+        conn.execute(text("CREATE TABLE IF NOT EXISTS colors(",
+                          "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                          "color VARCHAR NOT NULL"))
+        
+        conn.execute(text("CREATE TABLE IF NOT EXISTS filament_colors("
+                          "color_id INTEGER NOT NULL REFERENCES colors(id) ON DELETE CASCADE,"
+                          "filament INTEGER NOT NULL REFERENCES filaments(id) ON DELETE CASCADE)"))
+        
         conn.commit()
 
 def insert_order(email, file_name, price, note=None, layer_height=None, nozzle_width=None, infill=None, supports=None, pieces=None):
@@ -166,4 +179,24 @@ def get_staff_email(id):
         staff_email = staff_email_dict[0]['email']
         return staff_email;
         
+def add_filament(type):
+    with engine.connect() as conn:
+        filament_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM filaments WHERE type = :type)"), {"type": type}).scalar()
+        if not filament_exists:
+            conn.execute(text("INSERT INTO filaments(type, in_stock) VALUES (:type, FALSE)"), {"type": type})
+            
+        conn.commit()
+
+def update_filament(type, in_stock):
+    with engine.connect() as conn:
+        conn.execute(text("UPDATE filaments SET in_stock=:in_stock WHERE type=:type"),
+                     {"in_stock": in_stock, "type": type})
+
+def remove_filament(type):
+    with engine.connect() as conn:
+        conn.execute(text("DELETE FROM filaments WHERE type=:type"), {"type": type})
+
+        conn.commit()
+
+ 
 

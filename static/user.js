@@ -318,15 +318,37 @@ function insertGoogleIcon(element, iconName, color) {
     '<span class="material-symbols-outlined">' + iconName + "</span>";
 }
 
-// sets default layer height based on nozzle width selection
-// defaults: 0.6mm nozzle -> 0.3mm layer height, 0.4mm nozzle -> 0.2mm layer height
-const nozzleChange = document.querySelector("#nozzle-width");
-let layerChange = document.querySelector("#layer-height");
-nozzleChange.addEventListener('change', function() {
-  if (nozzleChange.value === "0.6") {
-    layerChange.value = 0.3;
-  } else {
-    layerChange.value = 0.2;
-  }
-})
+// dyamically updates the options presented for "Layer Height" depending on the user selection
+// for "Nozzle Size" (0.6: 0.3, 0.15) and (0.4: 0.2, 0.1)
+document.addEventListener('DOMContentLoaded', function() {
+  const nozzleSelect = document.querySelector('#nozzle-width');
+  const layerHeightSelect = document.querySelector('#layer-height');
 
+  function updateLayerHeightOptions() {
+      const nozzleSize = nozzleSelect.value;
+      let options = [];
+
+      if (nozzleSize === '0.4') {
+          options = [{ text: "0.2", value: "0.2" }, { text: "0.1", value: "0.1" }];
+      } else if (nozzleSize === '0.6') {
+          options = [{ text: "0.3", value: "0.3" }, { text: "0.15", value: "0.15" }];
+      }
+
+      // Clear existing options
+      layerHeightSelect.innerHTML = '';
+
+      // Add new options
+      options.forEach(function(option) {
+          const optionElement = document.createElement('option');
+          optionElement.value = option.value;
+          optionElement.textContent = option.text;
+          layerHeightSelect.appendChild(optionElement);
+      });
+  }
+
+  // Initialize with the default nozzle size
+  updateLayerHeightOptions();
+
+  // Event listener for nozzle size change
+  nozzleSelect.addEventListener('change', updateLayerHeightOptions);
+});

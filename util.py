@@ -6,8 +6,6 @@ import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import config.variables as variables
-from loguru import logger  
-
 
 form_types = {
     'email': [lambda value: value != '' or "Email cannot be empty"],
@@ -99,29 +97,23 @@ def get_price(file_path: str) -> float:
                     return float(cost_match.group())
     return None
 
-def send_email(receiver_email: str, subject: str, message: str) -> bool:
+def send_email(receiver_email: str, subject: str, message: str):
     """Send an email using SMTP."""
     port = 587
     smtp_server = "smtp.gmail.com"
     context = ssl.create_default_context()
-    try:
-        # Create a multipart message
-        msg = MIMEMultipart()
-        msg['From'] = variables.EPL_EMAIL
-        msg['To'] = receiver_email
-        msg['Subject'] = subject
+    # Create a multipart message
+    msg = MIMEMultipart()
+    msg['From'] = variables.EPL_EMAIL
+    msg['To'] = receiver_email
+    msg['Subject'] = subject
 
-        # Add message to email
-        msg.attach(MIMEText(message, 'plain'))
+    # Add message to email
+    msg.attach(MIMEText(message, 'plain'))
 
-        with smtplib.SMTP(smtp_server, port) as server:
-            server.starttls(context=context)
-            server.login(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD)
-            server.sendmail(variables.EPL_EMAIL, receiver_email, msg.as_string())
-        return True
+    with smtplib.SMTP(smtp_server, port) as server:
+        server.starttls(context=context)
+        server.login(variables.EPL_EMAIL, variables.EPL_EMAIL_APP_PASSWORD)
+        server.sendmail(variables.EPL_EMAIL, receiver_email, msg.as_string())
     
-    except smtplib.SMTPAuthenticationError as e:
-        logger.error(f"Email authentication failed: {e}")
-    except smtplib.SMTPException as e:
-        logger.error(f"Error sending email: {e}")
-    return False
+    

@@ -27,7 +27,6 @@ darkModeToggle.onclick = function () {
     toggleDarkMode(".header-text");
     toggleDarkMode(".multi-purpose-modal-content");
     toggleDarkMode(".review-order-modal-content");
-    toggleDarkMode(".support-recommended-modal-content");
 };
 
 // dark mode color scheme toggle for individual selectors
@@ -45,8 +44,6 @@ function toggleDarkMode(selector) {
     element.classList.toggle("dark-mode-multi-purpose-modal");
   } else if (selector === ".review-order-modal-content") {
     element.classList.toggle("dark-mode-review-order-modal");
-  } else if (selector === ".support-recommended-modal-content") {
-    element.classList.toggle("dark-mode-support-recommended-modal");
   } 
 }
 
@@ -60,10 +57,9 @@ function uploadAndShowFile() {
   const fileInput = document.querySelector("#file-input");
   const file = fileInput.files[0];
   const layerHeight = document.querySelector("#layer-height").value;
-  const nozzleWidth = document.querySelector("#nozzle-width").value;
+  const nozzleSize = document.querySelector("#nozzle-size").value;
   const infill = document.querySelector("#infill").value;
-  const supports = document.querySelector("#supports").value;
-  const pieces = document.querySelector("#pieces").value;
+  const quantity = document.querySelector("#quantity").value;
   const note = document.querySelector("#note").value;
 
   if (!file) {
@@ -72,17 +68,22 @@ function uploadAndShowFile() {
     return;
   }
 
+  if (layerHeight < 0.15) {
+    console.error("Layer height outside range");
+    openLayerHeightErrorModal();
+    return;
+  }
+
   const formData = new FormData();
   formData.append("email", email);
   formData.append("file", file);
-  formData.append("layer height", layerHeight);
-  formData.append("nozzle width", nozzleWidth);
+  formData.append("layer_height", layerHeight);
+  formData.append("nozzle_size", nozzleSize);
   formData.append("infill", infill);
-  formData.append("supports", supports);
-  formData.append("pieces", pieces);
+  formData.append("quantity", quantity);
   formData.append("note", note);
 
-  fetch("/upload_model", {
+  fetch("/order", {
     method: "POST",
     body: formData,
   })
@@ -94,15 +95,8 @@ function uploadAndShowFile() {
 
 
       // Demo variables to test modal. Parse g code and send actual values
-      let originalPrice = "2.34"; // the cost as configured
-      let supportsPrice = "3.85"; // cost if prusa recommends adding supports
-      let supportsRecommened = true; // flag to catch descripenscy
-
-      if (supportsRecommened) {
-        openSupportRecommendedModal(originalPrice, supportsPrice);
-      } else {
-        openReviewModal(originalPrice);
-      }
+      let price = "2.34"; // the cost as configured
+      openReviewModal(price);
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -174,38 +168,38 @@ function openCancelOrderModal() {
   }
 }
 
-// Displays a message to the user when prusaslicer recommends supports and allows them to chose to add
-function openSupportRecommendedModal(costOriginal, costSupport) {
-  const supportRecommendedModal = document.querySelector(".support-recommended-modal");
-  const addSupportButton = document.querySelector("#support-recommended-support-button");
-  const noSupportButton = document.querySelector("#support-recommended-no-support-button");
-  const cancelButton = document.querySelector("#support-recommended-cancel-button");
+// // Displays a message to the user when prusaslicer recommends supports and allows them to chose to add
+// function openSupportRecommendedModal(costOriginal, costSupport) {
+//   const supportRecommendedModal = document.querySelector(".support-recommended-modal");
+//   const addSupportButton = document.querySelector("#support-recommended-support-button");
+//   const noSupportButton = document.querySelector("#support-recommended-no-support-button");
+//   const cancelButton = document.querySelector("#support-recommended-cancel-button");
 
-  const costSupportString = document.querySelector("#support-modal-string");
-  const costNoSupportString = document.querySelector("#no-support-modal-string");
-  costSupportString.innerHTML = "Cost with added supports: $" + costSupport + " (recommended!)";
-  costNoSupportString.innerHTML = "Cost without supports: $" + costOriginal;
+//   const costSupportString = document.querySelector("#support-modal-string");
+//   const costNoSupportString = document.querySelector("#no-support-modal-string");
+//   costSupportString.innerHTML = "Cost with added supports: $" + costSupport + " (recommended!)";
+//   costNoSupportString.innerHTML = "Cost without supports: $" + costOriginal;
   
-  supportRecommendedModal.style.display = "block";
+//   supportRecommendedModal.style.display = "block";
 
-  addSupportButton.onclick = function() {
-    // close (hide) modal
-    supportRecommendedModal.style.display = "none";
-    openReviewModal(costSupport);
-  }
+//   addSupportButton.onclick = function() {
+//     // close (hide) modal
+//     supportRecommendedModal.style.display = "none";
+//     openReviewModal(costSupport);
+//   }
 
-  noSupportButton.onclick = function() {
-    // close (hide) modal
-    supportRecommendedModal.style.display = "none";
-    openReviewModal(costOriginal);
-  }
+//   noSupportButton.onclick = function() {
+//     // close (hide) modal
+//     supportRecommendedModal.style.display = "none";
+//     openReviewModal(costOriginal);
+//   }
 
-  cancelButton.onclick = function() {
-    // close (hide) modal
-    supportRecommendedModal.style.display = "none";
-    openCancelOrderModal();
-  }
-}
+//   cancelButton.onclick = function() {
+//     // close (hide) modal
+//     supportRecommendedModal.style.display = "none";
+//     openCancelOrderModal();
+//   }
+// }
 
 // Displays a message to the user that no file was selected for upload
 function openNoFileSelectedModal() {
@@ -240,6 +234,24 @@ function openSubmissionErrorModal() {
   submissionErrorOkButton.onclick = function() {
     // close (hide) submission error modal
     submissionErrorModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user that no file was selected for upload
+function openLayerHeightErrorModal() {
+  const layerErrorModal = document.querySelector(".multi-purpose-modal");
+  const layerErrorOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "The layer height value you entered is outside the allowed range";
+  lineTwo.innerHTML = "Minimum layer height: 0.15 mm";
+
+  layerErrorModal.style.display = "block";
+
+  layerErrorOkButton.onclick = function() {
+    // close (hide) no file modal
+    layerErrorModal.style.display = "none";
   }
 }
 
@@ -278,3 +290,16 @@ function insertGoogleIcon(element, iconName, color) {
   element.innerHTML =
     '<span class="material-symbols-outlined">' + iconName + "</span>";
 }
+
+// sets default layer height based on nozzle width selection
+// defaults: 0.6mm nozzle -> 0.3mm layer height, 0.4mm nozzle -> 0.2mm layer height
+const nozzleChange = document.querySelector("#nozzle-size");
+let layerChange = document.querySelector("#layer-height");
+nozzleChange.addEventListener('change', function() {
+  if (nozzleChange.value === "0.6") {
+    layerChange.value = 0.3;
+  } else {
+    layerChange.value = 0.2;
+  }
+})
+

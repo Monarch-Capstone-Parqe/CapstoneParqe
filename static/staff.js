@@ -42,7 +42,7 @@ function refreshJobs()
 //populate sections with new data, connected to objects
 //remove jobs that have been updated already
     console.log("refresh")
-    fetch("/staff/orders?type=pending", {
+    fetch("/staff/get_orders/pending", {
         method: "GET",
     })
     .then((response) => response.json())

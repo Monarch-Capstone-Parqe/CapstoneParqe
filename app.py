@@ -46,13 +46,13 @@ oauth.register(
 app.logger.addHandler(logging.FileHandler("app.log"))
 app.logger.setLevel(logging.INFO)
 
-
 @app.route("/")
 def user_home():
+    """Render the homepage for users."""
     return render_template("user/index.html")
 
-# Labels certain endpoints as privilged
 def requires_auth(f):
+    """Decorator to check if the staff is authenticated."""
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'token' not in session:
@@ -63,24 +63,27 @@ def requires_auth(f):
 @app.route('/staff')
 @requires_auth
 def staff_home():
+    """Render the homepage for staff members."""
     return render_template("staff/index.html")
 
-# Called by auth0 after successful sign in
 @app.route("/staff/callback", methods=["GET", "POST"])
-def callback():
+def staff_callback():
+    """Callback endpoint after successful staff authentication."""
     token = oauth.auth0.authorize_access_token()
     session["token"] = token
     return redirect("/staff")
 
 @app.route("/staff/login")
-def login():
+def staff_login():
+    """Redirect users to Auth0 for login."""
     return oauth.auth0.authorize_redirect(
         redirect_uri=url_for("callback", _external=True)
     )
 
 @app.route("/staff/logout")
 @requires_auth
-def logout():
+def staff_logout():
+    """Logout the staff member."""
     session.clear()
     return redirect(
         "https://"
@@ -95,9 +98,14 @@ def logout():
         )
     )
 
-# User uploads model and preferences
 @app.route('/order', methods=['POST'])
 def order():
+    """
+    Endpoint for users to upload model and preferences.
+
+    Returns:
+        JSON response indicating the status of the operation.
+    """
     try:
         errors = process_order_data(request.form, session)
         if errors:
@@ -113,7 +121,7 @@ def order():
         request.files.get('file').save(model_path)
 
         # Generate G-code
-        command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {session["layer_height"]} --nozzle-diameter {session["nozzle_size"]} --infill-overlap {session["infill"]} --dont-arrange --load EPL_0.20mm_SPEED.ini'
+        command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {session["layer_height"]} --nozzle-diameter {session["nozzle_size"]} --infill-overlap {session["infill"]} --dont-arrange --load config/EPL_0.20mm_SPEED.ini'
         prusa_output = subprocess.getoutput(command)
         
         # Remove the original file
@@ -124,7 +132,6 @@ def order():
             abort( HTTPStatus.BAD_REQUEST, jsonify(f"Failed to slice model. Check your file: {prusa_output}"))
 
         price = get_price(gcode_path)
-
         session['gcode_path'] = gcode_path
         session['price'] = price
         session['prusa_output'] = prusa_output
@@ -150,6 +157,15 @@ def order():
 
 @app.route("/confirm_order/<token>")
 def confirm_order(token):
+    """
+    If this endpoint is visited with the correct token, the order is confirmed.
+
+    Args:
+        token: JWT token.
+
+    Returns:
+        JSON response indicating the status of the operation.
+    """
     try:
         _ = jwt.decode(token, app.config["SECRET_KEY"], algorithms="HS256")
         session['verified'] = True
@@ -176,6 +192,7 @@ def confirm_order(token):
 
 @app.route("/order_confirmed")
 def order_confirmed():
+    """Render the order confirmation page."""
     return "Order confirmed."
 
 @app.route('/staff/get_orders/<order_type>', methods=['GET'])
@@ -184,8 +201,11 @@ def get_orders(order_type):
     """
     Retrieve orders based on the specified type.
 
+    Args:
+        order_type: Type of orders to retrieve.
+
     Returns:
-        A JSON response containing the retrieved orders.
+        JSON response containing the retrieved orders.
     """
     
     if order_type == 'all':
@@ -201,10 +221,13 @@ def get_orders(order_type):
 @requires_auth
 def get_gcode(gcode_path):
     """
-    Retrieve orders based on the specified type.
+    Retrieve G-code.
+
+    Args:
+        gcode_path: Path to the G-code file.
 
     Returns:
-        A JSON response containing the retrieved orders.
+        The G-code file.
     """
     
     try:
@@ -215,10 +238,15 @@ def get_gcode(gcode_path):
         app.logger.error(f"Error in get_gcode route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
-
-@app.route('/staff/return_orders', methods=['PUT'])
+@app.route('/staff/review_orders', methods=['PUT'])
 @requires_auth
-def return_orders():
+def review_orders():
+    """
+    Review and update orders.
+
+    Returns:
+        JSON response indicating the status of the operation.
+    """
     try:
         # Grab order details
         order_id = request.form['id']
@@ -238,6 +266,7 @@ def return_orders():
         send_email(order_email, "EPL Verify Purchase", message)
 
         return jsonify({'message': 'Update received'}), HTTPStatus.OK
+    
     # Reraise client errors
     except HTTPException:
         raise  

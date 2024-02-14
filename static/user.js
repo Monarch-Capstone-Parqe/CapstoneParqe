@@ -316,7 +316,7 @@ function openQuantityIntegerModal() {
   const lineTwo = document.querySelector('#line2');
 
   lineOne.innerHTML = "Quantity must be entered as an integer value";
-  lineTwo.innerHTML = "Please enter a quantity value as an integer greater than 0";
+  lineTwo.innerHTML = "Please enter an integer of 1 or greater";
 
   quantityIntegerModal.style.display = "block";
 
@@ -334,7 +334,7 @@ function openQuantityRangeModal() {
   const lineTwo = document.querySelector('#line2');
 
   lineOne.innerHTML = "The quantity entered is outside the allowed range";
-  lineTwo.innerHTML = "Please enter a quantity greater than 0";
+  lineTwo.innerHTML = "Please enter a quantity of 1 or greater";
 
   quantityRangeModal.style.display = "block";
 

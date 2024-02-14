@@ -58,8 +58,8 @@
         </select>
       </div>
       <div class="form-group">
-        <label for="nozzle-width">Nozzle Size: (mm)</label>
-        <select id="nozzle-width" name="nozzle-width">
+        <label for="nozzle-size">Nozzle Size: (mm)</label>
+        <select id="nozzle-size" name="nozzle-size">
           <option value="0.4" selected>0.4</option>
           <option value="0.6">0.6</option>
         </select>
@@ -71,20 +71,20 @@
       <div class="form-group">
         <label for="infill">Infill Density:</label>
         <select id="infill" name="infill">
-          <option value="0">0%</option>
-          <option value="5">5%</option>
-          <option value="10">10%</option>
-          <option value="15">15%</option>
-          <option value="20" selected>20%</option>
-          <option value="25">25%</option>
-          <option value="30">30%</option>
-          <option value="40">40%</option>
-          <option value="50">50%</option>
-          <option value="60">60%</option>
-          <option value="70">70%</option>
-          <option value="80">80%</option>
-          <option value="90">90%</option>
-          <option value="100">100%</option>
+          <option value="0.0">0%</option>
+              <option value="0.05">5%</option>
+              <option value="0.1">10%</option>
+              <option value="0.15">15%</option>
+              <option value="0.2" selected>20%</option>
+              <option value="0.25">25%</option>
+              <option value="0.3">30%</option>
+              <option value="0.4">40%</option>
+              <option value="0.5">50%</option>
+              <option value="0.6">60%</option>
+              <option value="0.7">70%</option>
+              <option value="0.8">80%</option>
+              <option value="0.9">90%</option>
+              <option value="1.0">100%</option>
         </select>
       </div>
       <div class="form-group">
@@ -92,6 +92,7 @@
         <input type="number" id="quantity" name="quantity" value="1" min="1" max="20">
     </div>
     </fieldset>
+    
 
     <div class="form-group">
       <label for="note">Note:</label>

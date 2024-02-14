@@ -58,7 +58,7 @@ function uploadAndShowFile() {
   const file = fileInput.files[0];
   const filamentType = document.querySelector("#filament-type").value;
   const layerHeight = document.querySelector("#layer-height").value;
-  const nozzleWidth = document.querySelector("#nozzle-width").value;
+  const nozzleSize = document.querySelector("#nozzle-size").value;
   const infill = document.querySelector("#infill").value;
   const quantity = document.querySelector("#quantity").value;
   const note = document.querySelector("#note").value;
@@ -78,13 +78,13 @@ function uploadAndShowFile() {
   const formData = new FormData();
   formData.append("email", email);
   formData.append("file", file);
-  formData.append("nozzle width", nozzleWidth);
-  formData.append("layer height", layerHeight);
+  formData.append("layer_height", layerHeight);
+  formData.append("nozzle_size", nozzleSize);
   formData.append("infill", infill);
   formData.append("quantity", quantity);
   formData.append("note", note);
 
-  fetch("/upload_model", {
+  fetch("/order", {
     method: "POST",
     body: formData,
   })
@@ -94,7 +94,7 @@ function uploadAndShowFile() {
       // Handle the response data as needed
       showFileInfo(fileInput);
 
-      openReviewModal(email, fileInput, filamentType, nozzleWidth, layerHeight, infill, quantity, note);
+      openReviewModal(email, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note);
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -105,7 +105,7 @@ function uploadAndShowFile() {
 }
 
 // Displays print cost to user upon form submission, requires approval or cancel before being sent for review
-function openReviewModal(email, file, filamentType, nozzleWidth, layerHeight, infill, quantity, note) {
+function openReviewModal(email, file, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
   const reviewModal = document.querySelector(".review-order-modal");
   const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
   const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
@@ -114,7 +114,7 @@ function openReviewModal(email, file, filamentType, nozzleWidth, layerHeight, in
   orderReview.innerHTML = "Email: " + email + "<br>";
   orderReview.innerHTML += "File: " + file.files.item(0).name + "<br>";
   orderReview.innerHTML += "Filament Type: " + filamentType + "<br>";
-  orderReview.innerHTML += "Nozzle Size: " + nozzleWidth + "mm<br>";
+  orderReview.innerHTML += "Nozzle Size: " + nozzleSize + "mm<br>";
   orderReview.innerHTML += "Layer Height: " + layerHeight + "mm<br>";
   orderReview.innerHTML += "Infill: " + infill + "%<br>";
   orderReview.innerHTML += "Quantity: " + quantity + "<br>";
@@ -317,7 +317,7 @@ function insertGoogleIcon(element, iconName, color) {
 // dyamically updates the options presented for "Layer Height" depending on the user selection
 // for "Nozzle Size" (0.6: 0.3, 0.15) and (0.4: 0.2, 0.1)
 document.addEventListener('DOMContentLoaded', function() {
-  const nozzleSelect = document.querySelector('#nozzle-width');
+  const nozzleSelect = document.querySelector('#nozzle-size');
   const layerHeightSelect = document.querySelector('#layer-height');
 
   function updateLayerHeightOptions() {

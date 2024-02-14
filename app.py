@@ -56,7 +56,7 @@ def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if 'token' not in session:
-            return redirect(url_for('login'))
+            return redirect(url_for('staff_login'))
         return f(*args, **kwargs)
     return decorated
 
@@ -77,7 +77,7 @@ def staff_callback():
 def staff_login():
     """Redirect users to Auth0 for login."""
     return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
+        redirect_uri=url_for("staff_callback", _external=True)
     )
 
 @app.route("/staff/logout")

@@ -135,6 +135,9 @@ function uploadAndShowFile(email, file, fileInput, filamentType, nozzleSize, lay
   const formData = new FormData();
   formData.append("email", email);
   formData.append("file", file);
+  // not currently sending filament_type field until ready for it downstream
+  // format of filament type value material,color example: pla,black
+  // formData.append("filament_type", filamentType);
   formData.append("layer_height", layerHeight);
   formData.append("nozzle_size", nozzleSize);
   formData.append("infill", infill);

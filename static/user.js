@@ -50,33 +50,93 @@ function toggleDarkMode(selector) {
 let submitButton = document.querySelector("#submit-button");
 submitButton.onclick = function (event) {
   event.preventDefault();
-  uploadAndShowFile();
+  // check fields of form
+  formFieldCheck();
 };
-function uploadAndShowFile() {
+
+// function that performs checks on form fields
+// add any checks wish to perform here
+function formFieldCheck() {
   const email = document.querySelector("#email").value;
   const fileInput = document.querySelector("#file-input");
   const file = fileInput.files[0];
+  const filamentType = document.querySelector("#filament-type").value;
   const layerHeight = document.querySelector("#layer-height").value;
   const nozzleSize = document.querySelector("#nozzle-size").value;
   const infill = document.querySelector("#infill").value;
   const quantity = document.querySelector("#quantity").value;
   const note = document.querySelector("#note").value;
 
+  // verify that email field populated
+  if (email === "") {
+    console.error("Email field empty");
+    openEmptyEmailFieldModal();
+    return;
+  }
+
+  // verify that a file is selected for upload
   if (!file) {
     console.error("No file selected.");
     openNoFileSelectedModal();
     return;
   }
 
-  if (layerHeight < 0.15) {
-    console.error("Layer height outside range");
-    openLayerHeightErrorModal();
+  // verify quantity is an integer
+  if (!Number.isInteger(+quantity)) {
+    console.error("Quantity must be integer value");
+    openQuantityIntegerModal();
     return;
   }
 
+  // verify quantity is greater than 0
+  if (quantity < 1) {
+    console.error("Quantity outside allowed range");
+    openQuantityRangeModal();
+    return;
+  }
+
+  // if checks pass, open the review modal
+  openReviewModal(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note);
+}
+
+// Displays print cost to user upon form submission, requires approval or cancel before being sent for review
+function openReviewModal(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
+  const reviewModal = document.querySelector(".review-order-modal");
+  const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
+  const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
+
+  let orderReview = document.querySelector(".order-review");
+  orderReview.innerHTML = "Email: " + email + "<br>";
+  orderReview.innerHTML += "File: " + fileInput.files.item(0).name + "<br>";
+  orderReview.innerHTML += "Filament Type: " + filamentType + "<br>";
+  orderReview.innerHTML += "Nozzle Size: " + nozzleSize + "mm<br>";
+  orderReview.innerHTML += "Layer Height: " + layerHeight + "mm<br>";
+  orderReview.innerHTML += "Infill: " + infill + "%<br>";
+  orderReview.innerHTML += "Quantity: " + quantity + "<br>";
+  orderReview.innerHtml += "Note: " + note + "<br>";
+  reviewModal.style.display = "block";
+
+  reviewModalApproveButton.onclick = function() {
+    // send the form data
+    uploadAndShowFile(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note);
+    // close (hide) review modal
+    reviewModal.style.display = "none";
+  }
+
+  reviewModalCancelButton.onclick = function() {
+    // close (hide) review modal
+    reviewModal.style.display = "none";
+    openCancelOrderModal();
+  }
+}
+
+function uploadAndShowFile(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
   const formData = new FormData();
   formData.append("email", email);
   formData.append("file", file);
+  // not currently sending filament_type field until ready for it downstream
+  // format of filament type value material,color example: pla,black
+  // formData.append("filament_type", filamentType);
   formData.append("layer_height", layerHeight);
   formData.append("nozzle_size", nozzleSize);
   formData.append("infill", infill);
@@ -93,40 +153,15 @@ function uploadAndShowFile() {
       // Handle the response data as needed
       showFileInfo(fileInput);
 
-
-      // Demo variables to test modal. Parse g code and send actual values
-      let price = "2.34"; // the cost as configured
-      openReviewModal(price);
+      // notify the user of success and next steps
+      openOrderSuccessModal();
     })
     .catch((error) => {
       console.error("Error:", error);
 
-      // alerts the user of an error while uploading order
+      // notify the user there was an error while uploading order
       openSubmissionErrorModal();
     });
-}
-
-// Displays print cost to user upon form submission, requires approval or cancel before being sent for review
-function openReviewModal(cost) {
-  const priceModal = document.querySelector(".review-order-modal");
-  const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
-  const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
-
-  let priceString = document.querySelector(".print-cost");
-  priceString.innerHTML = "Print Cost: $" + cost;
-  priceModal.style.display = "block";
-
-  reviewModalApproveButton.onclick = function() {
-    // close (hide) review modal
-    priceModal.style.display = "none";
-    openOrderSuccessModal();
-  }
-
-  reviewModalCancelButton.onclick = function() {
-    // close (hide) review modal
-    priceModal.style.display = "none";
-    openCancelOrderModal();
-  }
 }
 
 // Displays a message to the user that there print was successful uploaded for review and informs next steps
@@ -137,7 +172,7 @@ function openOrderSuccessModal() {
   const lineTwo = document.querySelector('#line2');
 
   lineOne.innerHTML = "Your order was successfully sent for review";
-  lineTwo.innerHTML = "Please monitor your email for admin approval";
+  lineTwo.innerHTML = "Please monitor your email for admin approval and payment link";
 
   successModal.style.display = "block";
 
@@ -250,8 +285,62 @@ function openLayerHeightErrorModal() {
   layerErrorModal.style.display = "block";
 
   layerErrorOkButton.onclick = function() {
-    // close (hide) no file modal
+    // close (hide) modal
     layerErrorModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user if the email field is blank on the order form
+function openEmptyEmailFieldModal() {
+  const emptyEmailFieldModal = document.querySelector(".multi-purpose-modal");
+  const emptyEmailFieldOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "The email field cannot be empty";
+  lineTwo.innerHTML = "Please enter a valid email";
+
+  emptyEmailFieldModal.style.display = "block";
+
+  emptyEmailFieldOkButton.onclick = function() {
+    // close (hide) modal
+    emptyEmailFieldModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user if the quantity entered is not an integer value
+function openQuantityIntegerModal() {
+  const quantityIntegerModal = document.querySelector(".multi-purpose-modal");
+  const quantityOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "Quantity must be entered as an integer value";
+  lineTwo.innerHTML = "Please enter an integer of 1 or greater";
+
+  quantityIntegerModal.style.display = "block";
+
+  quantityOkButton.onclick = function() {
+    // close (hide) modal
+    quantityIntegerModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user if the quantity is outside allowed range
+function openQuantityRangeModal() {
+  const quantityRangeModal = document.querySelector(".multi-purpose-modal");
+  const quantityOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "The quantity entered is outside the allowed range";
+  lineTwo.innerHTML = "Please enter a quantity of 1 or greater";
+
+  quantityRangeModal.style.display = "block";
+
+  quantityOkButton.onclick = function() {
+    // close (hide) modal
+    quantityRangeModal.style.display = "none";
   }
 }
 
@@ -291,15 +380,37 @@ function insertGoogleIcon(element, iconName, color) {
     '<span class="material-symbols-outlined">' + iconName + "</span>";
 }
 
-// sets default layer height based on nozzle width selection
-// defaults: 0.6mm nozzle -> 0.3mm layer height, 0.4mm nozzle -> 0.2mm layer height
-const nozzleChange = document.querySelector("#nozzle-size");
-let layerChange = document.querySelector("#layer-height");
-nozzleChange.addEventListener('change', function() {
-  if (nozzleChange.value === "0.6") {
-    layerChange.value = 0.3;
-  } else {
-    layerChange.value = 0.2;
-  }
-})
+// dyamically updates the options presented for "Layer Height" depending on the user selection
+// for "Nozzle Size" (0.6: 0.3, 0.15) and (0.4: 0.2, 0.1)
+document.addEventListener('DOMContentLoaded', function() {
+  const nozzleSelect = document.querySelector('#nozzle-size');
+  const layerHeightSelect = document.querySelector('#layer-height');
 
+  function updateLayerHeightOptions() {
+      const nozzleSize = nozzleSelect.value;
+      let options = [];
+
+      if (nozzleSize === '0.4') {
+          options = [{ text: "0.2", value: "0.2" }, { text: "0.1", value: "0.1" }];
+      } else if (nozzleSize === '0.6') {
+          options = [{ text: "0.3", value: "0.3" }, { text: "0.15", value: "0.15" }];
+      }
+
+      // Clear existing options
+      layerHeightSelect.innerHTML = '';
+
+      // Add new options
+      options.forEach(function(option) {
+          const optionElement = document.createElement('option');
+          optionElement.value = option.value;
+          optionElement.textContent = option.text;
+          layerHeightSelect.appendChild(optionElement);
+      });
+  }
+
+  // Initialize with the default nozzle size
+  updateLayerHeightOptions();
+
+  // Event listener for nozzle size change
+  nozzleSelect.addEventListener('change', updateLayerHeightOptions);
+});

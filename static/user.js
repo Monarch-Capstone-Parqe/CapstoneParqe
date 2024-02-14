@@ -50,9 +50,13 @@ function toggleDarkMode(selector) {
 let submitButton = document.querySelector("#submit-button");
 submitButton.onclick = function (event) {
   event.preventDefault();
-  uploadAndShowFile();
+  // check fields of form
+  formFieldCheck();
 };
-function uploadAndShowFile() {
+
+// function that performs checks on form fields
+// add any checks wish to perform here
+function formFieldCheck() {
   const email = document.querySelector("#email").value;
   const fileInput = document.querySelector("#file-input");
   const file = fileInput.files[0];
@@ -75,6 +79,49 @@ function uploadAndShowFile() {
     return;
   }
 
+  // Do we want an upper limit for quantity?
+  if (quantity < 1 || quantity > 10) {
+    console.error("Quantity outside allowed range");
+    openQuantityRangeModal();
+    return;
+  }
+
+  // if checks pass, open the review modal
+  openReviewModal(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note);
+}
+
+// Displays print cost to user upon form submission, requires approval or cancel before being sent for review
+function openReviewModal(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
+  const reviewModal = document.querySelector(".review-order-modal");
+  const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
+  const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
+
+  let orderReview = document.querySelector(".order-review");
+  orderReview.innerHTML = "Email: " + email + "<br>";
+  orderReview.innerHTML += "File: " + fileInput.files.item(0).name + "<br>";
+  orderReview.innerHTML += "Filament Type: " + filamentType + "<br>";
+  orderReview.innerHTML += "Nozzle Size: " + nozzleSize + "mm<br>";
+  orderReview.innerHTML += "Layer Height: " + layerHeight + "mm<br>";
+  orderReview.innerHTML += "Infill: " + infill + "%<br>";
+  orderReview.innerHTML += "Quantity: " + quantity + "<br>";
+  orderReview.innerHtml += "Note: " + note + "<br>";
+  reviewModal.style.display = "block";
+
+  reviewModalApproveButton.onclick = function() {
+    // send the form data
+    uploadAndShowFile(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note);
+    // close (hide) review modal
+    reviewModal.style.display = "none";
+  }
+
+  reviewModalCancelButton.onclick = function() {
+    // close (hide) review modal
+    reviewModal.style.display = "none";
+    openCancelOrderModal();
+  }
+}
+
+function uploadAndShowFile(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
   const formData = new FormData();
   formData.append("email", email);
   formData.append("file", file);
@@ -94,44 +141,15 @@ function uploadAndShowFile() {
       // Handle the response data as needed
       showFileInfo(fileInput);
 
-      openReviewModal(email, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note);
+      // notify the user of success and next steps
+      openOrderSuccessModal();
     })
     .catch((error) => {
       console.error("Error:", error);
 
-      // alerts the user of an error while uploading order
+      // notify the user there was an error while uploading order
       openSubmissionErrorModal();
     });
-}
-
-// Displays print cost to user upon form submission, requires approval or cancel before being sent for review
-function openReviewModal(email, file, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
-  const reviewModal = document.querySelector(".review-order-modal");
-  const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
-  const reviewModalCancelButton = document.querySelector("#review-modal-cancel-button");
-
-  let orderReview = document.querySelector(".order-review");
-  orderReview.innerHTML = "Email: " + email + "<br>";
-  orderReview.innerHTML += "File: " + file.files.item(0).name + "<br>";
-  orderReview.innerHTML += "Filament Type: " + filamentType + "<br>";
-  orderReview.innerHTML += "Nozzle Size: " + nozzleSize + "mm<br>";
-  orderReview.innerHTML += "Layer Height: " + layerHeight + "mm<br>";
-  orderReview.innerHTML += "Infill: " + infill + "%<br>";
-  orderReview.innerHTML += "Quantity: " + quantity + "<br>";
-  orderReview.innerHtml += "Note: " + note + "<br>";
-  reviewModal.style.display = "block";
-
-  reviewModalApproveButton.onclick = function() {
-    // close (hide) review modal
-    reviewModal.style.display = "none";
-    openOrderSuccessModal();
-  }
-
-  reviewModalCancelButton.onclick = function() {
-    // close (hide) review modal
-    reviewModal.style.display = "none";
-    openCancelOrderModal();
-  }
 }
 
 // Displays a message to the user that there print was successful uploaded for review and informs next steps
@@ -275,6 +293,24 @@ function openEmptyEmailFieldModal() {
   emptyEmailFieldOkButton.onclick = function() {
     // close (hide) modal
     emptyEmailFieldModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user if the quantity is outside allowed range
+function openQuantityRangeModal() {
+  const quantityRangeModal = document.querySelector(".multi-purpose-modal");
+  const quantityOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "The quantity entered is outside the allowed range";
+  lineTwo.innerHTML = "Please enter a quantity value between 1 and 10";
+
+  quantityRangeModal.style.display = "block";
+
+  quantityOkButton.onclick = function() {
+    // close (hide) modal
+    quantityRangeModal.style.display = "none";
   }
 }
 

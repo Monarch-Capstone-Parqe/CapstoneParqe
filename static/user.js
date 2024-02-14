@@ -67,19 +67,29 @@ function formFieldCheck() {
   const quantity = document.querySelector("#quantity").value;
   const note = document.querySelector("#note").value;
 
+  // verify that email field populated
   if (email === "") {
     console.error("Email field empty");
     openEmptyEmailFieldModal();
     return;
   }
 
+  // verify that a file is selected for upload
   if (!file) {
     console.error("No file selected.");
     openNoFileSelectedModal();
     return;
   }
 
-  // Do we want an upper limit for quantity?
+  // verify quantity is an integer
+  if (!Number.isInteger(+quantity)) {
+    console.error("Quantity must be integer value");
+    openQuantityIntegerModal();
+    return;
+  }
+
+  // verify quantity in allowed range
+  // Do we want to have an upper limit for quantity?
   if (quantity < 1 || quantity > 10) {
     console.error("Quantity outside allowed range");
     openQuantityRangeModal();
@@ -293,6 +303,24 @@ function openEmptyEmailFieldModal() {
   emptyEmailFieldOkButton.onclick = function() {
     // close (hide) modal
     emptyEmailFieldModal.style.display = "none";
+  }
+}
+
+// Displays a message to the user if the quantity entered is not an integer value
+function openQuantityIntegerModal() {
+  const quantityIntegerModal = document.querySelector(".multi-purpose-modal");
+  const quantityOkButton = document.querySelector("#multi-purpose-ok-button");
+  const lineOne = document.querySelector('#line1');
+  const lineTwo = document.querySelector('#line2');
+
+  lineOne.innerHTML = "Quantity must be entered as an integer value";
+  lineTwo.innerHTML = "Please enter a quantity value as an integer between 1 and 10";
+
+  quantityIntegerModal.style.display = "block";
+
+  quantityOkButton.onclick = function() {
+    // close (hide) modal
+    quantityIntegerModal.style.display = "none";
   }
 }
 

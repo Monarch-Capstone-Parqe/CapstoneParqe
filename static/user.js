@@ -88,9 +88,8 @@ function formFieldCheck() {
     return;
   }
 
-  // verify quantity in allowed range
-  // Do we want to have an upper limit for quantity?
-  if (quantity < 1 || quantity > 10) {
+  // verify quantity is greater than 0
+  if (quantity < 1) {
     console.error("Quantity outside allowed range");
     openQuantityRangeModal();
     return;
@@ -317,7 +316,7 @@ function openQuantityIntegerModal() {
   const lineTwo = document.querySelector('#line2');
 
   lineOne.innerHTML = "Quantity must be entered as an integer value";
-  lineTwo.innerHTML = "Please enter a quantity value as an integer between 1 and 10";
+  lineTwo.innerHTML = "Please enter a quantity value as an integer greater than 0";
 
   quantityIntegerModal.style.display = "block";
 
@@ -335,7 +334,7 @@ function openQuantityRangeModal() {
   const lineTwo = document.querySelector('#line2');
 
   lineOne.innerHTML = "The quantity entered is outside the allowed range";
-  lineTwo.innerHTML = "Please enter a quantity value between 1 and 10";
+  lineTwo.innerHTML = "Please enter a quantity greater than 0";
 
   quantityRangeModal.style.display = "block";
 

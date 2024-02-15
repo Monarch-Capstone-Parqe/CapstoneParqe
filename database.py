@@ -1,25 +1,15 @@
 from datetime import date
 
 from sqlalchemy import create_engine, text
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import MetaData
 
 import config.variables as variables
-
-#Constants
-#MAIL_ADDR_LEN = 40 #See --> https://stackoverflow.com/questions/1297272/how-long-should-sql-email-fields-be
-
 
 #DB_USERNAME & DB_PASSWORD exist as system environment variables
 # -TODO Likely will make the whole DB_URI its own env var eventually
 engine = create_engine(f'postgresql://{variables.DB_USERNAME}:{variables.DB_PASSWORD}@localhost:5432/parqe')
-
-#################################
-# CURRENTLY NO ORM UTILIZIATION #
-#################################
-#Sets up DB connection & information pipeline 
-#conn = engine.connect()
-#metadata = db.MetaData()
-#metadata.reflect(bind=engine)
+metadata = MetaData()
+metadata.reflect(bind=engine)
 
 def check_db_connect():
     engine.connect()
@@ -96,11 +86,6 @@ def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quanti
         conn.execute(text("INSERT INTO pending_orders(order_id) VALUES (:order_id)"), {"order_id": order_id})
         conn.commit()
 
-from sqlalchemy import MetaData
-metadata = MetaData()
-metadata.reflect(bind=engine)
-
-
 def fetch_orders(query) -> list:
     """
     Retrieve orders from the database based on the given query.
@@ -140,8 +125,7 @@ def get_pending_orders() -> list:
     Returns:
         list: A list of dictionaries representing each pending order.
     """
-    query = "SELECT o.* FROM orders o JOIN pending_orders p ON o.id = p.order_id ORDER BY o.date"
-    return fetch_orders(query)
+    return fetch_orders("SELECT o.* FROM orders o JOIN pending_orders p ON o.id = p.order_id ORDER BY o.date")
 
 def get_approved_orders() -> list:
     """

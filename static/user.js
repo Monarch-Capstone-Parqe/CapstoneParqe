@@ -47,6 +47,8 @@ function toggleDarkMode(selector) {
   } 
 }
 
+// the 'submit' button for the form
+// we want to prevent the default behaviour submitting upon click, and instead control the flow through custom modal windows
 let submitButton = document.querySelector("#submit-button");
 submitButton.onclick = function (event) {
   event.preventDefault();
@@ -130,6 +132,7 @@ function openReviewModal(email, file, fileInput, filamentType, nozzleSize, layer
   }
 }
 
+// this function implments the post method to submit the form data, it also console logs the files info
 function uploadAndShowFile(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
   const formData = new FormData();
   formData.append("email", email);
@@ -180,7 +183,7 @@ function openOrderSuccessModal() {
     // close (hide) order success modal
     successModal.style.display = "none";
 
-    // reset the form
+    // resets the form upon successful submission
     document.querySelector(".order-form").reset()
   }
 }
@@ -254,7 +257,7 @@ function openNoFileSelectedModal() {
   }
 }
 
-// Displays a message to the user if there is an issue with submission
+// Displays a message to the user if there is an issue with submission upon form submission
 function openSubmissionErrorModal() {
   const submissionErrorModal = document.querySelector(".multi-purpose-modal");
   const submissionErrorOkButton = document.querySelector("#multi-purpose-ok-button");

@@ -6,3 +6,4 @@ app.log
 /flask_session
 /static/node_modules
 /flask
+/.vs

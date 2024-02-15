@@ -1,3 +1,5 @@
+import * as GCodePreview from 'gcode-preview';
+import * as THREE from 'three';
 function approve(id)
 {
 //update status of job
@@ -57,6 +59,11 @@ function refreshJobs()
     });
 }
 
+
+//retrieve placeholder gcode from the browser
+let response = await fetch("/static/benchy.gcode");
+let gcode = await response.text() ;
+
 //Function to create job sections with input variables
 //Variables will be received from database
 function renderJob(order)
@@ -104,16 +111,28 @@ function renderJob(order)
     });
     denyButton.textContent = 'DENY';
 
+    let previewButton = document.createElement('button');
+    previewButton.id = 'preview-button'
+    previewButton.addEventListener('click', () => {
+        openPreview(gcode)
+    });
+    previewButton.textContent = 'VIEW GCODE';
+
     let underline = document.createElement('div');
     underline.classList.add('boxed-data-underline');
     underline.id = 'underline' + order.id;
 
+
+
     dataBox.appendChild(job);
     dataBox.appendChild(buttonBox);
+    buttonBox.appendChild(previewButton);
     buttonBox.appendChild(approveButton);
     buttonBox.appendChild(denyButton);
     jobsBox.appendChild(dataBox);
     jobsBox.appendChild(underline);
+      
+
 }
 
 //Function to remove a job by id from the page
@@ -164,6 +183,36 @@ function openRejectModal(id) {
         textInput.placeholder = 'Type here..';
         textInput.value = '';
     } 
+}
+
+
+
+function openPreview(gcode)
+{
+    const previewModal = document.querySelector('.gcode-preview-modal');
+    const closeButton = document.getElementById('preview-close-button');
+    previewModal.style.display = 'block';
+    //gcode-preview canvas
+    let gcodePrev = document.getElementById('preview-canvas');
+    gcodePrev.id = "preview-canvas"
+    //Process the gcode after the canvas is initialized
+    const preview = GCodePreview.init({
+      canvas: gcodePrev,
+      buildVolume: { x: 300, y: 300, z: 0 },
+      drawBuildVolume: { x: 300, y: 300, z: 0 },
+      initialCameraPosition: [90, 75, 150],
+      renderExtrusion: false,
+      renderTravel: false,
+      renderTubes: false,
+      extrusionColor: 'hotpink',
+      backgroundColor: '#eee',
+      travelColor: new THREE.Color('lime')
+    });
+
+    preview.processGCode(gcode);
+    closeButton.onclick = function() {
+        previewModal.style.display = 'none';
+    }
 }
 
 let intervalId = setInterval(refreshJobs, 10000);

@@ -1,30 +1,37 @@
+# Standard
 import os
 import subprocess
+from urllib.parse import quote_plus, urlencode
 from http import HTTPStatus
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_file
+import smtplib
+
+# Third-Party
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_file, abort
+import logging
 from flask_session import Session
 import jwt
+from functools import wraps
+from authlib.integrations.flask_client import OAuth
+from werkzeug.exceptions import HTTPException
+
+# Local
 import database as db
 from util import get_price, gen_file_uuid, process_order_data, send_email
-from loguru import logger  
-from functools import wraps
 import config.variables as variables
-from urllib.parse import quote_plus, urlencode
-from authlib.integrations.flask_client import OAuth
-
 
 # Init db
 db.check_db_connect()
 db.create_tables()
 
+# Init flask
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.config["SECRET_KEY"] = variables.APP_SECRET_KEY
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+# Init auth0
 oauth = OAuth(app)
-
 oauth.register(
     "auth0",
     client_id=variables.AUTH0_CLIENT_ID,
@@ -35,41 +42,48 @@ oauth.register(
     server_metadata_url=f'https://{variables.AUTH0_DOMAIN}/.well-known/openid-configuration',
 )
 
-logger.add("app.log", rotation="500 MB", level="INFO") 
+# Configure the Flask app logger
+app.logger.addHandler(logging.FileHandler("app.log"))
+app.logger.setLevel(logging.INFO)
 
 @app.route("/")
 def user_home():
+    """Render the homepage for users."""
     return render_template("user/index.html")
 
-# Labels certain endpoints as privilged
 def requires_auth(f):
+    """Decorator to check if the staff is authenticated."""
     @wraps(f)
     def decorated(*args, **kwargs):
-        if 'user' not in session:
-            return redirect(url_for('login'))
+        if 'token' not in session:
+            return redirect(url_for('staff_login'))
         return f(*args, **kwargs)
     return decorated
 
 @app.route('/staff')
 @requires_auth
 def staff_home():
+    """Render the homepage for staff members."""
     return render_template("staff/index.html")
 
 @app.route("/staff/callback", methods=["GET", "POST"])
-def callback():
+def staff_callback():
+    """Callback endpoint after successful staff authentication."""
     token = oauth.auth0.authorize_access_token()
-    session["user"] = token
+    session["token"] = token
     return redirect("/staff")
 
 @app.route("/staff/login")
-def login():
+def staff_login():
+    """Redirect users to Auth0 for login."""
     return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
+        redirect_uri=url_for("staff_callback", _external=True)
     )
 
 @app.route("/staff/logout")
 @requires_auth
-def logout():
+def staff_logout():
+    """Logout the staff member."""
     session.clear()
     return redirect(
         "https://"
@@ -84,43 +98,40 @@ def logout():
         )
     )
 
-# User uploads model and prefrences
 @app.route('/order', methods=['POST'])
 def order():
+    """
+    Endpoint for users to upload model and preferences.
+
+    Returns:
+        JSON response indicating the status of the operation.
+    """
     try:
         errors = process_order_data(request.form, session)
         if errors:
-            return jsonify({"Error": "Invalid/Incomplete input", "Log": errors}), HTTPStatus.BAD_REQUEST
+            return abort(HTTPStatus.BAD_REQUEST, f"Invalid/Incomplete input: {errors}") 
 
-        # Grab the extension and verify it
-        _, ext = os.path.splitext(request.files.get('file').filename)
-        if ext not in {'.stl', '.stp', '.step', '.3mf'}:
-            return jsonify({"Error": "Invalid file format"}), HTTPStatus.BAD_REQUEST
-        
         # Save the model with a unique name in the uploads directory
+        _, ext = os.path.splitext(request.files.get('file').filename)
         uuid = gen_file_uuid()
         model_path = f'uploads/{uuid}{ext}'
         gcode_path = f'uploads/{uuid}.gcode'
 
-        try:
-            # Save the file to disk
-            request.files.get('file').save(model_path)
+        # Save the file to disk
+        request.files.get('file').save(model_path)
 
-            # Generate G-code
-            command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {session["layer_height"]} --nozzle-diameter {session["nozzle_size"]} --infill-overlap {session["infill"]} --dont-arrange --load EPL_0.20mm_SPEED.ini'
-            prusa_output = subprocess.getoutput(command)
-            # Remove the original file
-            os.remove(model_path)
+        # Generate G-code
+        command = f'./prusa.AppImage --export-gcode {model_path} --layer-height {session["layer_height"]} --nozzle-diameter {session["nozzle_size"]} --infill-overlap {session["infill"]} --dont-arrange --load config/EPL_0.20mm_SPEED.ini'
+        prusa_output = subprocess.getoutput(command)
+        
+        # Remove the original file
+        os.remove(model_path)
 
-            # Check if G-code was generated successfully
-            if not os.path.exists(gcode_path):
-                return jsonify({"error": f"Failed to generate G-code. Check your file.", "log" : prusa_output}), HTTPStatus.BAD_REQUEST
-
-        except Exception as e:
-            print(f"Error: {e}")
+        # Check if G-code was generated successfully
+        if not os.path.exists(gcode_path):
+            abort( HTTPStatus.BAD_REQUEST, jsonify(f"Failed to slice model. Check your file: {prusa_output}"))
 
         price = get_price(gcode_path)
-
         session['gcode_path'] = gcode_path
         session['price'] = price
         session['prusa_output'] = prusa_output
@@ -133,12 +144,28 @@ def order():
 
         return jsonify('Model uploaded'), HTTPStatus.CREATED
     
+    # Reraise client errors
+    except HTTPException:
+        raise  
+    # Email exceptions
+    except smtplib.SMTPException as e:
+        abort( HTTPStatus.BAD_REQUEST, jsonify(f"Error sending email: {e}"))
+    # Unkown
     except Exception as e:
-        logger.error(f"Error in order route: {e}")
-        return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
+        app.logger.critical(f"Error in order route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
 
 @app.route("/confirm_order/<token>")
 def confirm_order(token):
+    """
+    If this endpoint is visited with the correct token, the order is confirmed.
+
+    Args:
+        token: JWT token.
+
+    Returns:
+        JSON response indicating the status of the operation.
+    """
     try:
         _ = jwt.decode(token, app.config["SECRET_KEY"], algorithms="HS256")
         session['verified'] = True
@@ -165,6 +192,7 @@ def confirm_order(token):
 
 @app.route("/order_confirmed")
 def order_confirmed():
+    """Render the order confirmation page."""
     return "Order confirmed."
 
 @app.route('/staff/get_orders/<order_type>', methods=['GET'])
@@ -173,8 +201,11 @@ def get_orders(order_type):
     """
     Retrieve orders based on the specified type.
 
+    Args:
+        order_type: Type of orders to retrieve.
+
     Returns:
-        A JSON response containing the retrieved orders.
+        JSON response containing the retrieved orders.
     """
     
     if order_type == 'all':
@@ -190,10 +221,13 @@ def get_orders(order_type):
 @requires_auth
 def get_gcode(gcode_path):
     """
-    Retrieve orders based on the specified type.
+    Retrieve G-code.
+
+    Args:
+        gcode_path: Path to the G-code file.
 
     Returns:
-        A JSON response containing the retrieved orders.
+        The G-code file.
     """
     
     try:
@@ -201,13 +235,18 @@ def get_gcode(gcode_path):
     except FileNotFoundError:
         return jsonify({'error': 'File not found'}), HTTPStatus.NOT_FOUND
     except Exception as e:
-        logger.error(f"Error in get_gcode route: {e}")
+        app.logger.error(f"Error in get_gcode route: {e}")
         return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
-
-@app.route('/staff/return_orders', methods=['PUT'])
+@app.route('/staff/review_orders', methods=['PUT'])
 @requires_auth
-def return_orders():
+def review_orders():
+    """
+    Review and update orders.
+
+    Returns:
+        JSON response indicating the status of the operation.
+    """
     try:
         # Grab order details
         order_id = request.form['id']
@@ -221,16 +260,20 @@ def return_orders():
         elif(order_status == 'approved'):
             db.approve_order(order_id, staff_email)
         else:
-            return jsonify({'error': f'"{order_status}" is an invalid status.'}), HTTPStatus.BAD_REQUEST
+            return abort(HTTPStatus.BAD_REQUEST, jsonify({'error': f'"{order_status}" is an invalid status.'}))
         
         message = f"Your order has been {order_status}. {order_comment}"
         send_email(order_email, "EPL Verify Purchase", message)
 
         return jsonify({'message': 'Update received'}), HTTPStatus.OK
     
+    # Reraise client errors
+    except HTTPException:
+        raise  
+    # Unkown
     except Exception as e:
-        logger.error(f"Error in return_orders route: {e}")
-        return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
+        app.logger.critical(f"Error in order route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

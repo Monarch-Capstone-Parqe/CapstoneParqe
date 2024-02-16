@@ -466,6 +466,22 @@ button[id="dark-mode-toggle"]:hover {
   width: 75%;
 }
 
+#jobs-table {
+  border-collapse: collapse;
+}
+
+#jobs-table th {
+  text-align: left;
+  border-bottom: 1px solid black;
+}
+#jobs-table td {
+  border-bottom: 1px solid black;
+}
+
+/* #jobs-table td:last-child {
+  border-bottom: none;
+} */
+
 .boxed-data-underline {
   height: 1px;
   background-color: #404040;

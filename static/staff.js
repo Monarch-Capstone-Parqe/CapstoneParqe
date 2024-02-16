@@ -170,18 +170,61 @@ let intervalId = setInterval(refreshJobs, 10000);
 
 // hardcoded order for testing purposes
 class Order {
-    constructor(email, filament_type, price, nozzle_width, layer_height, infill, supports, pieces, note) {
+    constructor(price, email, filament_type, nozzle_size, layer_height, infill, quantity, note) {
+      this.price = price;
       this.email = email;
       this.filament_type = filament_type;
-      this.price = price;
-      this.nozzle_width = nozzle_width;
+      this.nozzle_size = nozzle_size;
       this.layer_height = layer_height;
       this.infill = infill;
-      this.supports = supports;
-      this.pieces = pieces;
+      this.quantity = quantity;
       this.note = note;
     }
   }
 
-let order = new Order('test-test@pdx.edu', 'pla,black', '2.34', '0.4mm', '0.2mm', '20%', 'no', '3', 'This a test note.');
-renderJob(order);
+let order1 = new Order('$2.34', 'test-test@pdx.edu', 'pla,black', '0.4mm', '0.2mm', '20%', '10', 'This a test note. This a test note. This a test note.');
+// testing 150 characters for note
+let order2 = new Order('$22.80', 'this-is-a-longer-email@pdx.edu', 'petg,purple', '0.6mm', '0.15mm', '100%', '100', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis p');
+// renderJob(order);
+
+// new test code
+let jobsTable = document.querySelector('#jobs-table');
+let row = jobsTable.insertRow(1);
+
+let priceCell = row.insertCell(0);
+let emailCell = row.insertCell(1);
+let filamentCell = row.insertCell(2);
+let nozzleCell = row.insertCell(3);
+let layerCell = row.insertCell(4);
+let infillCell = row.insertCell(5);
+let quantityCell = row.insertCell(6);
+let noteCell = row.insertCell(7);
+
+priceCell.innerHTML = order1.price;
+emailCell.innerHTML = order1.email;
+filamentCell.innerHTML = order1.filament_type;
+nozzleCell.innerHTML = order1.nozzle_size;
+layerCell.innerHTML = order1.layer_height;
+infillCell.innerHTML = order1.infill;
+quantityCell.innerHTML = order1.quantity;
+noteCell.innerHTML = order1.note;
+
+row = jobsTable.insertRow(2);
+
+priceCell = row.insertCell(0);
+emailCell = row.insertCell(1);
+filamentCell = row.insertCell(2);
+nozzleCell = row.insertCell(3);
+layerCell = row.insertCell(4);
+infillCell = row.insertCell(5);
+quantityCell = row.insertCell(6);
+noteCell = row.insertCell(7);
+
+priceCell.innerHTML = order2.price;
+emailCell.innerHTML = order2.email;
+filamentCell.innerHTML = order2.filament_type;
+nozzleCell.innerHTML = order2.nozzle_size;
+layerCell.innerHTML = order2.layer_height;
+infillCell.innerHTML = order2.infill;
+quantityCell.innerHTML = order2.quantity;
+noteCell.innerHTML = order2.note;

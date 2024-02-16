@@ -57,21 +57,6 @@ function refreshJobs()
     });
 }
 
-class OtherOrder {
-    constructor(email, price, nozzle_width, layer_height, infill, supports, pieces, note) {
-      this.email = email;
-      this.price = price;
-      this.nozzle_width = nozzle_width;
-      this.layer_height = layer_height;
-      this.infill = infill;
-      this.supports = supports;
-      this.pieces = pieces;
-      this.note = note;
-    }
-  }
-let otherOrder = new OtherOrder('test@gmail.com', '$4.33', '0.4mm', '0.2mm', 'no', '3', 'this is a test');
-// renderJob(OtherOrder);
-
 //Function to create job sections with input variables
 //Variables will be received from database
 function renderJob(order)
@@ -89,56 +74,8 @@ function renderJob(order)
         initJobsTable();
     }
 
-    // if (document.querySelector('#jobs-table').style.display === 'none') {
-    //     initJobsTable();
-    // }
-
     // insert the order into the table to display on staff page
     insertTableRow(order);
-
-    // let dataBox = document.createElement('section');
-    // dataBox.id = order.id;
-    // dataBox.classList.add('boxed-data');
-
-    // let job = document.createElement('p');
-    // job.classList.add('data-formatting');
-
-    // job.innerHTML = '<span class="first-text">Email: </span>' + order.email + 
-    //                     '<span class="emphasis-text">Price: </span>' + order.price + 
-    //                     '<span class="emphasis-text">Layer Height: </span>'+ order.layer_height + 
-    //                     '<span class="emphasis-text">Nozzle Width: </span>' + order.nozzle_width +
-    //                     '<span class="emphasis-text">Infill: </span>' + order.infill +
-    //                     '<span class="emphasis-text">Supports: </span>' + order.supports +
-    //                     '<span class="emphasis-text">Pieces: </span>' + order.pieces + 
-    //                     '<span class="emphasis-text">Note: </span>' + order.note;
-
-    // let buttonBox = document.createElement('section');
-    // buttonBox.classList.add('staff-buttons');
-
-    // let approveButton = document.createElement('button');
-    // approveButton.id = 'approve-button'
-    // approveButton.addEventListener('click', () => {
-    //     approve(order.id);
-    // });
-    // approveButton.textContent = 'APPROVE';
-
-    // let denyButton = document.createElement('button');
-    // denyButton.id = 'deny-button'
-    // denyButton.addEventListener('click', () => {
-    //     openRejectModal(order.id)
-    // });
-    // denyButton.textContent = 'DENY';
-
-    // let underline = document.createElement('div');
-    // underline.classList.add('boxed-data-underline');
-    // underline.id = 'underline' + order.id;
-
-    // dataBox.appendChild(job);
-    // dataBox.appendChild(buttonBox);
-    // buttonBox.appendChild(approveButton);
-    // buttonBox.appendChild(denyButton);
-    // jobsBox.appendChild(dataBox);
-    // jobsBox.appendChild(underline);
 }
 
 //Function to remove a job by id from the page
@@ -195,26 +132,6 @@ function openRejectModal(id) {
 }
 
 let intervalId = setInterval(refreshJobs, 10000);
-
-// hardcoded order for testing purposes
-class Order {
-    constructor(price, email, filament_type, nozzle_size, layer_height, infill, quantity, note) {
-      this.price = price;
-      this.email = email;
-      this.filament_type = filament_type;
-      this.nozzle_size = nozzle_size;
-      this.layer_height = layer_height;
-      this.infill = infill;
-      this.quantity = quantity;
-      this.note = note;
-    }
-  }
-
-let order1 = new Order('$2.34', 'test-test@pdx.edu', 'pla, black', '0.4mm', '0.2mm', '20%', '10', 'This a test note. This a test note. This a test note.');
-// testing 180 characters for note
-let order2 = new Order('$22.80', 'this-is-a-longer-email@pdx.edu', 'petg, purple', '0.6mm', '0.15mm', '100%', '100', 'THIS IS 180 CHARACTERS LONG.  Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis p');
-let order3 = new Order('$45.67', 'no-note-test@pdx.edu', 'abs, white', '0.6mm', '0.3mm', '15%', '5', '');
-let order4 = new Order('$11.11', 'test-again@pdx.edu', 'pla, orange', '0.4mm', '0.1mm', '80%', '1', 'Testing another note here to see how it shows up in the table!!!!!!!');
 
 // initializes the table when their are orders in the queue
 // and sets width of table columns
@@ -283,9 +200,3 @@ function insertTableRow(orderToAdd) {
     buttonBox.appendChild(denyButton);
     row.insertCell(8).append(buttonBox);
 }
-
-// initJobsTable();
-// insertTableRow(order1);
-// insertTableRow(order2);
-// insertTableRow(order3);
-// insertTableRow(order4);

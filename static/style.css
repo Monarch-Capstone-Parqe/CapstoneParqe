@@ -463,7 +463,6 @@ button[id="dark-mode-toggle"]:hover {
 .jobs-box-header-underline {
   height: 1px;
   background-color: #404040;
-  /* width: 75%; */
   width: 100%;
 }
 
@@ -489,10 +488,6 @@ button[id="dark-mode-toggle"]:hover {
   height: 80px;
   padding-left: 20px;
 }
-
-/* #jobs-table td:last-child {
-  border-bottom: none;
-} */
 
 .boxed-data-underline {
   height: 1px;

@@ -65,11 +65,10 @@ function renderJob(order)
     if(exists) {
         return
     }
-    let jobsBox = document.getElementById('jobs-box');
-    if(jobsBox.childElementCount == 3) {
-        let toHide = document.getElementById('no-jobs-message');
+    
+    if(document.querySelector('#jobs-table').rows.length > 0) {
         // hide the 'no jobs' message
-        toHide.style.display = "none";
+        document.getElementById('no-jobs-message').style.display = 'none';
         // display the table
         initJobsTable();
     }
@@ -81,18 +80,14 @@ function renderJob(order)
 //Function to remove a job by id from the page
 function removeJob(id) {
     let toRemove = document.getElementById(id);
-    let removeUnderline = document.getElementById('underline' + id);
-    if(toRemove != null) {
-        let parent = toRemove.parentNode;
-        parent.removeChild(toRemove);
-        parent.removeChild(removeUnderline);    
-        if(parent.childElementCount == 3) {
-            let toDisplay = document.getElementById("no-jobs-message");
-            // show the 'no jobs' message
-            toDisplay.style.display = 'block';
-            // hide the jobs table
-            document.querySelector('#jobs-table').style.display === 'none'
-        }
+    toRemove.remove();
+
+    if(jobsTable = document.querySelector('#jobs-table').rows.length === 1) {
+        // hide the intialized table
+        document.querySelector('#jobs-table').style.display = 'none';
+
+        // show the no jobs in queue message
+        document.getElementById('no-jobs-message').style.display = 'block';
     }
 }
 
@@ -148,18 +143,19 @@ function initJobsTable() {
 
 
     // hide the no jobs in queue message
-    let toHide = document.getElementById('no-jobs-message');
-    toHide.style.display = "none";
+    document.getElementById('no-jobs-message').style.display = 'none';
 
     // display the intialized table
-    let jobsTable = document.querySelector('#jobs-table');
-    jobsTable.style.display = 'block';
+    document.querySelector('#jobs-table').style.display = 'block';
 }
 
 // inserts an order into the jobs table
 function insertTableRow(orderToAdd) {
     let jobsTable = document.querySelector('#jobs-table');
     let row = jobsTable.insertRow(jobsTable.rows.length);
+
+    // set the id of the row to the corresponding order, for use in the removeJob() function
+    row.setAttribute('id', orderToAdd.id);
 
     let priceCell = row.insertCell(0);
     let emailCell = row.insertCell(1);

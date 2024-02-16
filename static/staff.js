@@ -70,7 +70,7 @@ class OtherOrder {
     }
   }
 let otherOrder = new OtherOrder('test@gmail.com', '$4.33', '0.4mm', '0.2mm', 'no', '3', 'this is a test');
-renderJob(OtherOrder);
+// renderJob(OtherOrder);
 
 //Function to create job sections with input variables
 //Variables will be received from database
@@ -199,10 +199,12 @@ class Order {
 
 let order1 = new Order('$2.34', 'test-test@pdx.edu', 'pla,black', '0.4mm', '0.2mm', '20%', '10', 'This a test note. This a test note. This a test note.');
 // testing 150 characters for note
-let order2 = new Order('$22.80', 'this-is-a-longer-email@pdx.edu', 'petg,purple', '0.6mm', '0.15mm', '100%', '100', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis p');
+let order2 = new Order('$22.80', 'this-is-a-longer-email@pdx.edu', 'petg,purple', '0.6mm', '0.15mm', '100%', '100', 'THIS IS 180 CHARACTERS LONG.  Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis p');
 let order3 = new Order('$11.11', 'test-again@pdx.edu', 'pla,orange', '0.4mm', '0.1mm', '80%', '1', 'Testing another note here to see how it shows up in the table!!!!!!!');
 
 function initJobsTable() {
+    let toHide = document.getElementById('no-jobs-message');
+    toHide.style.display = "none";
     let jobsTable = document.querySelector('#jobs-table');
     jobsTable.style.display = 'block';
 }

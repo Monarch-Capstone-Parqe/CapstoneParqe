@@ -464,7 +464,7 @@ button[id="dark-mode-toggle"]:hover {
   height: 1px;
   background-color: #404040;
   /* width: 75%; */
-  width: 100px;
+  width: 100%;
 }
 
 #jobs-table {

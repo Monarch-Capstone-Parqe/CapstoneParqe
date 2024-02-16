@@ -62,6 +62,22 @@ def create_tables():
         # Create the pending_orders table with a foreign key reference to staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS pending_orders("
                             "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE)"))
+        
+        # Create the filaments table
+        conn.execute(text("CREATE TABLE IF NOT EXISTS filaments("
+                          "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                          "type VARCHAR NOT NULL,"
+                          "in_stock BOOLEAN NOT NULL)"))
+
+        # Create the colors table
+        conn.execute(text("CREATE TABLE IF NOT EXISTS colors("
+                          "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                          "color VARCHAR NOT NULL)"))
+
+        # Create the filament_colors table with a foreign key reference to the colors and filaments tables
+        conn.execute(text("CREATE TABLE IF NOT EXISTS filament_colors("
+                          "color_id INTEGER NOT NULL REFERENCES colors(id) ON DELETE CASCADE,"
+                          "filament INTEGER NOT NULL REFERENCES filaments(id) ON DELETE CASCADE)"))
 
         conn.commit()
 
@@ -198,6 +214,23 @@ def get_staff_emails() -> list:
         result = conn.execute(text("SELECT email FROM staff")).fetchall()
         staff_emails = [row[0] for row in result]
         return staff_emails
+    
+def get_staff_email(id):
+    """
+    Retrieve the email of a staff member from the database.
+
+    Returns:
+        str: The email associated with the given staff ID.
+    """
+    with engine.connect() as conn:
+        staff_email_result = conn.execute(text("SELECT email FROM staff WHERE id=:id"),
+                                    {"id": id})
+        staff_email_dict = []
+        for row in staff_email_result:
+            row_as_dict = row._mapping
+            staff_email_dict.append(dict(row_as_dict))
+        staff_email = staff_email_dict[0]['email']
+        return staff_email;
 
 def get_email_by_order_id(order_id) -> str:
     """
@@ -233,4 +266,42 @@ def add_staff_member(email) -> bool:
             return True
         else:
             return False
+        
+def add_filament(type):
+    """
+    Add a new type of filament to the 'filaments' table if not already exists.
+
+    Parameters: 
+        type (str): The type of the filament to be added.
+    """
+    with engine.connect() as conn:
+        filament_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM filaments WHERE type = :type)"), {"type": type}).scalar()
+        if not filament_exists:
+            conn.execute(text("INSERT INTO filaments(type, in_stock) VALUES (:type, FALSE)"), {"type": type})
+
+        conn.commit()
+
+def update_filament(type, in_stock):
+    """
+    Update the availability status of a type of filament in the 'filaments' table.
+
+    Parameters: 
+        type (str): The type of the filament to be updated.
+        in_stock (bool): True if the filament is in stock, false if not.
+    """
+    with engine.connect() as conn:
+        conn.execute(text("UPDATE filaments SET in_stock=:in_stock WHERE type=:type"),
+                     {"in_stock": in_stock, "type": type})
+
+def remove_filament(type):
+    """
+    Remove a type of filament from the 'filaments' table.
+
+    Parameters: 
+        type (str): The type of the filament to be removed.
+    """
+    with engine.connect() as conn:
+        conn.execute(text("DELETE FROM filaments WHERE type=:type"), {"type": type})
+
+        conn.commit()
    

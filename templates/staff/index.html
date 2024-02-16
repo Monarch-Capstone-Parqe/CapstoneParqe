@@ -8,7 +8,7 @@
 
 
 {% block body %}
-<body onload="refreshJobs()">
+<body onload="initialLoad()">
 <main>
   <div class="page-header">
     <img
@@ -16,16 +16,21 @@
       src="{{ url_for('static', filename='images/psu_logo_svg.svg') }}"
       alt="Portland State Logo"
     />
+    <section class="staff-header-buttons">
+      <button class="staff-header-button" id="pending-page-button" onclick="openPendingPage()">Pending Jobs</button>
+      <button class="staff-header-button" id="approved-page-button" onclick="openApprovedPage()">Approved Jobs</button>
+      <button class="staff-header-button" id="denied-page-button" onclick="openDeniedPage()">Denied Jobs</button>
+    </section>
   </div>
   <div class="staff-header-box">
     <h1 class="staff-header-content">PARQE STAFF PAGE</h1>
   </div>
   <div class="jobs-box-container" id="jobs-box">
       <div class="jobs-box-header">
-        <h1 id ="subheader-text" class="jobs-box-header-content">JOBS IN QUEUE</h1>
+        <h1 id ="subheader-text" class="jobs-box-header-content"></h1>
         <div class="jobs-box-header-underline"></div>
       </div>
-      <p id="no-jobs-message" class="data-formatting">No jobs in queue.</p>
+      <p id="no-jobs-message" class="data-formatting"></p>
       <div class="reject-order-modal">
         <div class="reject-order-modal-content">
           <p>Please state why this order was not approved, your message will be relayed to the submitter via email: </p>

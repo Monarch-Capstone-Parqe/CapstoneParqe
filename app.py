@@ -212,6 +212,10 @@ def get_orders(order_type):
         orders = db.get_orders()
     elif order_type == 'pending':
         orders = db.get_pending_orders()
+    elif order_type == 'approved':
+        orders = db.get_approved_orders()
+    elif order_type == 'denied':
+        orders = db.get_denied_orders()
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 
@@ -256,7 +260,7 @@ def review_orders():
         staff_email = session['user']['userinfo']['email']
 
         if(order_status == 'denied'):
-            db.delete_order(order_id)
+            db.deny_order(order_id, staff_email)
         elif(order_status == 'approved'):
             db.approve_order(order_id, staff_email)
         else:

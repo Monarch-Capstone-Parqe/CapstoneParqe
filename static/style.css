@@ -47,6 +47,11 @@ legend {
   src: url("fonts/Acumin-ItPro.otf");
 }
 
+@font-face {
+  font-family: "Acumin-WProL";
+  src: url("fonts/Acumin-WProL.otf");
+}
+
 /* Google Font */
 .material-symbols-outlined {
   font-variation-settings:
@@ -400,6 +405,8 @@ button[id="dark-mode-toggle"]:hover {
   background-color: #6d810e;
   height: 38px;
   margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .psu-logo-staff {
@@ -407,6 +414,31 @@ button[id="dark-mode-toggle"]:hover {
   width: 160px;
   margin-left: 36px;
   margin-top: 6px;
+}
+
+.staff-header-buttons {
+  display: flex;
+  height: 38px;
+}
+
+.staff-header-button {
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding-top: 9px;
+  padding-left: 15px;
+  padding-right: 15px;
+  font-family: "Acumin-WProL";
+  font-size: 0.87em;
+  letter-spacing: 1.15px;
+}
+
+.staff-header-button:hover {
+  background-color: #001a33;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 .staff-header-box {
@@ -435,6 +467,7 @@ button[id="dark-mode-toggle"]:hover {
 .jobs-box-container {
   width: 70%;
   margin: 0 auto;
+  margin-bottom: 150px;
 }
 
 .jobs-box-header {
@@ -540,6 +573,32 @@ button[id="dark-mode-toggle"]:hover {
 #deny-button:hover {
   color: white;
   background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.load-more-button-box {
+  width: 100%;
+  margin-top: 30px;
+  text-align: center;
+}
+
+#load-more-button {
+  color: black;
+  background-color: white;
+  width: 200px;
+  height: 50px;
+  font-size: 1.3em;
+  border: 2px solid #404040;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  transition: 0.3s;
+}
+
+#load-more-button:hover {
+  color: white;
+  background-color: #404040;
   text-decoration: underline;
   text-underline-offset: -1%;
   text-decoration-thickness: 1px;

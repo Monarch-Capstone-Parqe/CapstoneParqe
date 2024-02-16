@@ -167,3 +167,21 @@ function openRejectModal(id) {
 }
 
 let intervalId = setInterval(refreshJobs, 10000);
+
+// hardcoded order for testing purposes
+class Order {
+    constructor(email, filament_type, price, nozzle_width, layer_height, infill, supports, pieces, note) {
+      this.email = email;
+      this.filament_type = filament_type;
+      this.price = price;
+      this.nozzle_width = nozzle_width;
+      this.layer_height = layer_height;
+      this.infill = infill;
+      this.supports = supports;
+      this.pieces = pieces;
+      this.note = note;
+    }
+  }
+
+let order = new Order('test-test@pdx.edu', 'pla,black', '2.34', '0.4mm', '0.2mm', '20%', 'no', '3', 'This a test note.');
+renderJob(order);

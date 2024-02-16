@@ -200,7 +200,8 @@ class Order {
 let order1 = new Order('$2.34', 'test-test@pdx.edu', 'pla,black', '0.4mm', '0.2mm', '20%', '10', 'This a test note. This a test note. This a test note.');
 // testing 150 characters for note
 let order2 = new Order('$22.80', 'this-is-a-longer-email@pdx.edu', 'petg,purple', '0.6mm', '0.15mm', '100%', '100', 'THIS IS 180 CHARACTERS LONG.  Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis p');
-let order3 = new Order('$11.11', 'test-again@pdx.edu', 'pla,orange', '0.4mm', '0.1mm', '80%', '1', 'Testing another note here to see how it shows up in the table!!!!!!!');
+let order3 = new Order('$45.67', 'no-note-test@pdx.edu', 'abs,white', '0.6mm', '0.3mm', '15%', '5', '');
+let order4 = new Order('$11.11', 'test-again@pdx.edu', 'pla,orange', '0.4mm', '0.1mm', '80%', '1', 'Testing another note here to see how it shows up in the table!!!!!!!');
 
 // initializes the table when their are orders in the queue
 function initJobsTable() {
@@ -259,3 +260,4 @@ initJobsTable();
 insertTableRow(order1);
 insertTableRow(order2);
 insertTableRow(order3);
+insertTableRow(order4);

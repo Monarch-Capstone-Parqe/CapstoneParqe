@@ -47,6 +47,7 @@ def create_tables():
                             "gcode_path VARCHAR NOT NULL,"
                             "prusa_output VARCHAR NOT NULL,"
                             "price NUMERIC(6,2) NOT NULL,"
+                            "filament_type VARCHAR NOT NULL,"
                             "date DATE DEFAULT CURRENT_DATE)"))
 
         # Create the approved_orders table with a foreign key reference to staff table
@@ -66,7 +67,7 @@ def create_tables():
         conn.commit()
 
 
-def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
+def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None, filament_type=None) -> int:
     """
     Insert a new order into the 'orders' and 'pending_orders' tables.
 
@@ -80,17 +81,18 @@ def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quanti
         prusa_output (str): The PrusaSlicer output file path.
         gcode_path (str): The G-code file path.
         price (float): The total price of the order.
+        filament_type (str): The material and color of the filament
 
     Returns:
         int: The ID of the inserted order.
     """
      
     with engine.begin() as conn:
-        result = conn.execute(text("INSERT INTO orders(email, layer_height, nozzle_size, infill, quantity, note, prusa_output, gcode_path, price, date) "
-                          "VALUES (:email, :layer_height, :nozzle_size, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :date) RETURNING id"),
+        result = conn.execute(text("INSERT INTO orders(email, layer_height, nozzle_size, infill, quantity, note, prusa_output, gcode_path, price, filament_type, date) "
+                          "VALUES (:email, :layer_height, :nozzle_size, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :filament_type, :date) RETURNING id"),
                      {"email": email, "layer_height": layer_height, "nozzle_size": nozzle_size,
                       "infill": infill, "quantity": quantity, "note": note,
-                      "prusa_output": prusa_output, "gcode_path": gcode_path, "price": price, "date": date.today()})
+                      "prusa_output": prusa_output, "gcode_path": gcode_path, "price": price, "filament_type": filament_type, "date": date.today()})
         
         order_id = result.fetchone()["id"]
         conn.execute(text("INSERT INTO pending_orders(order_id) VALUES (:order_id)"), {"order_id": order_id})

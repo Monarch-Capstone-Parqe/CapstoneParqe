@@ -204,9 +204,24 @@ let order3 = new Order('$45.67', 'no-note-test@pdx.edu', 'abs,white', '0.6mm', '
 let order4 = new Order('$11.11', 'test-again@pdx.edu', 'pla,orange', '0.4mm', '0.1mm', '80%', '1', 'Testing another note here to see how it shows up in the table!!!!!!!');
 
 // initializes the table when their are orders in the queue
+// and sets width of table columns
 function initJobsTable() {
+    // set the width of each column in the table
+    document.querySelector('#table-email').style.width = '300px';
+    document.querySelector('#table-filament').style.width = '90px';
+    document.querySelector('#table-nozzle').style.width = '75px';
+    document.querySelector('#table-layer').style.width = '60px';
+    document.querySelector('#table-infill').style.width = '55px';
+    document.querySelector('#table-quantity').style.width = '50px';
+    document.querySelector('#table-note').style.width = '500px';
+    document.querySelector('#table-buttons').style.width = '200px';
+
+
+    // hide the no jobs in queue message
     let toHide = document.getElementById('no-jobs-message');
     toHide.style.display = "none";
+
+    // display the intialized table
     let jobsTable = document.querySelector('#jobs-table');
     jobsTable.style.display = 'block';
 }

@@ -57,6 +57,21 @@ function refreshJobs()
     });
 }
 
+class OtherOrder {
+    constructor(email, price, nozzle_width, layer_height, infill, supports, pieces, note) {
+      this.email = email;
+      this.price = price;
+      this.nozzle_width = nozzle_width;
+      this.layer_height = layer_height;
+      this.infill = infill;
+      this.supports = supports;
+      this.pieces = pieces;
+      this.note = note;
+    }
+  }
+let otherOrder = new OtherOrder('test@gmail.com', '$4.33', '0.4mm', '0.2mm', 'no', '3', 'this is a test');
+renderJob(OtherOrder);
+
 //Function to create job sections with input variables
 //Variables will be received from database
 function renderJob(order)
@@ -213,6 +228,27 @@ function insertTableRow(orderToAdd) {
     infillCell.innerHTML = orderToAdd.infill;
     quantityCell.innerHTML = orderToAdd.quantity;
     noteCell.innerHTML = orderToAdd.note;
+
+    let buttonBox = document.createElement('section');
+    buttonBox.classList.add('staff-buttons');
+
+    let approveButton = document.createElement('button');
+    approveButton.id = 'approve-button'
+    approveButton.addEventListener('click', () => {
+        approve(order.id);
+    });
+    approveButton.textContent = 'APPROVE';
+
+    let denyButton = document.createElement('button');
+    denyButton.id = 'deny-button'
+    denyButton.addEventListener('click', () => {
+        openRejectModal(order.id)
+    });
+    denyButton.textContent = 'DENY';
+
+    buttonBox.appendChild(approveButton);
+    buttonBox.appendChild(denyButton);
+    row.insertCell(8).append(buttonBox);
 }
 
 initJobsTable();

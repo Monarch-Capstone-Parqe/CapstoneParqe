@@ -471,6 +471,7 @@ button[id="dark-mode-toggle"]:hover {
   border-collapse: collapse;
   color: #404040;
   font-family: 'Acumin-ItPro';
+  padding-bottom: 80px;
 }
 
 #jobs-table th {

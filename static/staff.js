@@ -83,52 +83,62 @@ function renderJob(order)
     let jobsBox = document.getElementById('jobs-box');
     if(jobsBox.childElementCount == 3) {
         let toHide = document.getElementById('no-jobs-message');
+        // hide the 'no jobs' message
         toHide.style.display = "none";
+        // display the table
+        initJobsTable();
     }
 
-    let dataBox = document.createElement('section');
-    dataBox.id = order.id;
-    dataBox.classList.add('boxed-data');
+    // if (document.querySelector('#jobs-table').style.display === 'none') {
+    //     initJobsTable();
+    // }
 
-    let job = document.createElement('p');
-    job.classList.add('data-formatting');
+    // insert the order into the table to display on staff page
+    insertTableRow(order);
 
-    job.innerHTML = '<span class="first-text">Email: </span>' + order.email + 
-                        '<span class="emphasis-text">Price: </span>' + order.price + 
-                        '<span class="emphasis-text">Layer Height: </span>'+ order.layer_height + 
-                        '<span class="emphasis-text">Nozzle Width: </span>' + order.nozzle_width +
-                        '<span class="emphasis-text">Infill: </span>' + order.infill +
-                        '<span class="emphasis-text">Supports: </span>' + order.supports +
-                        '<span class="emphasis-text">Pieces: </span>' + order.pieces + 
-                        '<span class="emphasis-text">Note: </span>' + order.note;
+    // let dataBox = document.createElement('section');
+    // dataBox.id = order.id;
+    // dataBox.classList.add('boxed-data');
 
-    let buttonBox = document.createElement('section');
-    buttonBox.classList.add('staff-buttons');
+    // let job = document.createElement('p');
+    // job.classList.add('data-formatting');
 
-    let approveButton = document.createElement('button');
-    approveButton.id = 'approve-button'
-    approveButton.addEventListener('click', () => {
-        approve(order.id);
-    });
-    approveButton.textContent = 'APPROVE';
+    // job.innerHTML = '<span class="first-text">Email: </span>' + order.email + 
+    //                     '<span class="emphasis-text">Price: </span>' + order.price + 
+    //                     '<span class="emphasis-text">Layer Height: </span>'+ order.layer_height + 
+    //                     '<span class="emphasis-text">Nozzle Width: </span>' + order.nozzle_width +
+    //                     '<span class="emphasis-text">Infill: </span>' + order.infill +
+    //                     '<span class="emphasis-text">Supports: </span>' + order.supports +
+    //                     '<span class="emphasis-text">Pieces: </span>' + order.pieces + 
+    //                     '<span class="emphasis-text">Note: </span>' + order.note;
 
-    let denyButton = document.createElement('button');
-    denyButton.id = 'deny-button'
-    denyButton.addEventListener('click', () => {
-        openRejectModal(order.id)
-    });
-    denyButton.textContent = 'DENY';
+    // let buttonBox = document.createElement('section');
+    // buttonBox.classList.add('staff-buttons');
 
-    let underline = document.createElement('div');
-    underline.classList.add('boxed-data-underline');
-    underline.id = 'underline' + order.id;
+    // let approveButton = document.createElement('button');
+    // approveButton.id = 'approve-button'
+    // approveButton.addEventListener('click', () => {
+    //     approve(order.id);
+    // });
+    // approveButton.textContent = 'APPROVE';
 
-    dataBox.appendChild(job);
-    dataBox.appendChild(buttonBox);
-    buttonBox.appendChild(approveButton);
-    buttonBox.appendChild(denyButton);
-    jobsBox.appendChild(dataBox);
-    jobsBox.appendChild(underline);
+    // let denyButton = document.createElement('button');
+    // denyButton.id = 'deny-button'
+    // denyButton.addEventListener('click', () => {
+    //     openRejectModal(order.id)
+    // });
+    // denyButton.textContent = 'DENY';
+
+    // let underline = document.createElement('div');
+    // underline.classList.add('boxed-data-underline');
+    // underline.id = 'underline' + order.id;
+
+    // dataBox.appendChild(job);
+    // dataBox.appendChild(buttonBox);
+    // buttonBox.appendChild(approveButton);
+    // buttonBox.appendChild(denyButton);
+    // jobsBox.appendChild(dataBox);
+    // jobsBox.appendChild(underline);
 }
 
 //Function to remove a job by id from the page
@@ -141,7 +151,10 @@ function removeJob(id) {
         parent.removeChild(removeUnderline);    
         if(parent.childElementCount == 3) {
             let toDisplay = document.getElementById("no-jobs-message");
+            // show the 'no jobs' message
             toDisplay.style.display = 'block';
+            // hide the jobs table
+            document.querySelector('#jobs-table').style.display === 'none'
         }
     }
 }
@@ -271,8 +284,8 @@ function insertTableRow(orderToAdd) {
     row.insertCell(8).append(buttonBox);
 }
 
-initJobsTable();
-insertTableRow(order1);
-insertTableRow(order2);
-insertTableRow(order3);
-insertTableRow(order4);
+// initJobsTable();
+// insertTableRow(order1);
+// insertTableRow(order2);
+// insertTableRow(order3);
+// insertTableRow(order4);

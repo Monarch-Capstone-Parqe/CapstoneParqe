@@ -1,25 +1,15 @@
 from datetime import date
 
 from sqlalchemy import create_engine, text
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import MetaData
 
 import config.variables as variables
-
-#Constants
-#MAIL_ADDR_LEN = 40 #See --> https://stackoverflow.com/questions/1297272/how-long-should-sql-email-fields-be
-
 
 #DB_USERNAME & DB_PASSWORD exist as system environment variables
 # -TODO Likely will make the whole DB_URI its own env var eventually
 engine = create_engine(f'postgresql://{variables.DB_USERNAME}:{variables.DB_PASSWORD}@localhost:5432/parqe')
-
-#################################
-# CURRENTLY NO ORM UTILIZIATION #
-#################################
-#Sets up DB connection & information pipeline 
-#conn = engine.connect()
-#metadata = db.MetaData()
-#metadata.reflect(bind=engine)
+metadata = MetaData()
+metadata.reflect(bind=engine)
 
 def check_db_connect():
     engine.connect()
@@ -92,20 +82,41 @@ def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quanti
                       "infill": infill, "quantity": quantity, "note": note,
                       "prusa_output": prusa_output, "gcode_path": gcode_path, "price": price, "date": date.today()})
         
-        order_id = result.fetchone()["id"]
+        order_id = result.fetchone()[0]
         conn.execute(text("INSERT INTO pending_orders(order_id) VALUES (:order_id)"), {"order_id": order_id})
         conn.commit()
 
-def get_orders():
+def fetch_orders(query) -> list:
+    """
+    Retrieve orders from the database based on the given query.
+
+    Parameters:
+        query (str): The SQL query to retrieve orders.
+
+    Returns:
+        list: A list of dictionaries representing each order.
+    """
+    orders_table = metadata.tables['orders']
+    column_names = orders_table.columns.keys()
+    
+    with engine.connect() as conn:
+        result = conn.execute(text(query)).fetchall()
+        if not result:
+            return []  # Return an empty list if no orders are found
+        orders = []
+        for row in result:
+            row_dict = dict(zip(column_names, row))  # Create dictionary using column names
+            orders.append(row_dict)
+        return orders
+
+def get_orders() -> list:
     """
     Retrieve all orders from the 'orders' table.
 
     Returns:
         list: A list of dictionaries representing each order.
     """
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM orders ORDER BY date")).fetchall()
-        return [dict(row) for row in result]
+    return fetch_orders("SELECT * FROM orders ORDER BY date")
 
 def get_pending_orders() -> list:
     """
@@ -114,9 +125,7 @@ def get_pending_orders() -> list:
     Returns:
         list: A list of dictionaries representing each pending order.
     """
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT o.* FROM orders o JOIN pending_orders p ON o.id = p.order_id ORDER BY o.date")).fetchall()
-        return [dict(row) for row in result]
+    return fetch_orders("SELECT o.* FROM orders o JOIN pending_orders p ON o.id = p.order_id ORDER BY o.date")
 
 def get_approved_orders() -> list:
     """
@@ -125,9 +134,7 @@ def get_approved_orders() -> list:
     Returns:
         list: A list of dictionaries representing each approved order.
     """
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT o.* FROM orders o JOIN approved_orders a ON o.id = a.order_id ORDER BY o.date")).fetchall()
-        return [dict(row) for row in result]
+    return fetch_orders("SELECT o.* FROM orders o JOIN approved_orders a ON o.id = a.order_id ORDER BY o.date")
 
 def get_denied_orders() -> list:
     """
@@ -136,9 +143,7 @@ def get_denied_orders() -> list:
     Returns:
         list: A list of dictionaries representing each denied order.
     """
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT o.* FROM orders o JOIN denied_orders d ON o.id = d.order_id ORDER BY o.date")).fetchall()
-        return [dict(row) for row in result]
+    return fetch_orders("SELECT o.* FROM orders o JOIN denied_orders d ON o.id = d.order_id ORDER BY o.date")
 
 def delete_order(order_id):
     """

@@ -463,7 +463,30 @@ button[id="dark-mode-toggle"]:hover {
 .jobs-box-header-underline {
   height: 1px;
   background-color: #404040;
-  width: 75%;
+  width: 100%;
+}
+
+#jobs-table {
+  border-collapse: collapse;
+  color: #404040;
+  font-family: 'Acumin-ItPro';
+  font-size: 0.9em;
+  padding-bottom: 80px;
+}
+
+#jobs-table th {
+  text-align: left;
+  border-bottom: 1px solid black;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+}
+#jobs-table td {
+  border-bottom: 1px solid black;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  height: 80px;
+  padding-left: 20px;
 }
 
 .boxed-data-underline {
@@ -500,7 +523,7 @@ button[id="dark-mode-toggle"]:hover {
   display: flex;
   width: 200px;
   height: 50px;
-  margin-left: 20px;
+  /* margin-left: 20px; */
 }
 
 .staff-buttons button[id='approve-button']{

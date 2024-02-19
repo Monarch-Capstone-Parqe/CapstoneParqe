@@ -29,8 +29,9 @@ def create_tables():
         conn.execute(text("CREATE TABLE IF NOT EXISTS orders("
                             "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                             "email VARCHAR NOT NULL,"
-                            "layer_height VARCHAR NOT NULL,"      
+                            "filament_type VARCHAR NOT NULL,"
                             "nozzle_size VARCHAR NOT NULL,"      
+                            "layer_height VARCHAR NOT NULL,"      
                             "infill NUMERIC(3,2) NOT NULL,"          
                             "quantity INTEGER NOT NULL," 
                             "note VARCHAR,"
@@ -56,14 +57,15 @@ def create_tables():
         conn.commit()
 
 
-def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
+def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None, filament_type=None) -> int:
     """
     Insert a new order into the 'orders' and 'pending_orders' tables.
 
     Parameters:
         email (str): The email of the customer placing the order.
-        layer_height (str): The layer height of the 3D print.
+        filament_type (str): The material and color of the filament
         nozzle_size (str): The nozzle size of the 3D print.
+        layer_height (str): The layer height of the 3D print.
         infill (float): The infill percentage of the 3D print.
         quantity (int): The quantity of items ordered.
         note (str): Any additional notes or comments.
@@ -76,9 +78,9 @@ def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quanti
     """
      
     with engine.begin() as conn:
-        result = conn.execute(text("INSERT INTO orders(email, layer_height, nozzle_size, infill, quantity, note, prusa_output, gcode_path, price, date) "
-                          "VALUES (:email, :layer_height, :nozzle_size, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :date) RETURNING id"),
-                     {"email": email, "layer_height": layer_height, "nozzle_size": nozzle_size,
+        result = conn.execute(text("INSERT INTO orders(email, filament_type, nozzle_size, layer_height, infill, quantity, note, prusa_output, gcode_path, price, date) "
+                          "VALUES (:email, :filament_type, :nozzle_size, :layer_height, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :date) RETURNING id"),
+                     {"email": email, "filament_type": filament_type, "nozzle_size": nozzle_size, "layer_height": layer_height,
                       "infill": infill, "quantity": quantity, "note": note,
                       "prusa_output": prusa_output, "gcode_path": gcode_path, "price": price, "date": date.today()})
         

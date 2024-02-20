@@ -251,14 +251,32 @@ def get_email_by_order_id(order_id) -> str:
         return result if result else None
     
 def get_staff_email_by_approved_order_id(order_id) -> str:
+    """
+    Retrieve the staff email associated with the given approved order ID.
+
+    Parameters:
+        order_id (int): The primary key of the order.
+
+    Returns:
+        str: The staff email associated with the given approved order ID.
+    """
     with engine.connect() as conn:
         result = conn.execute(text("SELECT reviewed_by FROM approved_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
         return get_staff_email(result)
     
 def get_staff_email_by_denied_order_id(order_id) -> str:
-        with engine.connect() as conn:
-            result = conn.execute(text("SELECT reviewed_by FROM denied_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
-            return get_staff_email(result)
+    """
+    Retrieve the staff email associated with the given denied order ID.
+
+    Parameters:
+        order_id (int): The primary key of the order.
+
+    Returns:
+        str: The staff email associated with the given denied order ID.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT reviewed_by FROM denied_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
+        return get_staff_email(result)
 
 def add_staff_member(email) -> bool:
     """

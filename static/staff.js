@@ -59,11 +59,6 @@ function refreshJobs()
     });
 }
 
-
-//retrieve placeholder gcode from the browser
-let response = await fetch("/static/benchy.gcode");
-let gcode = await response.text() ;
-
 //Function to create job sections with input variables
 //Variables will be received from database
 function renderJob(order)
@@ -114,7 +109,7 @@ function renderJob(order)
     let previewButton = document.createElement('button');
     previewButton.id = 'preview-button'
     previewButton.addEventListener('click', () => {
-        openPreview(gcode)
+        openPreview(order.gcode_path)
     });
     previewButton.textContent = 'VIEW GCODE';
 
@@ -187,8 +182,19 @@ function openRejectModal(id) {
 
 
 
-function openPreview(gcode)
+function openPreview(gcode_path)
 {
+    fetch("/staff/get_gcode/"+gcode_path, {
+        method: "GET",
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data)
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
+
     const previewModal = document.querySelector('.gcode-preview-modal');
     const closeButton = document.getElementById('preview-close-button');
     previewModal.style.display = 'block';
@@ -209,7 +215,7 @@ function openPreview(gcode)
       travelColor: new THREE.Color('lime')
     });
 
-    preview.processGCode(gcode);
+    preview.processGCode(data);
     closeButton.onclick = function() {
         previewModal.style.display = 'none';
     }

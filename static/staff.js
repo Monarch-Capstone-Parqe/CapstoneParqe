@@ -349,6 +349,7 @@ function initialLoad() {
 }
 
 // initializes the table when their are orders in the queue
+// and sets width of table columns
 function initJobsTable() {
     // hide the no jobs in queue message
     document.getElementById('no-jobs-message').style.display = 'none';

@@ -1,5 +1,6 @@
 from datetime import date
 
+
 from sqlalchemy import create_engine, text, MetaData
 
 import config.variables as variables
@@ -72,6 +73,7 @@ def create_tables():
         conn.commit()
 
 
+
 def insert_order(email, filament_type=None, nozzle_size=None, layer_height=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
     """
     Insert a new order into the 'orders' and 'pending_orders' tables.
@@ -106,8 +108,9 @@ def insert_order(email, filament_type=None, nozzle_size=None, layer_height=None,
 def fetch_orders(query) -> list:
     """
     Retrieve orders from the database based on the given query.
+
     Parameters:
-        query (str): The SQL query to retrieve orders.Retrieve all orders from the 'orders' table.
+        query (str): The SQL query to retrieve orders.
 
     Returns:
         list: A list of dictionaries representing each order.
@@ -128,6 +131,7 @@ def fetch_orders(query) -> list:
 def get_orders() -> list:
     """
     Retrieve all orders from the 'orders' table.
+
     Returns:
         list: A list of dictionaries representing each order.
     """

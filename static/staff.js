@@ -194,6 +194,14 @@ function insertTableRow(orderToAdd) {
     });
     denyButton.textContent = 'DENY';
 
+    let previewButton = document.createElement('button');
+    previewButton.id = 'preview-button'
+    previewButton.addEventListener('click', () => {
+        openPreview(orderToAdd.gcode_path)
+    });
+    previewButton.textContent = 'VIEW GCODE';
+
+    buttonBox.appendChild(previewButton);
     buttonBox.appendChild(approveButton);
     buttonBox.appendChild(denyButton);
     row.insertCell(8).append(buttonBox);
@@ -238,5 +246,3 @@ function openPreview(gcode_path)
         previewModal.style.display = 'none';
     }
 }
-
-let intervalId = setInterval(refreshJobs, 10000);

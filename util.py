@@ -33,7 +33,7 @@ def process_order_data(data, session):
         try:
             session[key] = float(data[key])
             if session[key] not in {0.4, 0.6}:
-                validation_errors[key] = "Value must be one of: 0.1, 0.2, 0.3, 0.4"
+                validation_errors[key] = "Value must be one of: 0.4, 0.6"
         except (ValueError, TypeError):
             validation_errors[key] = f"Unable to cast '{key}' to the required type."
 
@@ -43,8 +43,8 @@ def process_order_data(data, session):
     else:
         try:
             session[key] = float(data[key])
-            #if session[key] not in {0.4, 0.6, 0.3, 0.4}:
-                #validation_errors[key] = "Value must be one of: 0.1, 0.2, 0.3, 0.4"
+            if session[key] not in {0.1, 0.15, 0.2, 0.3}:
+                validation_errors[key] = "Value must be one of: 0.1, 0.15, 0.2, 0.3"
         except (ValueError, TypeError):
             validation_errors[key] = f"Unable to cast '{key}' to the required type."
 

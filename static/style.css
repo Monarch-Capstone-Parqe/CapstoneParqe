@@ -506,7 +506,6 @@ button[id="dark-mode-toggle"]:hover {
   table-layout: fixed;
   overflow-wrap: break-word;
   empty-cells: hide;
-  padding-right: 8%;
 }
 
 #table-price {
@@ -538,7 +537,7 @@ button[id="dark-mode-toggle"]:hover {
 }
 
 #table-note {
-  width: 40%;
+  width: 50%;
 }
 
 .hide {

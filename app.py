@@ -64,7 +64,6 @@ def requires_auth(f):
 @requires_auth
 def staff_home():
     """Render the homepage for staff members."""
-    db.add_staff_member('mmahnke@pdx.edu')
     return render_template("staff/index.html")
 
 @app.route("/staff/callback", methods=["GET", "POST"])

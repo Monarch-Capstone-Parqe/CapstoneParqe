@@ -8,7 +8,7 @@
 
 
 {% block body %}
-<body onload="refreshJobs()">
+<body onload="initialLoad()">
 <main>
   <div class="page-header">
     <img
@@ -16,13 +16,18 @@
       src="{{ url_for('static', filename='images/psu_logo_svg.svg') }}"
       alt="Portland State Logo"
     />
+    <section class="staff-header-buttons">
+      <button class="staff-header-button" id="pending-page-button" onclick="openPendingPage()">Pending Jobs</button>
+      <button class="staff-header-button" id="approved-page-button" onclick="openApprovedPage()">Approved Jobs</button>
+      <button class="staff-header-button" id="denied-page-button" onclick="openDeniedPage()">Denied Jobs</button>
+    </section>
   </div>
   <div class="staff-header-box">
     <h1 class="staff-header-content">PARQE STAFF PAGE</h1>
   </div>
   <div class="jobs-box-container" id="jobs-box">
       <div class="jobs-box-header">
-        <h1 id ="subheader-text" class="jobs-box-header-content">JOBS IN QUEUE</h1>
+        <h1 id ="subheader-text" class="jobs-box-header-content"></h1>
         <div class="jobs-box-header-underline"></div>
         <table id="jobs-table" style="display:none">
           <tr>
@@ -38,7 +43,23 @@
           </tr>
         </table>
       </div>
-      <p id="no-jobs-message" class="data-formatting">No jobs in queue.</p>
+      <p id="no-jobs-message"></p>
+      <table id="jobs-table">
+        <thead>
+          <th id="table-price" class="table-header">Price</th>
+          <th id="table-email" class="table-header">Email</th>
+          <th id="table-filament" class="table-header">Filament</th> 
+          <th id="table-nozzle" class="table-header">Nozzle</th>
+          <th id="table-layer" class="table-header">Layer</th>
+          <th id="table-infill" class="table-header">Infill</th>
+          <th id="table-quantity" class="table-header">Qty</th>
+          <th id="table-note" class="table-header">Note</th>
+          <th id="table-approved" class="table-header">Approved By</th>
+          <th id="table-denied" class="table-header">Denied By</th>
+          <th id="table-buttons"></th>
+        </thead>
+        <tbody id="table-rows"></tbody>
+      </table>
       <div class="reject-order-modal">
         <div class="reject-order-modal-content">
           <p>Please state why this order was not approved, your message will be relayed to the submitter via email: </p>

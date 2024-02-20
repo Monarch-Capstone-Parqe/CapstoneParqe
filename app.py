@@ -173,8 +173,9 @@ def confirm_order(token):
         # Store the order
         db.insert_order(
             session['email'],
-            session['layer_height'],  
+            session['filament_type'],
             session['nozzle_size'], 
+            session['layer_height'],  
             session['infill'],
             session['quantity'],
             session['note'],
@@ -212,6 +213,14 @@ def get_orders(order_type):
         orders = db.get_orders()
     elif order_type == 'pending':
         orders = db.get_pending_orders()
+    elif order_type == 'approved':
+        orders = db.get_approved_orders()
+        for order in orders:
+            order['approved_by'] = db.get_staff_email_by_approved_order_id(order['id'])
+    elif order_type == 'denied':
+        orders = db.get_denied_orders()
+        for order in orders:
+            order['denied_by'] = db.get_staff_email_by_denied_order_id(order['id'])
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 
@@ -251,18 +260,19 @@ def review_orders():
         # Grab order details
         order_id = request.form['id']
         order_status = request.form['status']
-        order_comment = request.form['comment']
         order_email = db.get_email_by_order_id(order_id)
         staff_email = session['user']['userinfo']['email']
 
         if(order_status == 'denied'):
-            db.delete_order(order_id)
+            order_message = request.form['message']
+            db.deny_order(order_id, staff_email)
+            message = f"Your order has been denied. Reason: {order_message}"
         elif(order_status == 'approved'):
             db.approve_order(order_id, staff_email)
+            message = f"Your EPL 3D printing order has been approved."
         else:
             return abort(HTTPStatus.BAD_REQUEST, jsonify({'error': f'"{order_status}" is an invalid status.'}))
         
-        message = f"Your order has been {order_status}. {order_comment}"
         send_email(order_email, "EPL Verify Purchase", message)
 
         return jsonify({'message': 'Update received'}), HTTPStatus.OK

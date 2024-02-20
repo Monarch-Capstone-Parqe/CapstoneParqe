@@ -12,7 +12,7 @@ function approve(id)
     const formData = new FormData();
     formData.append("id", id)
     formData.append("status", "approved")
-    fetch("/staff/return_orders", {
+    fetch("/staff/review_orders", {
         method: "PUT",
         body: formData
     })
@@ -31,7 +31,7 @@ function deny(id, message)
     formData.append("id", id);
     formData.append("status", "denied");
     formData.append("message", message);
-    fetch("/staff/return_orders", {
+    fetch("/staff/review_orders", {
         method: "PUT",
         body: formData
     })
@@ -109,13 +109,13 @@ function refreshDeniedJobs()
 
 function refreshJobsWrapper()
 {
-    if(window.location.hash == 'pending') {
+    if(window.location.hash == '#pending') {
         refreshPendingJobs();
     }
-    else if(window.location.hash == 'approved') {
+    else if(window.location.hash == '#approved') {
         refreshApprovedJobs();
     }
-    else if(window.location.hash == 'denied') {
+    else if(window.location.hash == '#denied') {
         refreshDeniedJobs();
     }
 }
@@ -128,56 +128,15 @@ function renderPendingJob(order)
     if(exists) {
         return
     }
-    let jobsBox = document.getElementById('jobs-box');
-    if(jobsBox.childElementCount == 3) {
-        let toHide = document.getElementById('no-jobs-message');
-        toHide.style.display = "none";
+    
+    if(document.querySelector('#jobs-table').rows.length > 0) {
+        // hide the 'no jobs' message
+        document.getElementById('no-jobs-message').style.display = 'none';
+        // display the table
+        initJobsTable();
     }
-
-    let dataBox = document.createElement('section');
-    dataBox.id = order.id;
-    dataBox.classList.add('boxed-data');
-
-    let job = document.createElement('p');
-    job.classList.add('data-formatting');
-
-    job.innerHTML = '<span class="first-text">Email: </span>' + order.email + 
-                        '<span class="emphasis-text">Price: </span>' + order.price + 
-                        '<span class="emphasis-text">Layer Height: </span>'+ order.layer_height + 
-                        '<span class="emphasis-text">Nozzle Width: </span>' + order.nozzle_width +
-                        '<span class="emphasis-text">Infill: </span>' + order.infill +
-                        '<span class="emphasis-text">Supports: </span>' + order.supports +
-                        '<span class="emphasis-text">Pieces: </span>' + order.pieces + 
-                        '<span class="emphasis-text">Note: </span>' + order.note;
-
-    let buttonBox = document.createElement('section');
-    buttonBox.classList.add('staff-buttons');
-
-    let approveButton = document.createElement('button');
-    approveButton.id = 'approve-button'
-    approveButton.addEventListener('click', () => {
-        approve(order.id);
-    });
-    approveButton.textContent = 'APPROVE';
-
-    let denyButton = document.createElement('button');
-    denyButton.id = 'deny-button'
-    denyButton.addEventListener('click', () => {
-        openRejectModal(order.id)
-    });
-    denyButton.textContent = 'DENY';
-
-    let underline = document.createElement('div');
-    underline.classList.add('boxed-data-underline');
-    underline.id = 'underline' + order.id;
-
-
-    dataBox.appendChild(job);
-    dataBox.appendChild(buttonBox);
-    buttonBox.appendChild(approveButton);
-    buttonBox.appendChild(denyButton);
-    jobsBox.appendChild(dataBox);
-    jobsBox.appendChild(underline); 
+    // insert the order into the table to display on staff page
+    insertPendingTableRow(order);
 }
 
 function renderApprovedJob(order) {
@@ -185,37 +144,15 @@ function renderApprovedJob(order) {
     if(exists) {
         return
     }
-    let jobsBox = document.getElementById('jobs-box');
-    if(jobsBox.childElementCount == 3) {
-        let toHide = document.getElementById('no-jobs-message');
-        toHide.style.display = "none";
+
+    if(document.querySelector('#jobs-table').rows.length > 0) {
+        // hide the 'no jobs' message
+        document.getElementById('no-jobs-message').style.display = 'none';
+        // display the table
+        initJobsTable();
     }
-
-    let dataBox = document.createElement('section');
-    dataBox.id = order.id;
-    dataBox.classList.add('boxed-data');
-
-    let job = document.createElement('p');
-    job.classList.add('data-formatting');
-
-    job.innerHTML = '<span class="first-text">Email: </span>' + order.email + 
-                        '<span class="emphasis-text">Price: </span>' + order.price + 
-                        '<span class="emphasis-text">Layer Height: </span>'+ order.layer_height + 
-                        '<span class="emphasis-text">Nozzle Width: </span>' + order.nozzle_width +
-                        '<span class="emphasis-text">Infill: </span>' + order.infill +
-                        '<span class="emphasis-text">Supports: </span>' + order.supports +
-                        '<span class="emphasis-text">Pieces: </span>' + order.pieces + 
-                        '<span class="emphasis-text">Note: </span>' + order.note +
-                        '<span class="emphasis-text">Approved by: </span>' + order.approved_by;
-
-
-    let underline = document.createElement('div');
-    underline.classList.add('boxed-data-underline');
-    underline.id = 'underline' + order.id;
-
-    dataBox.appendChild(job);
-    jobsBox.appendChild(dataBox);
-    jobsBox.appendChild(underline); 
+    // insert the order into the table to display on staff page
+    insertApprovedTableRow(order);
 }
 
 function renderDeniedJob(order) {
@@ -223,37 +160,15 @@ function renderDeniedJob(order) {
     if(exists) {
         return
     }
-    let jobsBox = document.getElementById('jobs-box');
-    if(jobsBox.childElementCount == 3) {
-        let toHide = document.getElementById('no-jobs-message');
-        toHide.style.display = "none";
+
+    if(document.querySelector('#jobs-table').rows.length > 0) {
+        // hide the 'no jobs' message
+        document.getElementById('no-jobs-message').style.display = 'none';
+        // display the table
+        initJobsTable();
     }
-
-    let dataBox = document.createElement('section');
-    dataBox.id = order.id;
-    dataBox.classList.add('boxed-data');
-
-    let job = document.createElement('p');
-    job.classList.add('data-formatting');
-
-    job.innerHTML = '<span class="first-text">Email: </span>' + order.email + 
-                        '<span class="emphasis-text">Price: </span>' + order.price + 
-                        '<span class="emphasis-text">Layer Height: </span>'+ order.layer_height + 
-                        '<span class="emphasis-text">Nozzle Width: </span>' + order.nozzle_width +
-                        '<span class="emphasis-text">Infill: </span>' + order.infill +
-                        '<span class="emphasis-text">Supports: </span>' + order.supports +
-                        '<span class="emphasis-text">Pieces: </span>' + order.pieces + 
-                        '<span class="emphasis-text">Note: </span>' + order.note +
-                        '<span class="emphasis-text">Denied by: </span>' + order.denied_by;
-
-
-    let underline = document.createElement('div');
-    underline.classList.add('boxed-data-underline');
-    underline.id = 'underline' + order.id;
-
-    dataBox.appendChild(job);
-    jobsBox.appendChild(dataBox);
-    jobsBox.appendChild(underline); 
+    // insert the order into the table to display on staff page
+    insertDeniedTableRow(order);
 }
 
 function renderLoadMoreButton() {
@@ -290,35 +205,22 @@ function removeLoadMoreButton() {
 
 //Function to remove a job by id from the page
 function removeJob(id) {
-    let toRemove = document.getElementById(id);
-    let removeUnderline = document.getElementById('underline' + id);
-    if(toRemove != null) {
-        let parent = toRemove.parentNode;
-        parent.removeChild(toRemove);
-        parent.removeChild(removeUnderline);    
-        if(parent.childElementCount == 3) {
-            let toDisplay = document.getElementById("no-jobs-message");
-            toDisplay.style.display = 'block';
-        }
+    document.getElementById(id).remove();
+
+    if(jobsTable = document.querySelector('#jobs-table').rows.length === 1) {
+        // hide the intialized table
+        document.querySelector('#jobs-table').style.display = 'none';
+
+        // show the no jobs in queue message
+        document.getElementById('no-jobs-message').style.display = 'block';
     }
     removeLoadMoreButton();
 }
 
 function removeAllJobs() {
-    const dataBoxes = document.getElementsByClassName('boxed-data');
-    const underlines = document.getElementsByClassName('boxed-data-underline');
-    const parent = document.getElementById('jobs-box');
-
-    if(dataBoxes != null) {
-        while(dataBoxes.length > 0) {
-            dataBoxes[0].parentNode.removeChild(dataBoxes[0]);
-            underlines[0].parentNode.removeChild(underlines[0]);
-        }
-        if(parent.childElementCount == 3) {
-            let toDisplay = document.getElementById("no-jobs-message");
-            toDisplay.style.display = 'block';
-        }
-    }
+    document.getElementById('table-rows').innerHTML = '';
+    document.getElementById('jobs-table').style.display = 'none';
+    document.getElementById('no-jobs-message').style.display = 'block';
     removeLoadMoreButton();
 }
 
@@ -368,6 +270,9 @@ function openApprovedPage() {
     removeAllJobs();
     jobsBoxHeaderContent.innerText = 'APPROVED JOBS';
     noJobsMessage.innerText = 'No jobs have been approved.';
+    document.getElementById('table-approved').classList.remove('hide');
+    document.getElementById('table-denied').classList.add('hide');
+    document.getElementById('table-buttons').classList.add('hide');
 
     refreshJobsWrapper(); 
 }
@@ -382,6 +287,9 @@ function openPendingPage() {
     removeAllJobs();
     jobsBoxHeaderContent.innerText = 'PENDING JOBS';
     noJobsMessage.innerText = 'No jobs are currently pending.';
+    document.getElementById('table-approved').classList.add('hide');
+    document.getElementById('table-denied').classList.add('hide');
+    document.getElementById('table-buttons').classList.remove('hide');
 
     refreshJobsWrapper(); 
 }
@@ -396,6 +304,9 @@ function openDeniedPage() {
     removeAllJobs();
     jobsBoxHeaderContent.innerText = 'DENIED JOBS';
     noJobsMessage.innerText = 'No jobs have been denied.';
+    document.getElementById('table-approved').classList.add('hide');
+    document.getElementById('table-denied').classList.remove('hide');
+    document.getElementById('table-buttons').classList.add('hide');
 
     refreshJobsWrapper(); 
 }
@@ -428,6 +339,148 @@ function initialLoad() {
     else if(window.location.hash == '#denied') {
         openDeniedPage();
     }
+}
+
+// initializes the table when their are orders in the queue
+function initJobsTable() {
+    // hide the no jobs in queue message
+    document.getElementById('no-jobs-message').style.display = 'none';
+
+    // display the intialized table
+    document.querySelector('#jobs-table').style.display = 'block';
+}
+
+// inserts an order into the jobs table
+function insertPendingTableRow(order) {
+    let tableRows = document.querySelector('#table-rows');
+    let row = tableRows.insertRow();
+
+    // set the id of the row to the corresponding order, for use in the removeJob() function
+    row.setAttribute('id', order.id);
+
+    let priceCell = row.insertCell(0);
+    let emailCell = row.insertCell(1);
+    let filamentCell = row.insertCell(2);
+    let nozzleCell = row.insertCell(3);
+    let layerCell = row.insertCell(4);
+    let infillCell = row.insertCell(5);
+    let quantityCell = row.insertCell(6);
+    let noteCell = row.insertCell(7); 
+
+    priceCell.innerHTML = order.price;
+    emailCell.innerHTML = order.email;
+    filamentCell.innerHTML = order.filament_type;
+    nozzleCell.innerHTML = order.nozzle_size;
+    layerCell.innerHTML = order.layer_height;
+    infillCell.innerHTML = order.infill;
+    quantityCell.innerHTML = order.quantity;
+    noteCell.innerHTML = order.note;
+
+    priceCell.classList.add('table-data');
+    emailCell.classList.add('table-data');
+    filamentCell.classList.add('table-data');
+    nozzleCell.classList.add('table-data');
+    layerCell.classList.add('table-data');
+    infillCell.classList.add('table-data');
+    quantityCell.classList.add('table-data');
+    noteCell.classList.add('table-data');
+
+    let buttonBox = document.createElement('section');
+    buttonBox.classList.add('staff-buttons');
+
+    let approveButton = document.createElement('button');
+    approveButton.id = 'approve-button'
+    approveButton.addEventListener('click', () => {
+        approve(order.id);
+    });
+    approveButton.textContent = 'APPROVE';
+
+    let denyButton = document.createElement('button');
+    denyButton.id = 'deny-button'
+    denyButton.addEventListener('click', () => {
+        openRejectModal(order.id)
+    });
+    denyButton.textContent = 'DENY';
+
+    buttonBox.appendChild(approveButton);
+    buttonBox.appendChild(denyButton);
+    row.insertCell(8).append(buttonBox);
+}
+
+function insertApprovedTableRow(order) {
+    let tableRows = document.querySelector('#table-rows');
+    let row = tableRows.insertRow();
+
+    // set the id of the row to the corresponding order, for use in the removeJob() function
+    row.setAttribute('id', order.id);
+
+    let priceCell = row.insertCell(0);
+    let emailCell = row.insertCell(1);
+    let filamentCell = row.insertCell(2);
+    let nozzleCell = row.insertCell(3);
+    let layerCell = row.insertCell(4);
+    let infillCell = row.insertCell(5);
+    let quantityCell = row.insertCell(6);
+    let noteCell = row.insertCell(7); 
+    let approvedCell = row.insertCell(8);
+
+    priceCell.innerHTML = order.price;
+    emailCell.innerHTML = order.email;
+    filamentCell.innerHTML = order.filament_type;
+    nozzleCell.innerHTML = order.nozzle_size;
+    layerCell.innerHTML = order.layer_height;
+    infillCell.innerHTML = order.infill;
+    quantityCell.innerHTML = order.quantity;
+    noteCell.innerHTML = order.note;
+    approvedCell.innerHTML = order.approved_by;
+
+    priceCell.classList.add('table-data');
+    emailCell.classList.add('table-data');
+    filamentCell.classList.add('table-data');
+    nozzleCell.classList.add('table-data');
+    layerCell.classList.add('table-data');
+    infillCell.classList.add('table-data');
+    quantityCell.classList.add('table-data');
+    noteCell.classList.add('table-data');
+    approvedCell.classList.add('table-data');
+}
+
+function insertDeniedTableRow(order) {
+    let tableRows = document.querySelector('#table-rows');
+    let row = tableRows.insertRow();
+
+    // set the id of the row to the corresponding order, for use in the removeJob() function
+    row.setAttribute('id', order.id);
+
+    let priceCell = row.insertCell(0);
+    let emailCell = row.insertCell(1);
+    let filamentCell = row.insertCell(2);
+    let nozzleCell = row.insertCell(3);
+    let layerCell = row.insertCell(4);
+    let infillCell = row.insertCell(5);
+    let quantityCell = row.insertCell(6);
+    let noteCell = row.insertCell(7); 
+    let deniedCell = row.insertCell(8);
+
+    priceCell.innerHTML = order.price;
+    emailCell.innerHTML = order.email;
+    filamentCell.innerHTML = order.filament_type;
+    nozzleCell.innerHTML = order.nozzle_size;
+    layerCell.innerHTML = order.layer_height;
+    infillCell.innerHTML = order.infill;
+    quantityCell.innerHTML = order.quantity;
+    noteCell.innerHTML = order.note;
+    deniedCell.innerHTML = order.denied_by;
+
+    priceCell.classList.add('table-data');
+    emailCell.classList.add('table-data');
+    filamentCell.classList.add('table-data');
+    nozzleCell.classList.add('table-data');
+    layerCell.classList.add('table-data');
+    infillCell.classList.add('table-data');
+    quantityCell.classList.add('table-data');
+    noteCell.classList.add('table-data');
+    deniedCell.classList.add('table-data');
 }
 
 let intervalId = setInterval(refreshJobsWrapper, 10000);

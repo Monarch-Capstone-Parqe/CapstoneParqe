@@ -496,16 +496,82 @@ button[id="dark-mode-toggle"]:hover {
 .jobs-box-header-underline {
   height: 1px;
   background-color: #404040;
-  width: 75%;
+  width: 100%;
+}
+
+#jobs-table {
+  display: none;
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  overflow-wrap: break-word;
+  empty-cells: hide;
+  padding-right: 8%;
+}
+
+#table-price {
+  width: 5%;
+}
+
+#table-email {
+  width: 15%;
+}
+
+#table-filament {
+  width: 10%;
+}
+
+#table-nozzle {
+  width: 5%;
+}
+
+#table-layer {
+  width: 5%;
+}
+
+#table-infill {
+  width: 5%;
+}
+
+#table-quantity {
+  width: 5%;
+}
+
+#table-note {
+  width: 40%;
+}
+
+.hide {
+  display: none;
+}
+
+.table-header {
+  text-align: left;
+  border-bottom: 1px solid #404040;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 20px;
+  color: #404040;
+  font-size: 1.05em;
+  font-family: 'Acumin-ItPro';
+}
+
+.table-data {
+  border-bottom: 1px solid #404040;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  height: 80px;
+  padding-left: 20px;
+  font-family: 'Acumin-LtPro';
 }
 
 .boxed-data-underline {
   height: 1px;
+  display: block;
   background-color: #404040;
-  width: 70%;
 }
 
-.data-formatting {
+#no-jobs-message {
   color: #404040;
   margin: 0;
   margin-left: 20px;
@@ -533,7 +599,8 @@ button[id="dark-mode-toggle"]:hover {
   display: flex;
   width: 200px;
   height: 50px;
-  margin-left: 20px;
+  margin-left: 50px;
+  border: none;
 }
 
 .staff-buttons button[id='approve-button']{

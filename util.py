@@ -18,16 +18,13 @@ def process_order_data(data, session):
     else:
         session[key] = data[key]
 
-    key = 'layer_height'
+    key = 'filament_type'
     if key not in data:
         validation_errors[key] = f"'{key}' is not in the data."
+    elif data[key] == '':
+        validation_errors[key] = f"'{key}' cannot be empty."
     else:
-        try:
-            session[key] = float(data[key])
-            #if session[key] not in {0.4, 0.6, 0.3, 0.4}:
-                #validation_errors[key] = "Value must be one of: 0.1, 0.2, 0.3, 0.4"
-        except (ValueError, TypeError):
-            validation_errors[key] = f"Unable to cast '{key}' to the required type."
+        session[key] = data[key]
 
     key = 'nozzle_size'
     if key not in data:
@@ -37,6 +34,17 @@ def process_order_data(data, session):
             session[key] = float(data[key])
             if session[key] not in {0.4, 0.6}:
                 validation_errors[key] = "Value must be one of: 0.1, 0.2, 0.3, 0.4"
+        except (ValueError, TypeError):
+            validation_errors[key] = f"Unable to cast '{key}' to the required type."
+
+    key = 'layer_height'
+    if key not in data:
+        validation_errors[key] = f"'{key}' is not in the data."
+    else:
+        try:
+            session[key] = float(data[key])
+            #if session[key] not in {0.4, 0.6, 0.3, 0.4}:
+                #validation_errors[key] = "Value must be one of: 0.1, 0.2, 0.3, 0.4"
         except (ValueError, TypeError):
             validation_errors[key] = f"Unable to cast '{key}' to the required type."
 

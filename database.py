@@ -1,25 +1,14 @@
 from datetime import date
 
-from sqlalchemy import create_engine, text
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import create_engine, text, MetaData
 
 import config.variables as variables
-
-#Constants
-#MAIL_ADDR_LEN = 40 #See --> https://stackoverflow.com/questions/1297272/how-long-should-sql-email-fields-be
-
 
 #DB_USERNAME & DB_PASSWORD exist as system environment variables
 # -TODO Likely will make the whole DB_URI its own env var eventually
 engine = create_engine(f'postgresql://{variables.DB_USERNAME}:{variables.DB_PASSWORD}@localhost:5432/parqe')
-
-#################################
-# CURRENTLY NO ORM UTILIZIATION #
-#################################
-#Sets up DB connection & information pipeline 
-#conn = engine.connect()
-#metadata = db.MetaData()
-#metadata.reflect(bind=engine)
+metadata = MetaData()
+metadata.reflect(bind=engine)
 
 def check_db_connect():
     engine.connect()
@@ -28,7 +17,7 @@ def check_db_connect():
 def create_tables():
     with engine.connect() as conn:
         # This line is for development only
-        conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders CASCADE"))
+        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders CASCADE"))
 
         # Create the staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS staff("
@@ -39,8 +28,9 @@ def create_tables():
         conn.execute(text("CREATE TABLE IF NOT EXISTS orders("
                             "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                             "email VARCHAR NOT NULL,"
-                            "layer_height VARCHAR NOT NULL,"      
+                            "filament_type VARCHAR NOT NULL,"      
                             "nozzle_size VARCHAR NOT NULL,"      
+                            "layer_height VARCHAR NOT NULL,"
                             "infill NUMERIC(3,2) NOT NULL,"          
                             "quantity INTEGER NOT NULL," 
                             "note VARCHAR,"
@@ -82,14 +72,15 @@ def create_tables():
         conn.commit()
 
 
-def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
+def insert_order(email, filament_type=None, nozzle_size=None, layer_height=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
     """
     Insert a new order into the 'orders' and 'pending_orders' tables.
 
     Parameters:
         email (str): The email of the customer placing the order.
-        layer_height (str): The layer height of the 3D print.
+        filament_type (str): The material and color of the filament.
         nozzle_size (str): The nozzle size of the 3D print.
+        layer_height (str): The layer height of the 3D print.
         infill (float): The infill percentage of the 3D print.
         quantity (int): The quantity of items ordered.
         note (str): Any additional notes or comments.
@@ -102,26 +93,45 @@ def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quanti
     """
      
     with engine.begin() as conn:
-        result = conn.execute(text("INSERT INTO orders(email, layer_height, nozzle_size, infill, quantity, note, prusa_output, gcode_path, price, date) "
-                          "VALUES (:email, :layer_height, :nozzle_size, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :date) RETURNING id"),
-                     {"email": email, "layer_height": layer_height, "nozzle_size": nozzle_size,
+        result = conn.execute(text("INSERT INTO orders(email, filament_type, nozzle_size, layer_height, infill, quantity, note, prusa_output, gcode_path, price, date) "
+                          "VALUES (:email, :filament_type, :nozzle_size, :layer_height, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :date) RETURNING id"),
+                     {"email": email, "filament_type": filament_type, "nozzle_size": nozzle_size, "layer_height": layer_height, 
                       "infill": infill, "quantity": quantity, "note": note,
                       "prusa_output": prusa_output, "gcode_path": gcode_path, "price": price, "date": date.today()})
         
-        order_id = result.fetchone()["id"]
+        order_id = result.fetchone()[0]
         conn.execute(text("INSERT INTO pending_orders(order_id) VALUES (:order_id)"), {"order_id": order_id})
         conn.commit()
 
-def get_orders():
+def fetch_orders(query) -> list:
     """
-    Retrieve all orders from the 'orders' table.
+    Retrieve orders from the database based on the given query.
+    Parameters:
+        query (str): The SQL query to retrieve orders.Retrieve all orders from the 'orders' table.
 
     Returns:
         list: A list of dictionaries representing each order.
     """
+    orders_table = metadata.tables['orders']
+    column_names = orders_table.columns.keys()
+
     with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM orders ORDER BY date")).fetchall()
-        return [dict(row) for row in result]
+        result = conn.execute(text(query)).fetchall()
+        if not result:
+            return []  # Return an empty list if no orders are found
+        orders = []
+        for row in result:
+            row_dict = dict(zip(column_names, row))  # Create dictionary using column names
+            orders.append(row_dict)
+        return orders
+
+def get_orders() -> list:
+    """
+    Retrieve all orders from the 'orders' table.
+    Returns:
+        list: A list of dictionaries representing each order.
+    """
+    return fetch_orders("SELECT * FROM orders ORDER BY date")
 
 def get_pending_orders() -> list:
     """
@@ -130,9 +140,7 @@ def get_pending_orders() -> list:
     Returns:
         list: A list of dictionaries representing each pending order.
     """
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT o.* FROM orders o JOIN pending_orders p ON o.id = p.order_id ORDER BY o.date")).fetchall()
-        return [dict(row) for row in result]
+    return fetch_orders("SELECT o.* FROM orders o JOIN pending_orders p ON o.id = p.order_id ORDER BY o.date")
 
 def get_approved_orders() -> list:
     """
@@ -141,9 +149,7 @@ def get_approved_orders() -> list:
     Returns:
         list: A list of dictionaries representing each approved order.
     """
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT o.* FROM orders o JOIN approved_orders a ON o.id = a.order_id ORDER BY o.date")).fetchall()
-        return [dict(row) for row in result]
+    return fetch_orders("SELECT o.* FROM orders o JOIN approved_orders a ON o.id = a.order_id ORDER BY o.date")
 
 def get_denied_orders() -> list:
     """
@@ -152,9 +158,7 @@ def get_denied_orders() -> list:
     Returns:
         list: A list of dictionaries representing each denied order.
     """
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT o.* FROM orders o JOIN denied_orders d ON o.id = d.order_id ORDER BY o.date")).fetchall()
-        return [dict(row) for row in result]
+    return fetch_orders("SELECT o.* FROM orders o JOIN denied_orders d ON o.id = d.order_id ORDER BY o.date")
 
 def delete_order(order_id):
     """
@@ -230,7 +234,7 @@ def get_staff_email(id):
             row_as_dict = row._mapping
             staff_email_dict.append(dict(row_as_dict))
         staff_email = staff_email_dict[0]['email']
-        return staff_email;
+        return staff_email
 
 def get_email_by_order_id(order_id) -> str:
     """
@@ -246,6 +250,16 @@ def get_email_by_order_id(order_id) -> str:
         result = conn.execute(text("SELECT email FROM orders WHERE id = :order_id"), {"order_id": order_id}).scalar()
         return result if result else None
     
+def get_staff_email_by_approved_order_id(order_id) -> str:
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT reviewed_by FROM approved_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
+        return get_staff_email(result)
+    
+def get_staff_email_by_denied_order_id(order_id) -> str:
+        with engine.connect() as conn:
+            result = conn.execute(text("SELECT reviewed_by FROM denied_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
+            return get_staff_email(result)
+
 def add_staff_member(email) -> bool:
     """
     Add a new staff member to the 'staff' table if not already exists.

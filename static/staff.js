@@ -1,13 +1,14 @@
+//Maximum number of orders able to render on a page
 let maxRender = 10;
 
+//Updates page content based on url hash change
 window.addEventListener("hashchange", () => {
     initialLoad();
 })
 
+//Updates status of order to approved and sends order back to database
 function approve(id)
 {
-//update status of job
-//send job to printers
     console.log("approve");
     const formData = new FormData();
     formData.append("id", id)
@@ -19,13 +20,12 @@ function approve(id)
     .catch((error) => {
         console.error("Error: ", error);
     })
-    removeJob(id);
+    removeOrder(id);
 }
 
+//Updates status of order to denied and sends order back to database
 function deny(id, message)
 {
-//update status of job
-//remove from view
     console.log("deny");
     const formData = new FormData();
     formData.append("id", id);
@@ -38,12 +38,12 @@ function deny(id, message)
     .catch((error) => {
         console.error("Error: ", error);
     })
-    removeJob(id);
+    removeOrder(id);
 }
 
-function refreshPendingJobs()
+//Get pending orders from database
+function refreshPendingOrders()
 {
-//get pending jobs from database
     console.log("refresh")
     fetch("/staff/get_orders/pending", {
         method: "GET",
@@ -52,7 +52,7 @@ function refreshPendingJobs()
     .then((data) => {
         console.log(data)
         for(let i = 0; i < maxRender && i < data.orders.length; i++) {
-            renderPendingJob(data.orders[i]);
+            renderPendingOrder(data.orders[i]);
         }
         if(data.orders.length > maxRender) {
             renderLoadMoreButton();
@@ -63,9 +63,9 @@ function refreshPendingJobs()
     });
 }
 
-function refreshApprovedJobs()
+//Get approved orders from database
+function refreshApprovedOrders()
 {
-//get approved jobs from database
     console.log("refresh")
     fetch("/staff/get_orders/approved", {
         method: "GET",
@@ -74,7 +74,7 @@ function refreshApprovedJobs()
     .then((data) => {
         console.log(data)
         for(let i = 0; i < maxRender && i < data.orders.length; i++) {
-            renderApprovedJob(data.orders[i]);
+            renderApprovedOrder(data.orders[i]);
         }
         if(data.orders.length > maxRender) {
             renderLoadMoreButton();
@@ -85,9 +85,9 @@ function refreshApprovedJobs()
     });
 }
 
-function refreshDeniedJobs()
+//Get denied orders from database
+function refreshDeniedOrders()
 {
-//get denied jobs from database
     console.log("refresh")
     fetch("/staff/get_orders/denied", {
         method: "GET",
@@ -96,7 +96,7 @@ function refreshDeniedJobs()
     .then((data) => {
         console.log(data)
         for(let i = 0; i < maxRender && i < data.orders.length; i++) {
-            renderDeniedJob(data.orders[i]);
+            renderDeniedOrder(data.orders[i]);
         }
         if(data.orders.length > maxRender) {
             renderLoadMoreButton();
@@ -107,22 +107,24 @@ function refreshDeniedJobs()
     });
 }
 
-function refreshJobsWrapper()
+//Function to refresh orders from database
+//Correlates with window location via url hash
+function refreshOrdersWrapper()
 {
     if(window.location.hash == '#pending') {
-        refreshPendingJobs();
+        refreshPendingOrders();
     }
     else if(window.location.hash == '#approved') {
-        refreshApprovedJobs();
+        refreshApprovedOrders();
     }
     else if(window.location.hash == '#denied') {
-        refreshDeniedJobs();
+        refreshDeniedOrders();
     }
 }
 
-//Function to create job sections with input variables
+//Function to create order sections with input variables
 //Variables will be received from database
-function renderPendingJob(order)
+function renderPendingOrder(order)
 {
     const exists = document.getElementById(order.id)
     if(exists) {
@@ -139,7 +141,7 @@ function renderPendingJob(order)
     insertPendingTableRow(order);
 }
 
-function renderApprovedJob(order) {
+function renderApprovedOrder(order) {
     const exists = document.getElementById(order.id)
     if(exists) {
         return
@@ -155,7 +157,7 @@ function renderApprovedJob(order) {
     insertApprovedTableRow(order);
 }
 
-function renderDeniedJob(order) {
+function renderDeniedOrder(order) {
     const exists = document.getElementById(order.id)
     if(exists) {
         return
@@ -185,7 +187,7 @@ function renderLoadMoreButton() {
     loadMoreButton.addEventListener('click', () => {
         maxRender += 10;
         loadMoreButtonBox.parentNode.removeChild(loadMoreButtonBox);
-        refreshJobsWrapper();
+        refreshOrdersWrapper();
     });
     loadMoreButton.textContent = 'LOAD MORE';
 
@@ -203,8 +205,8 @@ function removeLoadMoreButton() {
     toRemoveParent.parentNode.removeChild(toRemoveParent);
 }
 
-//Function to remove a job by id from the page
-function removeJob(id) {
+//Function to remove an order by id from the page
+function removeOrder(id) {
     document.getElementById(id).remove();
 
     if(jobsTable = document.querySelector('#jobs-table').rows.length === 1) {
@@ -217,14 +219,15 @@ function removeJob(id) {
     removeLoadMoreButton();
 }
 
-function removeAllJobs() {
+//Removes all orders from the page
+function removeAllOrders() {
     document.getElementById('table-rows').innerHTML = '';
     document.getElementById('jobs-table').style.display = 'none';
     document.getElementById('no-jobs-message').style.display = 'block';
     removeLoadMoreButton();
 }
 
-//Function to display modal to input reason when an order is denied
+//Displays modal to input reason when an order is denied
 function openRejectModal(id) {
     const rejectModal = document.querySelector('.reject-order-modal');
     const rejectModalSubmitButton = document.getElementById('reject-modal-submit-button');
@@ -259,7 +262,7 @@ function openRejectModal(id) {
     } 
 }
 
-//Renders approved job content
+//Renders page of approved orders
 function openApprovedPage() {
     window.location.hash = 'approved';
     maxRender = 10;
@@ -267,16 +270,17 @@ function openApprovedPage() {
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
-    removeAllJobs();
+    removeAllOrders();
     jobsBoxHeaderContent.innerText = 'APPROVED JOBS';
     noJobsMessage.innerText = 'No jobs have been approved.';
     document.getElementById('table-approved').classList.remove('hide');
     document.getElementById('table-denied').classList.add('hide');
     document.getElementById('table-buttons').classList.add('hide');
 
-    refreshJobsWrapper(); 
+    refreshOrdersWrapper(); 
 }
 
+//Renders page of pending orders
 function openPendingPage() {
     window.location.hash = 'pending';
     maxRender = 10;
@@ -284,16 +288,17 @@ function openPendingPage() {
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
-    removeAllJobs();
+    removeAllOrders();
     jobsBoxHeaderContent.innerText = 'PENDING JOBS';
     noJobsMessage.innerText = 'No jobs are currently pending.';
     document.getElementById('table-approved').classList.add('hide');
     document.getElementById('table-denied').classList.add('hide');
     document.getElementById('table-buttons').classList.remove('hide');
 
-    refreshJobsWrapper(); 
+    refreshOrdersWrapper(); 
 }
 
+//Renders page of denied orders
 function openDeniedPage() {
     window.location.hash = 'denied';
     maxRender = 10;
@@ -301,16 +306,17 @@ function openDeniedPage() {
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
-    removeAllJobs();
+    removeAllOrders();
     jobsBoxHeaderContent.innerText = 'DENIED JOBS';
     noJobsMessage.innerText = 'No jobs have been denied.';
     document.getElementById('table-approved').classList.add('hide');
     document.getElementById('table-denied').classList.remove('hide');
     document.getElementById('table-buttons').classList.add('hide');
 
-    refreshJobsWrapper(); 
+    refreshOrdersWrapper(); 
 }
 
+//Renders page of filament inventory
 function openInventoryPage() {
     window.location.hash = 'denied';
     maxRender = 10;
@@ -318,13 +324,14 @@ function openInventoryPage() {
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
-    removeAllJobs();
+    removeAllOrders();
     jobsBoxHeaderContent.innerText = 'DENIED JOBS';
     noJobsMessage.innerText = 'No jobs have been denied.';
 
-    refreshJobsWrapper(); 
+    refreshOrdersWrapper(); 
 }
 
+//Determines which page to display based on current url hash
 function initialLoad() {
     console.log(window.location.hash);
     if(window.location.hash == '') {
@@ -350,7 +357,7 @@ function initJobsTable() {
     document.querySelector('#jobs-table').style.display = 'block';
 }
 
-// inserts an order into the jobs table
+// inserts a pending order into the jobs table
 function insertPendingTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
@@ -407,6 +414,7 @@ function insertPendingTableRow(order) {
     row.insertCell(8).append(buttonBox);
 }
 
+// inserts an approved order into the jobs table
 function insertApprovedTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
@@ -445,6 +453,7 @@ function insertApprovedTableRow(order) {
     approvedCell.classList.add('table-data');
 }
 
+// inserts a denied order into the jobs table
 function insertDeniedTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
@@ -483,4 +492,5 @@ function insertDeniedTableRow(order) {
     deniedCell.classList.add('table-data');
 }
 
-let intervalId = setInterval(refreshJobsWrapper, 10000);
+//Interval refreshing orders from database continuously to keep the page up to date
+let intervalId = setInterval(refreshOrdersWrapper, 10000);

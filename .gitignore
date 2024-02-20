@@ -4,3 +4,5 @@ config/__pycache__
 /uploads
 app.log
 /flask_session
+/static/node_modules
+/.vs

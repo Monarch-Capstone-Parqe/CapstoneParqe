@@ -497,8 +497,19 @@ function insertDeniedTableRow(order) {
 
 
 
-function openPreview(gcode)
+function openPreview(gcode_path)
 {
+    fetch("/staff/get_gcode/"+gcode_path, {
+        method: "GET",
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data)
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
+
     const previewModal = document.querySelector('.gcode-preview-modal');
     const closeButton = document.getElementById('preview-close-button');
     previewModal.style.display = 'block';
@@ -519,7 +530,7 @@ function openPreview(gcode)
       travelColor: new THREE.Color('lime')
     });
 
-    preview.processGCode(gcode);
+    preview.processGCode(data);
     closeButton.onclick = function() {
         previewModal.style.display = 'none';
     }

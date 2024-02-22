@@ -271,8 +271,8 @@ function openApprovedPage() {
     const noJobsMessage = document.getElementById('no-jobs-message');
 
     removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'APPROVED JOBS';
-    noJobsMessage.innerText = 'No jobs have been approved.';
+    jobsBoxHeaderContent.innerText = 'APPROVED ORDERS';
+    noJobsMessage.innerText = 'No orders have been approved.';
     document.getElementById('table-approved').classList.remove('hide');
     document.getElementById('table-denied').classList.add('hide');
     document.getElementById('table-buttons').classList.add('hide');
@@ -289,8 +289,8 @@ function openPendingPage() {
     const noJobsMessage = document.getElementById('no-jobs-message');
 
     removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'PENDING JOBS';
-    noJobsMessage.innerText = 'No jobs are currently pending.';
+    jobsBoxHeaderContent.innerText = 'PENDING ORDERS';
+    noJobsMessage.innerText = 'No orders are currently pending.';
     document.getElementById('table-approved').classList.add('hide');
     document.getElementById('table-denied').classList.add('hide');
     document.getElementById('table-buttons').classList.remove('hide');
@@ -307,8 +307,8 @@ function openDeniedPage() {
     const noJobsMessage = document.getElementById('no-jobs-message');
 
     removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'DENIED JOBS';
-    noJobsMessage.innerText = 'No jobs have been denied.';
+    jobsBoxHeaderContent.innerText = 'DENIED ORDERS';
+    noJobsMessage.innerText = 'No orders have been denied.';
     document.getElementById('table-approved').classList.add('hide');
     document.getElementById('table-denied').classList.remove('hide');
     document.getElementById('table-buttons').classList.add('hide');

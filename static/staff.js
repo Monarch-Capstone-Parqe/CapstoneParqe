@@ -1,3 +1,5 @@
+import * as GCodePreview from 'gcode-preview';
+import * as THREE from 'three';
 //Maximum number of orders able to render on a page
 let maxRender = 10;
 
@@ -157,6 +159,7 @@ function renderApprovedOrder(order) {
     insertApprovedTableRow(order);
 }
 
+
 function renderDeniedOrder(order) {
     const exists = document.getElementById(order.id)
     if(exists) {
@@ -279,6 +282,7 @@ function openApprovedPage() {
 
     refreshOrdersWrapper(); 
 }
+window.openApprovedPage = openApprovedPage;
 
 //Renders page of pending orders
 function openPendingPage() {
@@ -297,6 +301,7 @@ function openPendingPage() {
 
     refreshOrdersWrapper(); 
 }
+window.openPendingPage = openPendingPage;
 
 //Renders page of denied orders
 function openDeniedPage() {
@@ -315,6 +320,7 @@ function openDeniedPage() {
 
     refreshOrdersWrapper(); 
 }
+window.openDeniedPage = openDeniedPage;
 
 //Renders page of filament inventory
 function openInventoryPage() {
@@ -347,6 +353,7 @@ function initialLoad() {
         openDeniedPage();
     }
 }
+window.initialLoad = initialLoad;
 
 // initializes the table when their are orders in the queue
 // and sets width of table columns
@@ -410,6 +417,14 @@ function insertPendingTableRow(order) {
     });
     denyButton.textContent = 'DENY';
 
+    let previewButton = document.createElement('button');
+    previewButton.id = 'preview-button'
+    previewButton.addEventListener('click', () => {
+        openPreview(order.gcode_path)
+    });
+    previewButton.textContent = 'PREVIEW';
+
+    buttonBox.appendChild(previewButton);
     buttonBox.appendChild(approveButton);
     buttonBox.appendChild(denyButton);
     row.insertCell(8).append(buttonBox);
@@ -491,6 +506,57 @@ function insertDeniedTableRow(order) {
     quantityCell.classList.add('table-data');
     noteCell.classList.add('table-data');
     deniedCell.classList.add('table-data');
+}
+
+
+//open the gcode preview modal dialog
+function openPreview(gcode_path)
+{
+    //fetch the gcode from the backend
+    fetch("/staff/get_gcode/"+gcode_path, {
+        method: "GET",
+    })
+    .then((response) => response.text())
+    .then((data) => {
+        //console.log(data)
+        
+        //display the modal
+        const previewModal = document.querySelector('.gcode-preview-modal');
+        const closeButton = document.getElementById('preview-close-button');
+        previewModal.style.display = 'block';
+
+        //gcode preview canvas
+        let gcodePrev = document.getElementById('preview-canvas');
+        gcodePrev.id = "preview-canvas"
+
+        //Process the gcode after the canvas is initialized
+        const preview = GCodePreview.init({
+        canvas: gcodePrev,
+            buildVolume: { x: 300, y: 300, z: 0 },
+            //drawBuildVolume is used to change the size of the build grid in the preview window
+            drawBuildVolume: { x: 300, y: 300, z: 0 },
+            initialCameraPosition: [90, 75, 150],
+            renderExtrusion: false,
+            renderTravel: false,
+            renderTubes: false,
+            //extrusionColor is used to change the color of the build in the preview window
+            extrusionColor: 'hotpink',
+            backgroundColor: '#eee',
+            travelColor: new THREE.Color('lime')
+        });
+        
+        //after the preview is initialized the gcode is processed
+        preview.processGCode(data);
+
+
+        closeButton.onclick = function() {
+            previewModal.style.display = 'none';
+        }
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
+
 }
 
 //Interval refreshing orders from database continuously to keep the page up to date

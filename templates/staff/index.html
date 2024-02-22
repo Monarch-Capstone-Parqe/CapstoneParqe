@@ -3,7 +3,8 @@
 {% block title %} PrusaSlicer Automated Routing and Quoting Engine Staff Page{% endblock %}
 
 {% block head %}
-<script defer src="{{ url_for('static', filename='staff.js') }}"></script>
+<script defer src="{{ url_for('static', filename='dist/staff.bundle.js') }}"></script>
+
 {% endblock %}
 
 
@@ -56,6 +57,16 @@
             <button class="reject-modal-button" id="reject-modal-cancel-button">CANCEL</button>
           </div>
         </div>
+      </div>
+      <div class="gcode-preview-modal">
+       <div class="modal-dialog modal-lg">
+        <div class="gcode-preview-modal-content">
+            <p>GCODE PREVIEW<p>
+            <canvas class="preview-canvas" id="preview-canvas"></canvas>
+            <p>Left Click+drag to pan, Right Click+drag to move, scroll to zoom<p>
+            <button class="preview-close-button" id="preview-close-button">CLOSE</button>
+        </div>
+       </div>
       </div>
   </div>
 </main>

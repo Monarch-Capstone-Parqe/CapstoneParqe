@@ -285,5 +285,85 @@ def review_orders():
         app.logger.critical(f"Error in order route: {e}")
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
 
+@app.route('/staff/filament/<action>')
+@requires_auth
+def filament(action):
+    """
+    Modify filaments based on the specified action.
+
+    Args:
+        action: Action to be carried out
+    """
+    try:
+        filament_type = request.form['filament_type']
+
+        if action == 'add':
+            db.add_filament(filament_type)
+        elif action == 'remove':
+            db.remove_filament(filament_type)
+        elif action == 'add_color':
+            filament_id = db.get_filament_id(filament_type)
+            db.add_filament_color(filament_id, request.form['color_id'])
+        elif action == 'remove_color':
+            filament_id = db.get_filament_id(filament_type)
+            db.remove_filament_color(filament_id, request.form['color_id'])
+        else:
+            return jsonify({'error': 'Invalid action type'}), HTTPStatus.BAD_REQUEST
+    
+    # Reraise client errors
+    except HTTPException:
+        raise  
+    # Unkown
+    except Exception as e:
+        app.logger.critical(f"Error in filament route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+   
+@app.route('/staff/color/<action>')
+@requires_auth
+def color(action):
+    """
+    Modify colors based on the specified action.
+
+    Args:
+        action: Action to be carried out
+    """
+
+    try:
+        if action == 'add':
+            color_name = request.form['color']
+            db.add_color(color_name)
+        elif action == 'remove':
+            db.remove_filament(request.form['id'])
+        else:
+            return jsonify({'error': 'Invalid action type'}), HTTPStatus.BAD_REQUEST
+    
+    # Reraise client errors
+    except HTTPException:
+        raise  
+    # Unkown
+    except Exception as e:
+        app.logger.critical(f"Error in color route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+
+@app.route('/staff/get_filament_inventory', methods=['GET'])
+@requires_auth
+def get_filament_inventory():
+    """
+    Retrieve filament inventory
+
+    Returns:
+        JSON response containing the retrieved filament types and associated colors
+    """
+    try:
+        filaments = db.get_filaments()
+
+    # Reraise client errors
+    except HTTPException:
+        raise  
+    # Unkown
+    except Exception as e:
+        app.logger.critical(f"Error in filament inventory route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

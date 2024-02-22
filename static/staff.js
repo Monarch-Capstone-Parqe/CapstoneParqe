@@ -107,6 +107,24 @@ function refreshDeniedOrders()
     });
 }
 
+function refreshFilamentInventory()
+{
+    console.log("refresh")
+    fetch("/staff/get_filament_inventory", {
+        method: "GET",
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data)
+        for(filament in data.filaments) {
+            renderFilamentType(filament, data.colors[i])
+        }
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
+}
+
 //Function to refresh orders from database
 //Correlates with window location via url hash
 function refreshOrdersWrapper()
@@ -171,6 +189,10 @@ function renderDeniedOrder(order) {
     }
     // insert the order into the table to display on staff page
     insertDeniedTableRow(order);
+}
+
+function renderFilamentType(filament, colors) {
+
 }
 
 function renderLoadMoreButton() {
@@ -318,17 +340,16 @@ function openDeniedPage() {
 
 //Renders page of filament inventory
 function openInventoryPage() {
-    window.location.hash = 'denied';
-    maxRender = 10;
+    window.location.hash = 'inventory';
 
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
     removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'DENIED JOBS';
-    noJobsMessage.innerText = 'No jobs have been denied.';
+    jobsBoxHeaderContent.innerText = 'FILAMENT INVENTORY';
+    noJobsMessage.innerText = 'No filament types have been added.';
 
-    refreshOrdersWrapper(); 
+    renderFilamentInventory();
 }
 
 //Determines which page to display based on current url hash
@@ -345,6 +366,9 @@ function initialLoad() {
     }
     else if(window.location.hash == '#denied') {
         openDeniedPage();
+    }
+    else if(window.location.hash == '#inventory') {
+        openInventoryPage();
     }
 }
 

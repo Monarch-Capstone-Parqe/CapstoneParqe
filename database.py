@@ -328,6 +328,8 @@ def update_filament(type, in_stock):
     with engine.connect() as conn:
         conn.execute(text("UPDATE filaments SET in_stock=:in_stock WHERE type=:type"),
                      {"in_stock": in_stock, "type": type})
+        
+        conn.commit()
 
 def remove_filament(type):
     """
@@ -340,4 +342,115 @@ def remove_filament(type):
         conn.execute(text("DELETE FROM filaments WHERE type=:type"), {"type": type})
 
         conn.commit()
+
+def get_filament_id(type):
+    """
+    Retrieve a filament id by its type
+
+    Parameters:
+        type (str): The type of the filament
+
+    Returns:
+        int: The filament id
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT id FROM filaments WHERE type=:type"), {"type": type})
+
+        return result
+
+def get_filaments():
+    """
+    Retrieve all filaments from the 'filaments' table
+
+    Returns:
+        list: A list of all filaments 
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM filaments")).fetchall()
+        return result
+    
+def add_color(color):
+    """
+    Add a color to the 'colors' table 
+
+    Parameters:
+        color (str): The color to be added
+    """
+    with engine.connect() as conn:
+        color_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM colorss WHERE color = :color)"), {"color": color}).scalar()
+        if not color_exists:
+           conn.execute(text("INSERT INTO colors(color) VALUES :color"), {"color": color})
+
+        conn.commit()
+
+def remove_color(color):
+    """
+    Remove a color from the 'colors' table 
+
+    Parameters:
+        color (str): The color to be removed
+    """
+    with engine.connect() as conn:
+        conn.execute(text("DELETE FROM colors WHERE color=:color"), {"color": color})
+
+        conn.commit()
+
+def get_color(color_id):
+    """
+    Retrieve a color by its id
+
+    Parameters:
+        color_id (int): The id of the color
+
+    Returns:
+        str: The color
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT color FROM colors WHERE id=:color_id"), {"color_id": color_id})
+        return result
+
+def add_filament_color(filament_id, color_id):
+    """
+    Add a color to a filament type by adding it to the 'filament_colors' table
+
+    Parameters:
+        filament_id (int): The id of the filament type
+        color_id (int): The id of the color
+    """
+    with engine.connect() as conn:
+        conn.execute(text("INSERT INTO filament_colors(filament_id, color_id) VALUES (:filament_id, :color_id)"),
+                     {"filament_id": filament_id, "color_id": color_id})
+        
+        conn.commit()
+
+def remove_filament_color(filament_id, color_id):
+    """
+    Remove a color from a filament type by removing it from the 'filament_colors' table
+
+    Parameters:
+        filament_id (int): The id of the filament type
+        color_id (int): The id of the color
+    """
+    with engine.connect() as conn:
+        conn.execute(text("REMOVE FROM filament_colors WHERE filament_id=:filament_id AND color_id=:color_id)"),
+                     {"filament_id": filament_id, "color_id": color_id})
+        
+        conn.commit()
+
+def get_filament_colors(filament_id):
+    """
+    Retrieve colors associated with a filament id
+
+    Parameters:
+        filament_id (int): The id of the filament type 
+
+    Returns:
+        list: A list of all color ids associated with a filament type
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT color_id FROM filament_colors WHERE filament_id=:filament_id"),
+                     {"filament_id": filament_id})
+
+        return result
+ 
    

@@ -159,6 +159,7 @@ function renderApprovedOrder(order) {
     insertApprovedTableRow(order);
 }
 
+
 function renderDeniedOrder(order) {
     const exists = document.getElementById(order.id)
     if(exists) {
@@ -281,6 +282,7 @@ function openApprovedPage() {
 
     refreshOrdersWrapper(); 
 }
+window.openApprovedPage = openApprovedPage;
 
 //Renders page of pending orders
 function openPendingPage() {
@@ -299,6 +301,7 @@ function openPendingPage() {
 
     refreshOrdersWrapper(); 
 }
+window.openPendingPage = openPendingPage;
 
 //Renders page of denied orders
 function openDeniedPage() {
@@ -317,6 +320,7 @@ function openDeniedPage() {
 
     refreshOrdersWrapper(); 
 }
+window.openDeniedPage = openDeniedPage;
 
 //Renders page of filament inventory
 function openInventoryPage() {
@@ -349,6 +353,7 @@ function initialLoad() {
         openDeniedPage();
     }
 }
+window.initialLoad = initialLoad;
 
 // initializes the table when their are orders in the queue
 // and sets width of table columns

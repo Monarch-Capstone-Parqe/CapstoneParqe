@@ -776,6 +776,14 @@ button[id="dark-mode-toggle"]:hover {
 
 /************** end reject order modal **************/
 
+#myInput {
+  width: 100%; /* Full-width */
+  font-size: 16px; /* Increase font-size */
+  padding: 12px 20px 12px 40px; /* Add some padding */
+  border: 1px solid #ddd; /* Add a grey border */
+  margin-bottom: 12px; /* Add some space below the input */
+}
+
 @media (min-width: 768px) and (max-width: 1023px) {
   .header-text {
     font-size: 2em;

@@ -495,3 +495,20 @@ function insertDeniedTableRow(order) {
 
 //Interval refreshing orders from database continuously to keep the page up to date
 let intervalId = setInterval(refreshOrdersWrapper, 10000);
+
+class Order {
+    constructor(id, price, email, filament_type, nozzle_size, layer_height, infill, quantity, note) {
+        this.id = id;
+        this.price = price;
+        this.email = email;
+        this.filament_type = filament_type;
+        this.nozzle_size = nozzle_size;
+        this.layer_height = layer_height;
+        this.infill = infill;
+        this.quantity = quantity;
+        this.note = note;
+    }
+}
+
+let order1 = new Order('123456', '3.12', 'test-test@pdx.edu', 'pla, red', '0.4', '0.1', '20', '2', 'test note here');
+insertPendingTableRow(order1);

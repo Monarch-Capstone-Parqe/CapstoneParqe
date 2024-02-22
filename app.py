@@ -116,6 +116,7 @@ def order():
         uuid = gen_file_uuid()
         model_path = f'uploads/{uuid}{ext}'
         gcode_path = f'uploads/{uuid}.gcode'
+        gcode_path_raw = f'{uuid}.gcode'
 
         # Save the file to disk
         request.files.get('file').save(model_path)
@@ -132,7 +133,7 @@ def order():
             abort( HTTPStatus.BAD_REQUEST, jsonify(f"Failed to slice model. Check your file: {prusa_output}"))
 
         price = get_price(gcode_path)
-        session['gcode_path'] = gcode_path
+        session['gcode_path'] = gcode_path_raw
         session['price'] = price
         session['prusa_output'] = prusa_output
 
@@ -240,7 +241,8 @@ def get_gcode(gcode_path):
     """
     
     try:
-        return send_file(gcode_path, as_attachment=True)
+        search_path = f'uploads/{gcode_path}'
+        return send_file(search_path, as_attachment=True)
     except FileNotFoundError:
         return jsonify({'error': 'File not found'}), HTTPStatus.NOT_FOUND
     except Exception as e:

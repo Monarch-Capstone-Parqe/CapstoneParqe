@@ -17,9 +17,9 @@
       alt="Portland State Logo"
     />
     <section class="staff-header-buttons">
-      <button class="staff-header-button" id="pending-page-button" onclick="openPendingPage()">Pending Jobs</button>
-      <button class="staff-header-button" id="approved-page-button" onclick="openApprovedPage()">Approved Jobs</button>
-      <button class="staff-header-button" id="denied-page-button" onclick="openDeniedPage()">Denied Jobs</button>
+      <button class="staff-header-button" id="pending-page-button" onclick="openPendingPage()">Pending Orders</button>
+      <button class="staff-header-button" id="approved-page-button" onclick="openApprovedPage()">Approved Orders</button>
+      <button class="staff-header-button" id="denied-page-button" onclick="openDeniedPage()">Denied Orders</button>
     </section>
   </div>
   <div class="staff-header-box">
@@ -28,20 +28,7 @@
   <div class="jobs-box-container" id="jobs-box">
       <div class="jobs-box-header">
         <h1 id ="subheader-text" class="jobs-box-header-content"></h1>
-        <div class="jobs-box-header-underline"></div>
-        <table id="jobs-table" style="display:none">
-          <tr>
-            <th id="table-price">Price</th>
-            <th id="table-email">Email</th>
-            <th id="table-filament">Filament</th> 
-            <th id="table-nozzle">Nozzle</th>
-            <th id="table-layer">Layer</th>
-            <th id="table-infill">Infill</th>
-            <th id="table-quantity">Qty</th>
-            <th id="table-note">Note</th>
-            <th id="table-buttons"></th>
-          </tr>
-        </table>
+        <div class="jobs-box-header-underline"></div>   
       </div>
       <p id="no-jobs-message"></p>
       <table id="jobs-table">

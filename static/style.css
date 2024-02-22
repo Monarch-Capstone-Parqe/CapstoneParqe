@@ -561,6 +561,7 @@ button[id="dark-mode-toggle"]:hover {
   padding-bottom: 15px;
   height: 80px;
   padding-left: 20px;
+  padding-right: 20px;
   font-family: 'Acumin-LtPro';
 }
 

@@ -509,36 +509,46 @@ function insertDeniedTableRow(order) {
 }
 
 
-
+//open the gcode preview modal dialog
 function openPreview(gcode_path)
 {
+    //fetch the gcode from the backend
     fetch("/staff/get_gcode/"+gcode_path, {
         method: "GET",
     })
     .then((response) => response.text())
     .then((data) => {
-        console.log(data)
+        //console.log(data)
+        
+        //display the modal
         const previewModal = document.querySelector('.gcode-preview-modal');
         const closeButton = document.getElementById('preview-close-button');
         previewModal.style.display = 'block';
-        //gcode-preview canvas
+
+        //gcode preview canvas
         let gcodePrev = document.getElementById('preview-canvas');
         gcodePrev.id = "preview-canvas"
+
         //Process the gcode after the canvas is initialized
         const preview = GCodePreview.init({
         canvas: gcodePrev,
             buildVolume: { x: 300, y: 300, z: 0 },
+            //drawBuildVolume is used to change the size of the build grid in the preview window
             drawBuildVolume: { x: 300, y: 300, z: 0 },
             initialCameraPosition: [90, 75, 150],
             renderExtrusion: false,
             renderTravel: false,
             renderTubes: false,
+            //extrusionColor is used to change the color of the build in the preview window
             extrusionColor: 'hotpink',
             backgroundColor: '#eee',
             travelColor: new THREE.Color('lime')
         });
-
+        
+        //after the preview is initialized the gcode is processed
         preview.processGCode(data);
+
+
         closeButton.onclick = function() {
             previewModal.style.display = 'none';
         }

@@ -1,5 +1,5 @@
 import * as GCodePreview from 'gcode-preview';
-
+import * as THREE from 'three';
 //Maximum number of orders able to render on a page
 let maxRender = 10;
 
@@ -420,7 +420,7 @@ function insertPendingTableRow(order) {
     let previewButton = document.createElement('button');
     previewButton.id = 'preview-button'
     previewButton.addEventListener('click', () => {
-        openPreview(orderToAdd.gcode_path)
+        openPreview(order.gcode_path)
     });
     previewButton.textContent = 'VIEW GCODE';
 

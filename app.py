@@ -263,7 +263,7 @@ def review_orders():
         order_id = request.form['id']
         order_status = request.form['status']
         order_email = db.get_email_by_order_id(order_id)
-        staff_email = session['user']['userinfo']['email']
+        staff_email = session['token']['userinfo']['email']
 
         if(order_status == 'denied'):
             order_message = request.form['message']

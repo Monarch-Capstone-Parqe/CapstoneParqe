@@ -4,11 +4,12 @@
 # Table of Contents
 1. [Introduction](#intro)
    1. [Project Description](#projectDesc)
-   2. [Capstone Team](#capstoneTeam)
+   2. [Project Details](#projectDetails)
+   3. [Capstone Team](#capstoneTeam)
 2. [How to Set Up Development Environment ](#Set)
    1. [Set Up with Windows](#setupWindow)
    2. [Set Up with Linux](#setupLinux)
-4. Conclusion
+3. Conclusion
 
 
 
@@ -18,7 +19,58 @@
 PSU capstone project from team Monarch
 
 ### Project Description <a name="projectDesc"></a>
+This capstone project is to develop the PrusaSlicer Automated Routing and Quoting Engine (PARQE). Which aims to modernize and automate the 3D printing submission workflow in the Electronics Prototyping Lab. 
+
+### Project Details <a name="projectDetails"></a>
+There are 5 main componets to this project
+
+1. [User Interface](#UserApi)
+2. [Staff Interface](#StaffApi)
+3. [Backend](#Backend)
+4. [Octoprint](#Octo)
+5. [Database](#Database)
+
+---
+#### *User API* <a name="UserApi"></a>
+##### Purpose:
+A user can upload a 3d model in .stl, .3mf, .stp, or .step format.
+
+##### Functionality:
+
+
+---
+#### 2) Staff API <a name="StaffApi"></a>
+##### Purpose:
+
+##### Functionality:
+
+---
+#### 3) Backend <a name="Backend"></a>
+Related Files
+1. file 1
+2. file 2
+3. file 3
+   
+##### Purpose:
+
+##### Functionality:
+
+---
+#### 4) Octoprint <a name="Octo"></a>
+
+##### Purpose:
+
+##### Functionality:
+
+---
+#### 5) Database <a name="Database"></a>
+
+##### Purpose:
+
+##### Functionality:
+
 Link to more detailed Documentaion [Pareq Document]().
+
 ### Capstone Team <a name="capstoneTeam"></a>
 List of capstone teams and members who participated in the development of PARQE
 1. Team Monarch (Fall-Winter 2023-24)
@@ -37,15 +89,18 @@ List of capstone teams and members who participated in the development of PARQE
 
 
 #### Required 
-1. Version 3.12.1 Python
-2. Latest Version of Git
+1. Version 3.12.2 Python
+   - Go to https://www.python.org/downloads/ and download Python
+   - During installation process ensure that "Add python.exe to PATH" is checked.
+3. Latest Version of Git
    - Go to https://git-scm.com/book/en/v2/Getting-Started-Installing-Git and follow instructions to install Git
-3. IDE
+4. IDE
    - Microsoft Visual Studios
    - Visual Studios code
    - JetBrains
 ### Window <a name="setupWindow"></a>
-
+> [!NOTE]
+> Developers can setup local branch however they see fit. This is a barebones basic branch creation.
 #### Setting Up Local Branch
 1. Create local folder
 2. Open Git Bash and navivagte to previoursly created folder
@@ -64,6 +119,7 @@ git push --set-upstream origin <branch name>
 ```
 ![image](https://github.com/Monarch-Capstone-Parqe/CapstoneParqe/assets/92550433/086854e3-aa84-44b4-9523-ec4c322462ef)
 
+5. 
 
 ### Linux <a name="setupLinux"></a>
 ```

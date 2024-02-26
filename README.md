@@ -15,13 +15,14 @@
 
 
 
-## Introduction <a name="intro"></a>
+# Introduction <a name="intro"></a>
 PSU capstone project from team Monarch
+Link to more detailed Documentaion [Pareq Document]().
 
-### Project Description <a name="projectDesc"></a>
+## Project Description <a name="projectDesc"></a>
 This capstone project is to develop the PrusaSlicer Automated Routing and Quoting Engine (PARQE). Which aims to modernize and automate the 3D printing submission workflow in the Electronics Prototyping Lab. 
 
-### Project Details <a name="projectDetails"></a>
+## Project Details <a name="projectDetails"></a>
 There are 5 main componets to this project
 
 1. [User Interface](#UserApi)
@@ -31,47 +32,45 @@ There are 5 main componets to this project
 5. [Database](#Database)
 
 ---
-#### *User API* <a name="UserApi"></a>
-##### Purpose:
-A user can upload a 3d model in .stl, .3mf, .stp, or .step format.
+### *User API* <a name="UserApi"></a>
+#### Purpose:
+The User webpage/API is the first step for PARQE which allows users to submit 3d models in .stl, .3mf, .stp, or .step format and allow users to alter printing configuration. 
 
-##### Functionality:
+#### Functionality:
 
-
----
-#### 2) Staff API <a name="StaffApi"></a>
-##### Purpose:
-
-##### Functionality:
 
 ---
-#### 3) Backend <a name="Backend"></a>
+### 2) Staff API <a name="StaffApi"></a>
+#### Purpose:
+The Staff webpage/API is a manageral webpage which 
+#### Functionality:
+
+---
+### 3) Backend <a name="Backend"></a>
 Related Files
 1. file 1
 2. file 2
 3. file 3
    
-##### Purpose:
+#### Purpose:
 
-##### Functionality:
-
----
-#### 4) Octoprint <a name="Octo"></a>
-
-##### Purpose:
-
-##### Functionality:
+#### Functionality:
 
 ---
-#### 5) Database <a name="Database"></a>
+### 4) Octoprint <a name="Octo"></a>
 
-##### Purpose:
+#### Purpose:
 
-##### Functionality:
+#### Functionality:
 
-Link to more detailed Documentaion [Pareq Document]().
+---
+### 5) Database <a name="Database"></a>
 
-### Capstone Team <a name="capstoneTeam"></a>
+#### Purpose:
+
+#### Functionality:
+
+## Capstone Team <a name="capstoneTeam"></a>
 List of capstone teams and members who participated in the development of PARQE
 1. Team Monarch (Fall-Winter 2023-24)
    - Team Lead: Michael Do
@@ -82,13 +81,13 @@ List of capstone teams and members who participated in the development of PARQE
 
 
 
-## How to Set Up Development Environment <a name="Set"></a>
+# How to Set Up Development Environment <a name="Set"></a>
 > [!NOTE]
 > It is recommended for developers to develop on Windows and Linux (Mac is not recommended due to nuances)
 
 
 
-#### Required 
+### Required 
 1. Version 3.12.2 Python
    - Go to https://www.python.org/downloads/ and download Python
    - During installation process ensure that "Add python.exe to PATH" is checked.
@@ -98,10 +97,10 @@ List of capstone teams and members who participated in the development of PARQE
    - Microsoft Visual Studios
    - Visual Studios code
    - JetBrains
-### Window <a name="setupWindow"></a>
+## Window <a name="setupWindow"></a>
 > [!NOTE]
 > Developers can setup local branch however they see fit. This is a barebones basic branch creation.
-#### Setting Up Local Branch
+### Setting Up Local Branch
 1. Create local folder
 2. Open Git Bash and navivagte to previoursly created folder
 3. Once in desided direcoty, clone repo
@@ -121,7 +120,7 @@ git push --set-upstream origin <branch name>
 
 5. 
 
-### Linux <a name="setupLinux"></a>
+## Linux <a name="setupLinux"></a>
 ```
 git checkout (master branch)
 git pull

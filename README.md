@@ -42,8 +42,19 @@ The User webpage/API is the first step for PARQE which allows users to submit 3d
 ---
 ### 2) Staff API <a name="StaffApi"></a>
 #### Purpose:
-The Staff webpage/API is a manageral webpage which 
+The Staff webpage/API is a manageral webpage which allows staff to view, approve, and deny incomming print jobs. 
+
 #### Functionality:
+There are 3 pages 
+1. Pending page
+2. Approved page
+3. Denied page
+
+The pending will be the first page the EPL staff will view. This page list jobs that have been submitted by users through the User API. 
+
+Apporve page will list all proved print jobs
+
+Denied page will list all denied print jobs 
 
 ---
 ### 3) Backend <a name="Backend"></a>
@@ -53,7 +64,7 @@ Related Files
 3. file 3
    
 #### Purpose:
-
+Acts as the glue which allow differnt compenets of the PARQE project to communicate with each other 
 #### Functionality:
 
 ---

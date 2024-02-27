@@ -107,7 +107,8 @@ function formFieldCheck(email, file, fileInput, filamentType, nozzleSize, layerH
   return true;
 }
 
-// Displays print cost to user upon form submission, requires approval or cancel before being sent for review
+// Opens a modal that displays print details to the user. Allows them to review their order details and then approve if they are correct
+// if user approves, the form data will be sent
 function openReviewModal(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
   const reviewModal = document.querySelector(".review-order-modal");
   const reviewModalApproveButton = document.querySelector("#review-modal-approve-button");
@@ -134,10 +135,13 @@ function openReviewModal(email, file, fileInput, filamentType, nozzleSize, layer
   reviewModalCancelButton.onclick = function() {
     // close (hide) review modal
     reviewModal.style.display = "none";
+    // open modal window verifying order has been cancelled
     openCancelOrderModal();
   }
 }
 
+// submits the form data to the staff api for approval/denial
+// Success response opens a modal to inform user of success, error response opens modal informing user an error occured
 function uploadAndShowFile(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
   const formData = new FormData();
   formData.append("email", email);

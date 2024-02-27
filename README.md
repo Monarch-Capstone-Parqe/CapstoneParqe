@@ -13,8 +13,6 @@
 
 
 
-
-
 # Introduction <a name="intro"></a>
 PSU capstone project from team Monarch
 Link to more detailed Documentaion [Pareq Document]().
@@ -96,8 +94,6 @@ List of capstone teams and members who participated in the development of PARQE
 > [!NOTE]
 > It is recommended for developers to develop on Windows and Linux (Mac is not recommended due to nuances)
 
-
-
 ### Required 
 1. Version 3.12.2 Python
    - Go to https://www.python.org/downloads/ and download Python
@@ -108,6 +104,7 @@ List of capstone teams and members who participated in the development of PARQE
    - Microsoft Visual Studios
    - Visual Studios code
    - JetBrains
+   - 
 ## Window <a name="setupWindow"></a>
 > [!NOTE]
 > Developers can setup local branch however they see fit. This is a barebones basic branch creation.
@@ -127,6 +124,7 @@ git pull
 git checkout -b <branch-name>
 git push --set-upstream origin <branch name>
 ```
+
 ![image](https://github.com/Monarch-Capstone-Parqe/CapstoneParqe/assets/92550433/086854e3-aa84-44b4-9523-ec4c322462ef)
 
 5. 

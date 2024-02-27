@@ -1,7 +1,7 @@
 from datetime import date
 
-from sqlalchemy import create_engine, text
-from sqlalchemy import MetaData
+
+from sqlalchemy import create_engine, text, MetaData
 
 import config.variables as variables
 
@@ -18,7 +18,7 @@ def check_db_connect():
 def create_tables():
     with engine.connect() as conn:
         # This line is for development only
-        conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders CASCADE"))
+        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders CASCADE"))
 
         # Create the staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS staff("
@@ -29,9 +29,9 @@ def create_tables():
         conn.execute(text("CREATE TABLE IF NOT EXISTS orders("
                             "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
                             "email VARCHAR NOT NULL,"
-                            "filament_type VARCHAR NOT NULL,"
+                            "filament_type VARCHAR NOT NULL,"      
                             "nozzle_size VARCHAR NOT NULL,"      
-                            "layer_height VARCHAR NOT NULL,"      
+                            "layer_height VARCHAR NOT NULL,"
                             "infill NUMERIC(3,2) NOT NULL,"          
                             "quantity INTEGER NOT NULL," 
                             "note VARCHAR,"
@@ -53,17 +53,34 @@ def create_tables():
         # Create the pending_orders table with a foreign key reference to staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS pending_orders("
                             "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE)"))
+        
+        # Create the filaments table
+        conn.execute(text("CREATE TABLE IF NOT EXISTS filaments("
+                          "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                          "type VARCHAR NOT NULL,"
+                          "in_stock BOOLEAN NOT NULL)"))
+
+        # Create the colors table
+        conn.execute(text("CREATE TABLE IF NOT EXISTS colors("
+                          "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
+                          "color VARCHAR NOT NULL)"))
+
+        # Create the filament_colors table with a foreign key reference to the colors and filaments tables
+        conn.execute(text("CREATE TABLE IF NOT EXISTS filament_colors("
+                          "color_id INTEGER NOT NULL REFERENCES colors(id) ON DELETE CASCADE,"
+                          "filament INTEGER NOT NULL REFERENCES filaments(id) ON DELETE CASCADE)"))
 
         conn.commit()
 
 
-def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None, filament_type=None) -> int:
+
+def insert_order(email, filament_type=None, nozzle_size=None, layer_height=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
     """
     Insert a new order into the 'orders' and 'pending_orders' tables.
 
     Parameters:
         email (str): The email of the customer placing the order.
-        filament_type (str): The material and color of the filament
+        filament_type (str): The material and color of the filament.
         nozzle_size (str): The nozzle size of the 3D print.
         layer_height (str): The layer height of the 3D print.
         infill (float): The infill percentage of the 3D print.
@@ -80,7 +97,7 @@ def insert_order(email, layer_height=None, nozzle_size=None, infill=None, quanti
     with engine.begin() as conn:
         result = conn.execute(text("INSERT INTO orders(email, filament_type, nozzle_size, layer_height, infill, quantity, note, prusa_output, gcode_path, price, date) "
                           "VALUES (:email, :filament_type, :nozzle_size, :layer_height, :infill, :quantity, :note, :prusa_output, :gcode_path, :price, :date) RETURNING id"),
-                     {"email": email, "filament_type": filament_type, "nozzle_size": nozzle_size, "layer_height": layer_height,
+                     {"email": email, "filament_type": filament_type, "nozzle_size": nozzle_size, "layer_height": layer_height, 
                       "infill": infill, "quantity": quantity, "note": note,
                       "prusa_output": prusa_output, "gcode_path": gcode_path, "price": price, "date": date.today()})
         
@@ -100,7 +117,7 @@ def fetch_orders(query) -> list:
     """
     orders_table = metadata.tables['orders']
     column_names = orders_table.columns.keys()
-    
+
     with engine.connect() as conn:
         result = conn.execute(text(query)).fetchall()
         if not result:
@@ -205,6 +222,23 @@ def get_staff_emails() -> list:
         result = conn.execute(text("SELECT email FROM staff")).fetchall()
         staff_emails = [row[0] for row in result]
         return staff_emails
+    
+def get_staff_email(id):
+    """
+    Retrieve the email of a staff member from the database.
+
+    Returns:
+        str: The email associated with the given staff ID.
+    """
+    with engine.connect() as conn:
+        staff_email_result = conn.execute(text("SELECT email FROM staff WHERE id=:id"),
+                                    {"id": id})
+        staff_email_dict = []
+        for row in staff_email_result:
+            row_as_dict = row._mapping
+            staff_email_dict.append(dict(row_as_dict))
+        staff_email = staff_email_dict[0]['email']
+        return staff_email
 
 def get_email_by_order_id(order_id) -> str:
     """
@@ -220,6 +254,34 @@ def get_email_by_order_id(order_id) -> str:
         result = conn.execute(text("SELECT email FROM orders WHERE id = :order_id"), {"order_id": order_id}).scalar()
         return result if result else None
     
+def get_staff_email_by_approved_order_id(order_id) -> str:
+    """
+    Retrieve the staff email associated with the given approved order ID.
+
+    Parameters:
+        order_id (int): The primary key of the order.
+
+    Returns:
+        str: The staff email associated with the given approved order ID.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT reviewed_by FROM approved_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
+        return get_staff_email(result)
+    
+def get_staff_email_by_denied_order_id(order_id) -> str:
+    """
+    Retrieve the staff email associated with the given denied order ID.
+
+    Parameters:
+        order_id (int): The primary key of the order.
+
+    Returns:
+        str: The staff email associated with the given denied order ID.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT reviewed_by FROM denied_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
+        return get_staff_email(result)
+
 def add_staff_member(email) -> bool:
     """
     Add a new staff member to the 'staff' table if not already exists.
@@ -240,4 +302,42 @@ def add_staff_member(email) -> bool:
             return True
         else:
             return False
+        
+def add_filament(type):
+    """
+    Add a new type of filament to the 'filaments' table if not already exists.
+
+    Parameters: 
+        type (str): The type of the filament to be added.
+    """
+    with engine.connect() as conn:
+        filament_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM filaments WHERE type = :type)"), {"type": type}).scalar()
+        if not filament_exists:
+            conn.execute(text("INSERT INTO filaments(type, in_stock) VALUES (:type, FALSE)"), {"type": type})
+
+        conn.commit()
+
+def update_filament(type, in_stock):
+    """
+    Update the availability status of a type of filament in the 'filaments' table.
+
+    Parameters: 
+        type (str): The type of the filament to be updated.
+        in_stock (bool): True if the filament is in stock, false if not.
+    """
+    with engine.connect() as conn:
+        conn.execute(text("UPDATE filaments SET in_stock=:in_stock WHERE type=:type"),
+                     {"in_stock": in_stock, "type": type})
+
+def remove_filament(type):
+    """
+    Remove a type of filament from the 'filaments' table.
+
+    Parameters: 
+        type (str): The type of the filament to be removed.
+    """
+    with engine.connect() as conn:
+        conn.execute(text("DELETE FROM filaments WHERE type=:type"), {"type": type})
+
+        conn.commit()
    

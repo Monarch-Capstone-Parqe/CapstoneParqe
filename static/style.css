@@ -47,6 +47,11 @@ legend {
   src: url("fonts/Acumin-ItPro.otf");
 }
 
+@font-face {
+  font-family: "Acumin-WProL";
+  src: url("fonts/Acumin-WProL.otf");
+}
+
 /* Google Font */
 .material-symbols-outlined {
   font-variation-settings:
@@ -400,6 +405,8 @@ button[id="dark-mode-toggle"]:hover {
   background-color: #6d810e;
   height: 38px;
   margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .psu-logo-staff {
@@ -407,6 +414,31 @@ button[id="dark-mode-toggle"]:hover {
   width: 160px;
   margin-left: 36px;
   margin-top: 6px;
+}
+
+.staff-header-buttons {
+  display: flex;
+  height: 38px;
+}
+
+.staff-header-button {
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding-top: 9px;
+  padding-left: 15px;
+  padding-right: 15px;
+  font-family: "Acumin-WProL";
+  font-size: 0.87em;
+  letter-spacing: 1.15px;
+}
+
+.staff-header-button:hover {
+  background-color: #001a33;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 .staff-header-box {
@@ -435,6 +467,7 @@ button[id="dark-mode-toggle"]:hover {
 .jobs-box-container {
   width: 70%;
   margin: 0 auto;
+  margin-bottom: 150px;
 }
 
 .jobs-box-header {
@@ -467,35 +500,78 @@ button[id="dark-mode-toggle"]:hover {
 }
 
 #jobs-table {
+  display: none;
   border-collapse: collapse;
-  color: #404040;
-  font-family: 'Acumin-ItPro';
-  font-size: 0.9em;
-  padding-bottom: 80px;
+  width: 100%;
+  table-layout: fixed;
+  overflow-wrap: break-word;
+  empty-cells: hide;
 }
 
-#jobs-table th {
-  text-align: left;
-  border-bottom: 1px solid black;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 20px;
+#table-price {
+  width: 5%;
 }
-#jobs-table td {
-  border-bottom: 1px solid black;
-  padding-top: 10px;
-  padding-bottom: 10px;
+
+#table-email {
+  width: 15%;
+}
+
+#table-filament {
+  width: 10%;
+}
+
+#table-nozzle {
+  width: 5%;
+}
+
+#table-layer {
+  width: 5%;
+}
+
+#table-infill {
+  width: 5%;
+}
+
+#table-quantity {
+  width: 5%;
+}
+
+#table-note {
+  width: 50%;
+}
+
+.hide {
+  display: none;
+}
+
+.table-header {
+  text-align: left;
+  border-bottom: 1px solid #404040;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 20px;
+  color: #404040;
+  font-size: 1.05em;
+  font-family: 'Acumin-ItPro';
+}
+
+.table-data {
+  border-bottom: 1px solid #404040;
+  padding-top: 15px;
+  padding-bottom: 15px;
   height: 80px;
   padding-left: 20px;
+  padding-right: 20px;
+  font-family: 'Acumin-LtPro';
 }
 
 .boxed-data-underline {
   height: 1px;
+  display: block;
   background-color: #404040;
-  width: 70%;
 }
 
-.data-formatting {
+#no-jobs-message {
   color: #404040;
   margin: 0;
   margin-left: 20px;
@@ -521,9 +597,10 @@ button[id="dark-mode-toggle"]:hover {
 
 .staff-buttons {
   display: flex;
-  width: 200px;
+  width: 300px;
   height: 50px;
-  /* margin-left: 20px; */
+  margin-left: 50px;
+  border: none;
 }
 
 .staff-buttons button[id='approve-button']{
@@ -536,6 +613,7 @@ button[id="dark-mode-toggle"]:hover {
   cursor: pointer;
   font-family: "Acumin-ECBPro";
   margin-right: 10px;
+  margin-left: 10px;
   transition: 0.3s;
 }
 
@@ -552,6 +630,19 @@ button[id="dark-mode-toggle"]:hover {
   transition: 0.3s;
 }
 
+.staff-buttons button[id='preview-button']{
+  color: black;
+  background-color: white;
+  width: 100px;
+  height: 100%;
+  font-size: 1.3em;
+  border: 2px solid #008ac1;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  margin-right: 10px;
+  transition: 0.3s;
+}
+
 #approve-button:hover {
   color: white;
   background-color: #6d8d24;
@@ -563,6 +654,41 @@ button[id="dark-mode-toggle"]:hover {
 #deny-button:hover {
   color: white;
   background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+#preview-button:hover {
+  color: white;
+  background-color: #008ac1;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+
+.load-more-button-box {
+  width: 100%;
+  margin-top: 30px;
+  text-align: center;
+}
+
+#load-more-button {
+  color: black;
+  background-color: white;
+  width: 200px;
+  height: 50px;
+  font-size: 1.3em;
+  border: 2px solid #404040;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  transition: 0.3s;
+}
+
+#load-more-button:hover {
+  color: white;
+  background-color: #404040;
   text-decoration: underline;
   text-underline-offset: -1%;
   text-decoration-thickness: 1px;
@@ -672,6 +798,72 @@ button[id="dark-mode-toggle"]:hover {
 
 
 /************** end reject order modal **************/
+
+
+/************** gcode preview modal **************/
+
+.gcode-preview-modal{
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+}
+
+.gcode-preview-modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 800px;
+  font-size: 1.15em;
+  height: auto;
+  text-align: center;
+  font-family: "Acumin-LtPro";
+}
+
+
+.gcode-preview-modal-content .preview-canvas {
+  width: 700px ; 
+  height: 300px;
+}
+
+.gcode-preview-modal-content .preview-close-button{
+  display: inline-block;
+  color: black;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  border: none;
+  cursor: pointer;
+  width: 150px;
+  height: 50px;
+}
+
+.gcode-preview-modal-content button[id="preview-close-button"] {
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.gcode-preview-modal-content button[id="preview-close-button"]:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+/************** end gcode preview modal **************/
+
 
 @media (min-width: 768px) and (max-width: 1023px) {
   .header-text {

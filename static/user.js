@@ -203,39 +203,6 @@ function openCancelOrderModal() {
   }
 }
 
-// // Displays a message to the user when prusaslicer recommends supports and allows them to chose to add
-// function openSupportRecommendedModal(costOriginal, costSupport) {
-//   const supportRecommendedModal = document.querySelector(".support-recommended-modal");
-//   const addSupportButton = document.querySelector("#support-recommended-support-button");
-//   const noSupportButton = document.querySelector("#support-recommended-no-support-button");
-//   const cancelButton = document.querySelector("#support-recommended-cancel-button");
-
-//   const costSupportString = document.querySelector("#support-modal-string");
-//   const costNoSupportString = document.querySelector("#no-support-modal-string");
-//   costSupportString.innerHTML = "Cost with added supports: $" + costSupport + " (recommended!)";
-//   costNoSupportString.innerHTML = "Cost without supports: $" + costOriginal;
-  
-//   supportRecommendedModal.style.display = "block";
-
-//   addSupportButton.onclick = function() {
-//     // close (hide) modal
-//     supportRecommendedModal.style.display = "none";
-//     openReviewModal(costSupport);
-//   }
-
-//   noSupportButton.onclick = function() {
-//     // close (hide) modal
-//     supportRecommendedModal.style.display = "none";
-//     openReviewModal(costOriginal);
-//   }
-
-//   cancelButton.onclick = function() {
-//     // close (hide) modal
-//     supportRecommendedModal.style.display = "none";
-//     openCancelOrderModal();
-//   }
-// }
-
 // Displays a message to the user that no file was selected for upload
 function openNoFileSelectedModal() {
   const noFileModal = document.querySelector(".multi-purpose-modal");

@@ -8,6 +8,7 @@ darkModeToggle.onclick = function () {
   const darkSrc = image.getAttribute("dark-src");
   const lightSrc = image.getAttribute("light-src");
 
+  // check what mode is currently active
   if (modeIcon.innerHTML.includes("light_mode")) {
     console.log("dark mode active");
     insertGoogleIcon(modeIcon, "dark_mode", "white");
@@ -49,14 +50,6 @@ function toggleDarkMode(selector) {
 
 let submitButton = document.querySelector("#submit-button");
 submitButton.onclick = function (event) {
-  event.preventDefault();
-  // check fields of form
-  formFieldCheck();
-};
-
-// function that performs checks on form fields
-// add any checks wish to perform here
-function formFieldCheck() {
   const email = document.querySelector("#email").value;
   const fileInput = document.querySelector("#file-input");
   const file = fileInput.files[0];
@@ -67,36 +60,51 @@ function formFieldCheck() {
   const quantity = document.querySelector("#quantity").value;
   const note = document.querySelector("#note").value;
 
+  // prevents 'normal' form submit operations so we can instead control flow through modal windows
+  event.preventDefault();
+  // check fields of form, returns a boolean on if checks pass or not
+  let checksPass = formFieldCheck(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note);
+  // if all form checks have passed, then open the order review modal
+  if (checksPass) {
+    openReviewModal(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note);
+  }
+};
+
+// function that performs checks on form fields, all fields are passed as parameters
+// returns true if all check pass, false otherwise
+// add any checks wish to perform here
+function formFieldCheck(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note) {
+
   // verify that email field populated
   if (email === "") {
     console.error("Email field empty");
     openEmptyEmailFieldModal();
-    return;
+    return false;
   }
 
   // verify that a file is selected for upload
   if (!file) {
     console.error("No file selected.");
     openNoFileSelectedModal();
-    return;
+    return false;
   }
 
   // verify quantity is an integer
   if (!Number.isInteger(+quantity)) {
     console.error("Quantity must be integer value");
     openQuantityIntegerModal();
-    return;
+    return false;
   }
 
   // verify quantity is greater than 0
   if (quantity < 1) {
     console.error("Quantity outside allowed range");
     openQuantityRangeModal();
-    return;
+    return false;
   }
 
-  // if checks pass, open the review modal
-  openReviewModal(email, file, fileInput, filamentType, nozzleSize, layerHeight, infill, quantity, note);
+  // if all checks pass, return true
+  return true;
 }
 
 // Displays print cost to user upon form submission, requires approval or cancel before being sent for review

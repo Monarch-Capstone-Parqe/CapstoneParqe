@@ -22,14 +22,12 @@ function approve(id)
     .catch((error) => {
         console.error("Error: ", error);
     })
-    console.log(`Id: ${id}`);
     removeOrder(id);
 }
 
 //accepts an order payment, send a request to backend and remove from table
 function approve_payment(id)
 {
-    console.log("approve");
     const formData = new FormData();
     formData.append("id", id)
     formData.append("status", "payment_approved")
@@ -40,7 +38,6 @@ function approve_payment(id)
     .catch((error) => {
         console.error("Error: ", error);
     })
-    console.log(`Id: ${id}`);
     removeOrder(id);
 }
 
@@ -135,8 +132,6 @@ function refreshUnpaidOrders()
     })
     .then((response) => response.json())
     .then((data) => {
-        console.log('unpaid:');
-        console.log(data);
         for(let i = 0; i < maxRender && i < data.orders.length; i++) {
             renderUnpaidOrder(data.orders[i]);
         }
@@ -389,7 +384,7 @@ function openUnpaidPage() {
 
     removeAllOrders();
     jobsBoxHeaderContent.innerText = 'UNPAID ORDERS';
-    noJobsMessage.innerText = 'No orders are currently pending.';
+    noJobsMessage.innerText = 'No orders are have been approved for payment.';
     document.getElementById('table-approved').classList.add('hide');
     document.getElementById('table-denied').classList.add('hide');
     document.getElementById('table-buttons').classList.remove('hide');
@@ -551,7 +546,7 @@ function insertUnpaidTableRow(order) {
     approveButton.addEventListener('click', () => {
         approve_payment(order.id);
     });
-    approveButton.textContent = 'APPROVE';
+    approveButton.textContent = 'APPROVE PAYMENT';
 
     // let denyButton = document.createElement('button');
     // denyButton.id = 'deny-button'

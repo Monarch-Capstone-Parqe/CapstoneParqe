@@ -54,6 +54,11 @@ def create_tables():
         conn.execute(text("CREATE TABLE IF NOT EXISTS pending_orders("
                             "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE)"))
         
+        conn.execute(text("CREATE TABLE IF NOT EXISTS unpaid_orders("
+                          "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,"
+                          "reviewed_by INTEGER REFERENCES staff(id))"))
+      
+        
         # Create the filaments table
         conn.execute(text("CREATE TABLE IF NOT EXISTS filaments("
                           "id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,"
@@ -164,6 +169,15 @@ def get_denied_orders() -> list:
     """
     return fetch_orders("SELECT o.* FROM orders o JOIN denied_orders d ON o.id = d.order_id ORDER BY o.date")
 
+def get_unpaid_orders() -> list:
+    """
+    Retrieve all unpaid orders from the database.
+
+    Returns:
+        list: A list of dictionaries representing each unpaid order.
+    """
+    return fetch_orders("SELECT o.* FROM orders o JOIN unpaid_orders u ON o.id = u.order_id ORDER BY o.date")
+
 def delete_order(order_id):
     """
     Delete an order from the database based on its ID.
@@ -188,6 +202,9 @@ def approve_order(order_id, email):
         staff_id = staff_id_result.fetchone()[0]  # Fetch the staff ID from the result
 
         conn.execute(text("INSERT INTO approved_orders(order_id, reviewed_by) VALUES (:order_id, :staff_id)"),
+                     {"order_id": order_id, "staff_id": staff_id})
+        
+        conn.execute(text("INSERT INTO unpaid_orders(order_id, reviewed_by) VALUES (:order_id, :staff_id)"),
                      {"order_id": order_id, "staff_id": staff_id})
 
         conn.execute(text("DELETE FROM pending_orders WHERE order_id=:order_id"), {"order_id": order_id})
@@ -281,6 +298,21 @@ def get_staff_email_by_denied_order_id(order_id) -> str:
     with engine.connect() as conn:
         result = conn.execute(text("SELECT reviewed_by FROM denied_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
         return get_staff_email(result)
+
+def get_staff_email_by_unpaid_order_id(order_id) -> str:
+    """
+    Retrieve the staff email associated with the given unpaid order ID.
+
+    Parameters:
+        order_id (int): The primary key of the order.
+    
+    Returns:
+        str: The staff email associated with the given unpaid order ID.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT reviewed_by FROM unpaid_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
+        return get_staff_email(result)
+
 
 def add_staff_member(email) -> bool:
     """

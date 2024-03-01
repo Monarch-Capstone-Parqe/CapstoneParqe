@@ -109,6 +109,27 @@ function refreshDeniedOrders()
     });
 }
 
+function refreshUnpaidOrders()
+{
+    fetch("/staff/get_orders/unpaid", {
+        method: "GET",
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        console.log('unpaid:');
+        console.log(data);
+        for(let i = 0; i < maxRender && i < data.orders.length; i++) {
+            renderUnpaidOrder(data.orders[i]);
+        }
+        if(data.orders.length > maxRender) {
+            renderLoadMoreButton();
+        }
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
+}
+
 //Function to refresh orders from database
 //Correlates with window location via url hash
 function refreshOrdersWrapper()
@@ -121,6 +142,9 @@ function refreshOrdersWrapper()
     }
     else if(window.location.hash == '#denied') {
         refreshDeniedOrders();
+    }
+    else if(window.location.hash == '#unpaid') {
+        refreshUnpaidOrders();
     }
 }
 
@@ -174,6 +198,23 @@ function renderDeniedOrder(order) {
     }
     // insert the order into the table to display on staff page
     insertDeniedTableRow(order);
+}
+
+function renderUnpaidOrder(order)
+{
+    const exists = document.getElementById(order.id)
+    if(exists) {
+        return
+    }
+    
+    if(document.querySelector('#jobs-table').rows.length > 0) {
+        // hide the 'no jobs' message
+        document.getElementById('no-jobs-message').style.display = 'none';
+        // display the table
+        initJobsTable();
+    }
+    // insert the order into the table to display on staff page
+    insertUnpaidTableRow(order);
 }
 
 function renderLoadMoreButton() {
@@ -322,6 +363,22 @@ function openDeniedPage() {
 }
 window.openDeniedPage = openDeniedPage;
 
+function openUnpaidPage() {
+    window.location.hash = 'unpaid';
+    const jobsBoxHeaderContent = document.getElementById('subheader-text');
+    const noJobsMessage = document.getElementById('no-jobs-message');
+
+    removeAllOrders();
+    jobsBoxHeaderContent.innerText = 'UNPAID ORDERS';
+    noJobsMessage.innerText = 'No orders are currently pending.';
+    document.getElementById('table-approved').classList.add('hide');
+    document.getElementById('table-denied').classList.add('hide');
+    document.getElementById('table-buttons').classList.remove('hide');
+
+    refreshOrdersWrapper();
+}
+window.openUnpaidPage = openUnpaidPage
+
 //Renders page of filament inventory
 function openInventoryPage() {
     window.location.hash = 'denied';
@@ -351,6 +408,8 @@ function initialLoad() {
     }
     else if(window.location.hash == '#denied') {
         openDeniedPage();
+    }else if(window.location.hash == '#unpaid') {
+        openUnpaidPage();
     }
 }
 window.initialLoad = initialLoad;
@@ -427,6 +486,71 @@ function insertPendingTableRow(order) {
     buttonBox.appendChild(previewButton);
     buttonBox.appendChild(approveButton);
     buttonBox.appendChild(denyButton);
+    row.insertCell(8).append(buttonBox);
+}
+
+//Similar to Pending Table, create Unpaid Pending orders
+function insertUnpaidTableRow(order) {
+    let tableRows = document.querySelector('#table-rows');
+    let row = tableRows.insertRow();
+
+    // set the id of the row to the corresponding order, for use in the removeJob() function
+    row.setAttribute('id', order.id);
+
+    let priceCell = row.insertCell(0);
+    let emailCell = row.insertCell(1);
+    let filamentCell = row.insertCell(2);
+    let nozzleCell = row.insertCell(3);
+    let layerCell = row.insertCell(4);
+    let infillCell = row.insertCell(5);
+    let quantityCell = row.insertCell(6);
+    let noteCell = row.insertCell(7); 
+
+    priceCell.innerHTML = order.price;
+    emailCell.innerHTML = order.email;
+    filamentCell.innerHTML = order.filament_type;
+    nozzleCell.innerHTML = order.nozzle_size;
+    layerCell.innerHTML = order.layer_height;
+    infillCell.innerHTML = order.infill;
+    quantityCell.innerHTML = order.quantity;
+    noteCell.innerHTML = order.note;
+
+    priceCell.classList.add('table-data');
+    emailCell.classList.add('table-data');
+    filamentCell.classList.add('table-data');
+    nozzleCell.classList.add('table-data');
+    layerCell.classList.add('table-data');
+    infillCell.classList.add('table-data');
+    quantityCell.classList.add('table-data');
+    noteCell.classList.add('table-data');
+
+    let buttonBox = document.createElement('section');
+    buttonBox.classList.add('staff-buttons');
+
+    let approveButton = document.createElement('button');
+    approveButton.id = 'approve-button'
+    approveButton.addEventListener('click', () => {
+        approve(order.id);
+    });
+    approveButton.textContent = 'APPROVE';
+
+    // let denyButton = document.createElement('button');
+    // denyButton.id = 'deny-button'
+    // denyButton.addEventListener('click', () => {
+    //     openRejectModal(order.id)
+    // });
+    // denyButton.textContent = 'DENY';
+
+    // let previewButton = document.createElement('button');
+    // previewButton.id = 'preview-button'
+    // previewButton.addEventListener('click', () => {
+    //     openPreview(order.gcode_path)
+    // });
+    // previewButton.textContent = 'PREVIEW';
+
+    // buttonBox.appendChild(previewButton);
+    buttonBox.appendChild(approveButton);
+    // buttonBox.appendChild(denyButton);
     row.insertCell(8).append(buttonBox);
 }
 

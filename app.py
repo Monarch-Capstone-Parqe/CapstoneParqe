@@ -276,6 +276,9 @@ def review_orders():
         elif(order_status == 'approved'):
             db.approve_order(order_id, staff_email)
             message = f"Your EPL 3D printing order has been approved."
+        elif(order_status == 'payment_approved'):
+            db.approve_payment_order(order_id, staff_email)
+            message = f"Your payment was approved"
         else:
             return abort(HTTPStatus.BAD_REQUEST, jsonify({'error': f'"{order_status}" is an invalid status.'}))
         

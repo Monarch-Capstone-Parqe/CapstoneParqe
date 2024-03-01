@@ -22,6 +22,25 @@ function approve(id)
     .catch((error) => {
         console.error("Error: ", error);
     })
+    console.log(`Id: ${id}`);
+    removeOrder(id);
+}
+
+//accepts an order payment, send a request to backend and remove from table
+function approve_payment(id)
+{
+    console.log("approve");
+    const formData = new FormData();
+    formData.append("id", id)
+    formData.append("status", "payment_approved")
+    fetch("/staff/review_orders", {
+        method: "PUT",
+        body: formData
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    })
+    console.log(`Id: ${id}`);
     removeOrder(id);
 }
 
@@ -530,7 +549,7 @@ function insertUnpaidTableRow(order) {
     let approveButton = document.createElement('button');
     approveButton.id = 'approve-button'
     approveButton.addEventListener('click', () => {
-        approve(order.id);
+        approve_payment(order.id);
     });
     approveButton.textContent = 'APPROVE';
 

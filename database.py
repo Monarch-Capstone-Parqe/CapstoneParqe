@@ -57,6 +57,11 @@ def create_tables():
         conn.execute(text("CREATE TABLE IF NOT EXISTS unpaid_orders("
                           "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,"
                           "reviewed_by INTEGER REFERENCES staff(id))"))
+        
+         # Create paid_orders table with a foreign key reference to staff table
+        conn.execute(text("CREATE TABLE IF NOT EXISTS paid_orders("
+                            "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,"
+                            "reviewed_by INTEGER REFERENCES staff(id))"))
       
         
         # Create the filaments table
@@ -208,6 +213,24 @@ def approve_order(order_id, email):
                      {"order_id": order_id, "staff_id": staff_id})
 
         conn.execute(text("DELETE FROM pending_orders WHERE order_id=:order_id"), {"order_id": order_id})
+        conn.commit()
+
+def approve_payment_order(order_id, email):
+    """
+    Accept an order payment by adding the order to paid_orders table and removing from unpaid_orders table.
+
+    Parameters:
+        order_id (int): The ID of the order to be approved.
+        email (str): The email of the staff member approving the order.
+    """
+    with engine.connect() as conn:
+        staff_id_result = conn.execute(text("SELECT id FROM staff WHERE email=:email"), {"email": email})
+        staff_id = staff_id_result.fetchone()[0]  # Fetch the staff ID from the result
+
+        conn.execute(text("INSERT INTO paid_orders(order_id, reviewed_by) VALUES (:order_id, :staff_id)"),
+                     {"order_id": order_id, "staff_id": staff_id})
+        
+        conn.execute(text("DELETE FROM unpaid_orders WHERE order_id=:order_id"), {"order_id": order_id})
         conn.commit()
 
 def deny_order(order_id, email):

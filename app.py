@@ -116,6 +116,7 @@ def order():
         uuid = gen_file_uuid()
         model_path = f'uploads/{uuid}{ext}'
         gcode_path = f'uploads/{uuid}.gcode'
+        gcode_path_raw = f'{uuid}.gcode'
 
         # Save the file to disk
         request.files.get('file').save(model_path)
@@ -132,7 +133,7 @@ def order():
             abort( HTTPStatus.BAD_REQUEST, jsonify(f"Failed to slice model. Check your file: {prusa_output}"))
 
         price = get_price(gcode_path)
-        session['gcode_path'] = gcode_path
+        session['gcode_path'] = gcode_path_raw
         session['price'] = price
         session['prusa_output'] = prusa_output
 
@@ -240,7 +241,8 @@ def get_gcode(gcode_path):
     """
     
     try:
-        return send_file(gcode_path, as_attachment=True)
+        search_path = f'uploads/{gcode_path}'
+        return send_file(search_path, as_attachment=True)
     except FileNotFoundError:
         return jsonify({'error': 'File not found'}), HTTPStatus.NOT_FOUND
     except Exception as e:
@@ -285,7 +287,7 @@ def review_orders():
         app.logger.critical(f"Error in order route: {e}")
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
 
-@app.route('/staff/filament/<action>')
+@app.route('/staff/filament/<action>', methods=['POST', 'PUT', 'DELETE'])
 @requires_auth
 def filament(action):
     """
@@ -298,17 +300,28 @@ def filament(action):
         filament_type = request.form['filament_type']
 
         if action == 'add':
-            db.add_filament(filament_type)
+            in_stock = request.form['in_stock']
+            db.add_filament(filament_type, in_stock)
+            black_id = db.get_color_id('black')
+            filament_id = db.get_filament_id(filament_type)
+            db.add_filament_color(filament_id, black_id)
+        elif action == 'update':
+            in_stock = request.form['in_stock']
+            db.update_filament(filament_type, in_stock)
         elif action == 'remove':
             db.remove_filament(filament_type)
         elif action == 'add_color':
+            color_id = request.form['color_id'] 
             filament_id = db.get_filament_id(filament_type)
-            db.add_filament_color(filament_id, request.form['color_id'])
+            db.add_filament_color(filament_id, color_id)
         elif action == 'remove_color':
+            color_id = request.form['color_id'] 
             filament_id = db.get_filament_id(filament_type)
-            db.remove_filament_color(filament_id, request.form['color_id'])
+            db.remove_filament_color(filament_id, color_id)
         else:
             return jsonify({'error': 'Invalid action type'}), HTTPStatus.BAD_REQUEST
+     
+        return jsonify({'message': 'Update received'}), HTTPStatus.OK
     
     # Reraise client errors
     except HTTPException:
@@ -356,7 +369,13 @@ def get_filament_inventory():
     """
     try:
         filaments = db.get_filaments()
+        print(filaments)
+        colors = {}
 
+        for each in filaments:
+            colors.update({each['id']: db.get_filament_colors(each['id'])})
+
+        return jsonify({'filaments': filaments, 'colors': colors}), HTTPStatus.OK
     # Reraise client errors
     except HTTPException:
         raise  

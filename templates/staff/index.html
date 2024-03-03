@@ -3,7 +3,8 @@
 {% block title %} PrusaSlicer Automated Routing and Quoting Engine Staff Page{% endblock %}
 
 {% block head %}
-<script defer src="{{ url_for('static', filename='staff.js') }}"></script>
+<script defer src="{{ url_for('static', filename='dist/staff.bundle.js') }}"></script>
+
 {% endblock %}
 
 
@@ -16,12 +17,12 @@
       src="{{ url_for('static', filename='images/psu_logo_svg.svg') }}"
       alt="Portland State Logo"
     />
-    <section class="staff-header-buttons">
+    <div class="staff-header-buttons">
       <button class="staff-header-button" id="pending-page-button" onclick="openPendingPage()">Pending Orders</button>
       <button class="staff-header-button" id="approved-page-button" onclick="openApprovedPage()">Approved Orders</button>
       <button class="staff-header-button" id="denied-page-button" onclick="openDeniedPage()">Denied Orders</button>
       <button class="staff-header-button" id="inventory-page-button" onclick="openInventoryPage()">Filament Inventory</button>
-    </section>
+    </div>
   </div>
   <div class="staff-header-box">
     <h1 class="staff-header-content">PARQE STAFF PAGE</h1>
@@ -48,7 +49,16 @@
         </thead>
         <tbody id="table-rows"></tbody>
       </table>
-      <div class="reject-order-modal">
+      <table id="filament-table">
+        <thead>
+          <th id="filamenent-table-type" class="table-header">Type</th>
+          <th id="filament-table-in-stock" class="table-header">In Stock</th>
+          <th id="filament-table-colors" class="table-header">Colors</th>
+          <th id="filament-table-buttons"></th>
+        </thead>
+        <tbody id="filament-table-rows"></tbody>
+      </table>
+      <div class="staff-modal" id="reject-order-modal">
         <div class="reject-order-modal-content">
           <p>Please state why this order was not approved, your message will be relayed to the submitter via email: </p>
           <textarea placeholder="Type here.." class="reject-modal-input" id="reject-modal-input"></textarea>
@@ -57,6 +67,41 @@
             <button class="reject-modal-button" id="reject-modal-cancel-button">CANCEL</button>
           </div>
         </div>
+      </div>
+      <div class="staff-modal" id="add-filament-modal">
+        <div class="add-filament-modal-content">
+         <div class="add-filament-modal-input-container">
+          <label for="add-filament-modal-filament-type" class="add-filament-modal-label" id="add-filament-modal-filament-type-label">Filament type:</label> 
+          <input type="text" id="add-filament-modal-filament-type" name="add-filament-modal-filament-type" class="add-filament-modal-input" placeholder="Type here.." />
+         </div>
+         <div class="add-filament-modal-checkbox-container">
+          <label for="add-filament-modal-in-stock-checkbox" class="add-filament-modal-label" id="add-filament-modal-in-stock-checkbox-label">In-stock?</label>
+          <input type="checkbox" id="add-filament-modal-in-stock-checkbox" name="add-filament-modal-in-stock-checkbox" class="in-stock-checkbox" />
+         </div>
+         <div class="modal-button-container">
+          <button class="add-filament-modal-button" id="add-filament-modal-submit-button">SUBMIT</button>
+          <button class="add-filament-modal-button" id="add-filament-modal-cancel-button">CANCEL</button>
+         </div>
+        </div>
+      </div>
+      <div class="staff-modal" id="delete-filament-modal">
+        <div class="delete-filament-modal-content">
+          <p id="delete-filament-modal-text"></p>
+          <div class="modal-button-container">
+            <button class="delete-filament-modal-button" id="delete-filament-modal-submit-button">SUBMIT</button>
+            <button class="delete-filament-modal-button" id="delete-filament-modal-cancel-button">CANCEL</button>
+          </div>
+        </div>
+      </div>
+      <div class="gcode-preview-modal">
+       <div class="modal-dialog modal-lg">
+        <div class="gcode-preview-modal-content">
+            <p>GCODE PREVIEW<p>
+            <canvas class="preview-canvas" id="preview-canvas"></canvas>
+            <p>Left Click+drag to pan, Right Click+drag to move, scroll to zoom<p>
+            <button class="preview-close-button" id="preview-close-button">CLOSE</button>
+        </div>
+       </div>
       </div>
   </div>
 </main>

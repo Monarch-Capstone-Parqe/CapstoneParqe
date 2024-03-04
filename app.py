@@ -1,12 +1,10 @@
-# Standard
 import os
 import subprocess
 from urllib.parse import quote_plus, urlencode
 from http import HTTPStatus
 import smtplib
 
-# Third-Party
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_file, abort
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_file, abort, g
 import logging
 from flask_session import Session
 import jwt
@@ -14,14 +12,16 @@ from functools import wraps
 from authlib.integrations.flask_client import OAuth
 from werkzeug.exceptions import HTTPException
 
-# Local
 import database as db
 from util import get_price, gen_file_uuid, process_order_data, send_email
 import config.variables as variables
+import octoprint
 
 # Init db
 db.check_db_connect()
 db.create_tables()
+
+octoprint.start_sending_orders()
 
 # Init flask
 app = Flask(__name__, static_url_path='/static', static_folder='static')
@@ -263,7 +263,7 @@ def review_orders():
         order_id = request.form['id']
         order_status = request.form['status']
         order_email = db.get_email_by_order_id(order_id)
-        staff_email = session['user']['userinfo']['email']
+        staff_email = session['token']['userinfo']['email']
 
         if(order_status == 'denied'):
             order_message = request.form['message']
@@ -287,5 +287,26 @@ def review_orders():
         app.logger.critical(f"Error in order route: {e}")
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
 
+@app.route('/staff/close_order', methods=['PUT'])
+@requires_auth
+def close_order():
+    """
+    Review and update orders.
+
+    Returns:
+        JSON response indicating the status of the operation.
+    """
+    try:
+        # Grab order details
+        order_id = request.form['id']
+        db.close_order(order_id)
+        return jsonify({'message': 'Update received'}), HTTPStatus.OK
+    
+    # Unkown
+    except Exception as e:
+        app.logger.critical(f"Error in order route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+    octoprint.stop_sending_orders()

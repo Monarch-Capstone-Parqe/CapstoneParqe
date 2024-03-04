@@ -20,7 +20,6 @@ import octoprint
 # Init db
 db.check_db_connect()
 db.create_tables()
-db.add_staff_member('andrey7@pdx.edu')
 
 octoprint.start_sending_orders()
 

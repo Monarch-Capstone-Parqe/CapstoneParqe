@@ -75,10 +75,6 @@ def create_tables():
         if not color_exists:
            conn.execute(text("INSERT INTO colors(color) VALUES (:color)"), {"color": "black"})
 
-        blue_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM colors WHERE color = :color)"), {"color": "blue"}).scalar()
-        if not blue_exists:
-            conn.execute(text("INSERT INTO colors(color) VALUES (:color)"), {"color": "blue"})
-
         conn.commit()
 
 

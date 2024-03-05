@@ -776,6 +776,17 @@ button[id="dark-mode-toggle"]:hover {
   background-color: #007bff;
 }
 
+.color-checkbox {
+  height: 25px;
+  width: 25px;
+  background-color: white;  
+  cursor: pointer;
+}
+
+.color-checkbox:checked {
+  background-color: #007bff;
+}
+
 .colors-dropdown {
   position: relative;
   width: 70%;
@@ -783,7 +794,7 @@ button[id="dark-mode-toggle"]:hover {
 
 .colors-dropdown .colors-dropdown-list {
   position: absolute;
-  top: 40px;
+  top: 45px;
   left: 0px;
   right: 0px;
   box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .15);
@@ -810,7 +821,7 @@ button[id="dark-mode-toggle"]:hover {
 
 .colors-dropdown .colors-dropdown-label {
   display: block;
-  height: 30px;
+  min-height: 25px;
   background: #fff;
   border: 1px solid #404040;
   padding: 10px;
@@ -911,7 +922,7 @@ button[id="dark-mode-toggle"]:hover {
 .staff-modal {
   display: none;
   position: fixed;
-  z-index: 1;
+  z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;

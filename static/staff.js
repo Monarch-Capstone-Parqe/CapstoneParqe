@@ -849,7 +849,7 @@ function renderColorsDropdown(colors, filament_colors, parent, filament_type) {
     for(let i = 0; i < colors.length; i++) {
         let colorCheck = document.createElement('input');
         colorCheck.type = 'checkbox';
-        colorCheck.classList.add('in-stock-checkbox');
+        colorCheck.classList.add('color-checkbox');
         colorCheck.id = colors[i].id;
         for(let i = 0; i < filament_colors.length; i++) {
             if(colorCheck.id == filament_colors[i].color_id) {
@@ -869,6 +869,9 @@ function renderColorsDropdown(colors, filament_colors, parent, filament_type) {
         let colorBox = document.createElement('div');
         colorBox.classList.add('dropdown-color');
 
+        let colorContainer = document.createElement('div');
+        colorBox.classList.add('color-container');
+
         let colorName = document.createElement('label');
         colorName.textContent = colors[i].color;
         colorName.classList.add('dropdown-color-label');
@@ -882,7 +885,8 @@ function renderColorsDropdown(colors, filament_colors, parent, filament_type) {
         })
 
         colorName.append(colorCheck);
-        colorBox.append(colorName);
+        colorContainer.append(colorName);
+        colorBox.append(colorContainer);
         colorBox.append(removeButton);
         dropdownList.append(colorBox);
     }

@@ -303,10 +303,8 @@ def filament(action):
             in_stock = request.form['in_stock']
             db.add_filament(filament_type, in_stock)
             black_id = db.get_color_id('black')
-            blue_id = db.get_color_id('blue')
             filament_id = db.get_filament_id(filament_type)
             db.add_filament_color(filament_id, black_id)
-            db.add_filament_color(filament_id, blue_id)
         elif action == 'update':
             in_stock = request.form['in_stock']
             db.update_filament(filament_type, in_stock)
@@ -381,7 +379,6 @@ def get_filament_inventory():
         for each in filament_colors:
             for i in filament_colors[each]:
                 i.update({'color': db.get_color(i['color_id'])})
-        print(filament_colors)
 
         colors = db.get_colors()
 

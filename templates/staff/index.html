@@ -17,11 +17,12 @@
       src="{{ url_for('static', filename='images/psu_logo_svg.svg') }}"
       alt="Portland State Logo"
     />
-    <section class="staff-header-buttons">
+    <div class="staff-header-buttons">
       <button class="staff-header-button" id="pending-page-button" onclick="openPendingPage()">Pending Orders</button>
       <button class="staff-header-button" id="approved-page-button" onclick="openApprovedPage()">Approved Orders</button>
       <button class="staff-header-button" id="denied-page-button" onclick="openDeniedPage()">Denied Orders</button>
-    </section>
+      <button class="staff-header-button" id="inventory-page-button" onclick="openInventoryPage()">Filament Inventory</button>
+    </div>
   </div>
   <div class="staff-header-box">
     <h1 class="staff-header-content">PARQE STAFF PAGE</h1>
@@ -32,7 +33,7 @@
         <div class="jobs-box-header-underline"></div>   
       </div>
       <p id="no-jobs-message"></p>
-      <table id="jobs-table">
+      <table id="jobs-table" class="staff-table">
         <thead>
           <th id="table-price" class="table-header">Price</th>
           <th id="table-email" class="table-header">Email</th>
@@ -48,13 +49,68 @@
         </thead>
         <tbody id="table-rows"></tbody>
       </table>
-      <div class="reject-order-modal">
+      <table id="filament-table" class="staff-table">
+        <thead>
+          <th id="filament-table-type" class="table-header">Type</th>
+          <th id="filament-table-in-stock" class="table-header">In Stock</th>
+          <th id="filament-table-colors" class="table-header">Colors</th>
+          <th id="filament-table-buttons"></th>
+        </thead>
+        <tbody id="filament-table-rows"></tbody>
+      </table>
+      <div class="staff-modal" id="reject-order-modal">
         <div class="reject-order-modal-content">
           <p>Please state why this order was not approved, your message will be relayed to the submitter via email: </p>
           <textarea placeholder="Type here.." class="reject-modal-input" id="reject-modal-input"></textarea>
           <div class="modal-button-container">
             <button class="reject-modal-button" id="reject-modal-submit-button">SUBMIT</button>
             <button class="reject-modal-button" id="reject-modal-cancel-button">CANCEL</button>
+          </div>
+        </div>
+      </div>
+      <div class="staff-modal" id="add-filament-modal">
+        <div class="add-filament-modal-content">
+         <div class="add-filament-modal-input-container">
+          <label for="add-filament-modal-filament-type" class="add-filament-modal-label" id="add-filament-modal-filament-type-label">Filament type:</label> 
+          <input type="text" id="add-filament-modal-filament-type" name="add-filament-modal-filament-type" class="add-filament-modal-input" placeholder="Type here.." />
+         </div>
+         <div class="add-filament-modal-checkbox-container">
+          <label for="add-filament-modal-in-stock-checkbox" class="add-filament-modal-label" id="add-filament-modal-in-stock-checkbox-label">In-stock?</label>
+          <input type="checkbox" id="add-filament-modal-in-stock-checkbox" name="add-filament-modal-in-stock-checkbox" class="in-stock-checkbox" />
+         </div>
+         <div class="modal-button-container">
+          <button class="add-filament-modal-button" id="add-filament-modal-submit-button">SUBMIT</button>
+          <button class="add-filament-modal-button" id="add-filament-modal-cancel-button">CANCEL</button>
+         </div>
+        </div>
+      </div>
+      <div class="staff-modal" id="delete-filament-modal">
+        <div class="delete-filament-modal-content">
+          <p id="delete-filament-modal-text"></p>
+          <div class="modal-button-container">
+            <button class="delete-filament-modal-button" id="delete-filament-modal-submit-button">SUBMIT</button>
+            <button class="delete-filament-modal-button" id="delete-filament-modal-cancel-button">CANCEL</button>
+          </div>
+        </div>
+      </div>
+      <div class="staff-modal" id="add-color-modal">
+        <div class="add-filament-modal-content">
+         <div class="add-filament-modal-input-container">
+          <label for="add-color-modal-color-name" class="add-filament-modal-label" id="add-color-modal-color-name-label">Color:</label> 
+          <input type="text" id="add-color-modal-color-name" name="add-color-modal-color-name" class="add-filament-modal-input" placeholder="Type here.." />
+         </div>
+         <div class="modal-button-container">
+          <button class="add-filament-modal-button" id="add-color-modal-submit-button">SUBMIT</button>
+          <button class="add-filament-modal-button" id="add-color-modal-cancel-button">CANCEL</button>
+         </div>
+        </div>
+      </div>
+      <div class="staff-modal" id="delete-color-modal">
+        <div class="delete-filament-modal-content">
+          <p id="delete-color-modal-text"></p>
+          <div class="modal-button-container">
+            <button class="delete-filament-modal-button" id="delete-color-modal-submit-button">SUBMIT</button>
+            <button class="delete-filament-modal-button" id="delete-color-modal-cancel-button">CANCEL</button>
           </div>
         </div>
       </div>

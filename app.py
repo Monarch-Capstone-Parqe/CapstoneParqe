@@ -287,6 +287,109 @@ def review_orders():
         app.logger.critical(f"Error in order route: {e}")
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
 
+@app.route('/staff/filament/<action>', methods=['POST', 'PUT', 'DELETE'])
+@requires_auth
+def filament(action):
+    """
+    Modify filaments based on the specified action.
+
+    Args:
+        action: Action to be carried out
+    """
+    try:
+        filament_type = request.form['filament_type']
+
+        if action == 'add':
+            in_stock = request.form['in_stock']
+            db.add_filament(filament_type, in_stock)
+            black_id = db.get_color_id('black')
+            filament_id = db.get_filament_id(filament_type)
+            db.add_filament_color(filament_id, black_id)
+        elif action == 'update':
+            in_stock = request.form['in_stock']
+            db.update_filament(filament_type, in_stock)
+        elif action == 'remove':
+            db.remove_filament(filament_type)
+        elif action == 'add_color':
+            color_id = request.form['color_id'] 
+            filament_id = db.get_filament_id(filament_type)
+            db.add_filament_color(filament_id, color_id)
+        elif action == 'remove_color':
+            color_id = request.form['color_id'] 
+            filament_id = db.get_filament_id(filament_type)
+            db.remove_filament_color(filament_id, color_id)
+        else:
+            return jsonify({'error': 'Invalid action type'}), HTTPStatus.BAD_REQUEST
+     
+        return jsonify({'message': 'Update received'}), HTTPStatus.OK
+    
+    # Reraise client errors
+    except HTTPException:
+        raise  
+    # Unkown
+    except Exception as e:
+        app.logger.critical(f"Error in filament route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+   
+@app.route('/staff/color/<action>', methods=['POST', 'DELETE'])
+@requires_auth
+def color(action):
+    """
+    Modify colors based on the specified action.
+
+    Args:
+        action: Action to be carried out
+    """
+
+    try:
+        if action == 'add':
+            color_name = request.form['color']
+            db.add_color(color_name)
+        elif action == 'remove':
+            db.remove_color(request.form['id'])
+        else:
+            return jsonify({'error': 'Invalid action type'}), HTTPStatus.BAD_REQUEST
+        
+        return jsonify({'message': 'Update received'}), HTTPStatus.OK
+    
+    # Reraise client errors
+    except HTTPException:
+        raise  
+    # Unkown
+    except Exception as e:
+        app.logger.critical(f"Error in color route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+
+@app.route('/staff/get_filament_inventory', methods=['GET'])
+@requires_auth
+def get_filament_inventory():
+    """
+    Retrieve filament inventory
+
+    Returns:
+        JSON response containing the retrieved filament types and associated colors
+    """
+    try:
+        filaments = db.get_filaments()
+        filament_colors = {}
+
+        for each in filaments:
+            filament_colors.update({each['id']: db.get_filament_colors(each['id'])})
+
+        for each in filament_colors:
+            for i in filament_colors[each]:
+                i.update({'color': db.get_color(i['color_id'])})
+
+        colors = db.get_colors()
+
+        return jsonify({'filaments': filaments, 'filament_colors': filament_colors, 'colors': colors}), HTTPStatus.OK
+    # Reraise client errors
+    except HTTPException:
+        raise  
+    # Unkown
+    except Exception as e:
+        app.logger.critical(f"Error in filament inventory route: {e}")
+
 @app.route('/staff/close_order', methods=['PUT'])
 @requires_auth
 def close_order():

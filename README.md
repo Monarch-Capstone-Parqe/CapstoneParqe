@@ -1,4 +1,4 @@
-# CapstoneParqe
+# CapstonePARQE
 
 
 # Table of Contents
@@ -12,16 +12,30 @@
 3. Conclusion
 
 
-
 # Introduction <a name="intro"></a>
-PSU capstone project from team Monarch
-Link to more detailed Documentaion [Pareq Document]().
+
+Welcome to the Portland State University Capstone Project, brought to you by Team Monarch. 
+This initiative focuses on the development of the PrusaSlicer Automated Routing and Quoting Engine (PARQE) for Portland State University.
+
+For detailed documentation, refer to [PARQE Document]().
 
 ## Project Description <a name="projectDesc"></a>
-This capstone project is to develop the PrusaSlicer Automated Routing and Quoting Engine (PARQE). Which aims to modernize and automate the 3D printing submission workflow in the Electronics Prototyping Lab. 
+
+**Objective:**
+The primary objective of this project is to revolutionize the 3D printing submission workflow within the Portland State University Electronics Prototyping Lab. 
+Through the implementation of the PrusaSlicer Automated Routing and Quoting Engine (PARQE), we aim to introduce modernization and automation to the existing processes.
+
+**Key Goals:**
+- Streamline the design-to-prototype journey for students.
+- Enhance the efficiency of 3D printing submissions.
+- Integrate seamlessly with PrusaSlicer and OctoPrint for optimal functionality.
+- Provide a user-friendly interface for both students and staff.
+
+This capstone project, led by Team Monarch, is poised to make a significant impact on the Electronics Prototyping Lab, fostering innovation and efficiency in the realm of 3D printing at Portland State University.
+
 
 ## Project Details <a name="projectDetails"></a>
-There are 5 main componets to this project
+The project consists of 5 main componets:
 
 1. [User Interface](#UserApi)
 2. [Staff Interface](#StaffApi)
@@ -32,64 +46,146 @@ There are 5 main componets to this project
 ---
 ### *User API* <a name="UserApi"></a>
 #### Purpose:
-The User webpage/API is the first step for PARQE which allows users to submit 3d models in .stl, .3mf, .stp, or .step format and allow users to alter printing configuration. 
+The User API is a crucial component of the PARQE project, dedicated to providing a seamless and user-friendly experience for individuals interacting with the system.
 
 #### Functionality:
+The User API offers the following features:
 
+1. **User Authentication:**
+   - Allows users to securely log in to the PARQE system, ensuring data privacy and user-specific interactions.
+
+2. **File Submission:**
+   - Enables users to submit 3D models in various formats, including STL, .3MF, .STP, or .STEP. This functionality forms the core of the design submission process.
+
+3. **Printing Configuration:**
+   - Empowers users to customize printing configurations, providing flexibility and control over the 3D printing process.
+
+4. **User Dashboard:**
+   - Offers a personalized dashboard where users can track the status of their submitted designs, view past print jobs, and manage their account settings.
+
+#### Workflow:
+1. **User Authentication:**
+   - Users are required to log in to access the full functionality of the User API. This step ensures a secure and personalized experience.
+
+2. **File Submission:**
+   - Users can upload 3D models using supported file formats through a user-friendly interface. The system validates and processes the submitted files for further review.
+
+3. **Printing Configuration:**
+   - Users have the option to adjust printing configurations, such as print quality, materials, and other relevant parameters before finalizing the submission.
+
+4. **Submission Review:**
+   - The User API provides a submission review page, allowing users to confirm their selections, ensuring accuracy before the design is sent for managerial approval.
+
+The User API plays a pivotal role in empowering users to interact with the PARQE project efficiently and effectively, facilitating a streamlined workflow from design submission to the final 3D print.
 
 ---
-### 2) Staff API <a name="StaffApi"></a>
+### 2) *Staff API* <a name="StaffApi"></a>
 #### Purpose:
-The Staff webpage/API is a manageral webpage which allows staff to view, approve, and deny incomming print jobs. 
+The Staff API serves as the managerial hub within the PARQE project, facilitating efficient oversight and control over incoming print jobs.
 
 #### Functionality:
-There are 3 pages 
-1. Pending page
-2. Approved page
-3. Denied page
+The Staff API encompasses the following key functionalities:
 
-The pending will be the first page the EPL staff will view. This page list jobs that have been submitted by users through the User API. 
+1. **Pending Page:**
+   - The Pending Page provides an overview of all print jobs that have been submitted by users through the User API but are awaiting managerial approval.
+   - Staff members can review details of each pending job, including user information, design specifications, and proposed print configurations.
 
-Apporve page will list all proved print jobs
+2. **Approved Page:**
+   - The Approved Page consolidates a list of all print jobs that have received managerial approval. This section serves as a comprehensive record of designs that are ready for the printing process.
+   - Staff members can access detailed information about each approved job, ensuring clarity and transparency in the workflow.
 
-Denied page will list all denied print jobs 
+3. **Denied Page:**
+   - The Denied Page displays a catalog of print jobs that have been rejected by managerial review. This section provides insights into the reasons for denial and offers an opportunity for staff to communicate feedback to users.
+   - Staff members can access relevant details and communicate denial reasons, fostering effective collaboration between staff and users.
+
+#### Workflow:
+1. **Pending Page Review:**
+   - Staff members log in to the Staff API and navigate to the Pending Page, where they can assess design submissions pending managerial approval.
+   - Each entry provides a summary of user-submitted designs, allowing staff to make informed decisions.
+
+2. **Approval Process:**
+   - On the Approved Page, staff members can view and finalize their approvals for designs that meet the required criteria.
+   - Detailed information, including print configurations and user details, is accessible for thorough review.
+
+3. **Denial Process:**
+   - The Denied Page aids staff in reviewing and documenting reasons for denying specific print jobs.
+   - Staff members can provide feedback to users, facilitating a collaborative and constructive approach.
+
+The Staff API streamlines managerial responsibilities, offering a centralized platform for reviewing, approving, and denying print jobs, ultimately contributing to an organized and efficient 3D printing workflow.
 
 ---
-### 3) Backend <a name="Backend"></a>
+### 3) *Backend* <a name="Backend"></a>
 Related Files
 1. file 1
 2. file 2
 3. file 3
    
 #### Purpose:
-Acts as the glue which allow differnt compenets of the PARQE project to communicate with each other 
+The Backend component serves as the central hub, orchestrating seamless communication and integration among the various modules of the PARQE project.
+
 #### Functionality:
+The Backend is responsible for:
+- Efficiently routing data and requests between the User API, Staff API, Octoprint, and Database components.
+- Managing the flow of information to ensure timely processing of user submissions, staff approvals, and printing operations.
+- Handling file-related operations, such as storage, retrieval, and organization, to support the overall functionality of the system.
+- Implementing robust data validation and error handling mechanisms to ensure the reliability of the entire workflow.
+- Facilitating real-time updates and notifications between different parts of the system.
+
+This component acts as the backbone of PARQE, ensuring a cohesive and integrated operation throughout the entire project.
 
 ---
-### 4) Octoprint <a name="Octo"></a>
+### 4) *Octoprint* <a name="Octo"></a>
 
-#### Purpose:
+**Purpose:**
+OctoPrint serves as the pivotal bridge, connecting the PARQE system to the array of 3D printers within the Portland State University Electronics Prototyping Lab. 
+This integral component facilitates communication and control between the PARQE system and the diverse 3D printing infrastructure.
 
-#### Functionality:
+**Functionality:**
+- **Printer Connectivity:** OctoPrint establishes and manages connections with all available 3D printers within the lab, ensuring a unified network for streamlined operations.
+
+- **Job Queuing:** It acts as the central hub for managing print job queues, orchestrating the orderly execution of tasks based on managerial approvals and user submissions.
+
+- **Real-time Monitoring:** OctoPrint provides real-time monitoring capabilities, allowing users and staff to track the progress of ongoing print jobs and respond to any issues promptly.
+
+In essence, OctoPrint is the linchpin that harmonizes the PARQE project with the diverse 3D printing resources, enabling a cohesive and efficient workflow in the Electronics Prototyping Lab at Portland State University.
 
 ---
-### 5) Database <a name="Database"></a>
+### 5) *Database* <a name="Database"></a>
 
-#### Purpose:
+**Purpose:**
+The database component plays a pivotal role in storing, managing, and retrieving crucial data integral to the PARQE project's functionality. 
+It serves as the centralized repository for various aspects of the 3D printing submission workflow.
 
-#### Functionality:
+**Functionality:**
+- **User Data Storage:** The database securely stores user information, preferences, and historical submission data. This ensures a personalized and streamlined experience for users interacting with the PARQE system.
 
+- **Job Records:** Every print job submitted through the User API undergoes meticulous documentation within the database. This includes details such as user submissions, managerial approvals, and denial records, forming a comprehensive history of 3D printing activities.
+
+- **Configuration Settings:** Printing configurations, both user-altered and manager-approved, are stored in the database. This information is seamlessly retrieved during the printing process, ensuring accurate and consistent settings for each job.
+
+- **Audit Trails:** The database maintains detailed logs and audit trails, providing transparency into system activities. This feature aids troubleshooting, analytics, and overall system performance evaluation.
+
+In summary, the Database component acts as the reliable foundation, ensuring data integrity and accessibility throughout the PARQE project, thereby contributing significantly to the streamlined and efficient 3D printing workflow at Portland State University's Electronics Prototyping Lab.
+
+---
 ## Capstone Team <a name="capstoneTeam"></a>
-List of capstone teams and members who participated in the development of PARQE
+List of Capstone teams and members who have participated in the development of PARQE project
 1. Team Monarch (Fall-Winter 2023-24)
    - Team Lead: Michael Do
-   - Team Memebers: 
+   - Team Members:
+     - Fairuz Mohamad Yusuf
+     - Ryan Niiya
+     - Jordan
+     - Andrew
+     - David
+     - Matthew Mahnke
+     - Alan
 2. TBA
    - Team Lead: N/A
-   - Team Memebers: N/A
+   - Team Members: N/A
 
 
-
+# Guide
 # How to Set Up Development Environment <a name="Set"></a>
 > [!NOTE]
 > It is recommended for developers to develop on Windows and Linux (Mac is not recommended due to nuances)
@@ -111,7 +207,7 @@ List of capstone teams and members who participated in the development of PARQE
 ### Setting Up Local Branch
 1. Create local folder
 2. Open Git Bash and navivagte to previoursly created folder
-3. Once in desided direcoty, clone repo
+3. Once in desided directory, clone repo
 ```
 git clone https://github.com/Monarch-Capstone-Parqe/CapstoneParqe.git
 ```

@@ -18,7 +18,7 @@ def check_db_connect():
 def create_tables():
     with engine.connect() as conn:
         # This line is for development only
-        conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
+        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
 
         # Create the staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS staff("
@@ -74,6 +74,10 @@ def create_tables():
         color_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM colors WHERE color = :color)"), {"color": "black"}).scalar()
         if not color_exists:
            conn.execute(text("INSERT INTO colors(color) VALUES (:color)"), {"color": "black"})
+
+        blue_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM colors WHERE color = :color)"), {"color": "blue"}).scalar()
+        if not blue_exists:
+            conn.execute(text("INSERT INTO colors(color) VALUES (:color)"), {"color": "blue"})
 
         conn.commit()
 
@@ -397,15 +401,15 @@ def add_color(color):
 
         conn.commit()
 
-def remove_color(color):
+def remove_color(color_id):
     """
     Remove a color from the 'colors' table 
 
     Parameters:
-        color (str): The color to be removed
+        color_id (int): The id of the color to be removed
     """
     with engine.connect() as conn:
-        conn.execute(text("DELETE FROM colors WHERE color=:color"), {"color": color})
+        conn.execute(text("DELETE FROM colors WHERE id=:id"), {"id": color_id})
 
         conn.commit()
 
@@ -421,7 +425,12 @@ def get_color(color_id):
     """
     with engine.connect() as conn:
         result = conn.execute(text("SELECT color FROM colors WHERE id=:color_id"), {"color_id": color_id})
-        return result
+        result_dict = []
+        for row in result:
+            row_as_dict = row._mapping
+            result_dict.append(dict(row_as_dict))
+        color = result_dict[0]['color']
+        return color
     
 def get_color_id(color):
     """
@@ -480,7 +489,7 @@ def remove_filament_color(filament_id, color_id):
         color_id (int): The id of the color
     """
     with engine.connect() as conn:
-        conn.execute(text("REMOVE FROM filament_colors WHERE filament_id=:filament_id AND color_id=:color_id)"),
+        conn.execute(text("DELETE FROM filament_colors WHERE filament_id=:filament_id AND color_id=:color_id"),
                      {"filament_id": filament_id, "color_id": color_id})
         
         conn.commit()

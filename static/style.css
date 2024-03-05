@@ -498,7 +498,7 @@ button[id="dark-mode-toggle"]:hover {
   width: 100%;
 }
 
-#jobs-table {
+.staff-table {
   display: none;
   border-collapse: collapse;
   width: 100%;
@@ -699,6 +699,7 @@ button[id="dark-mode-toggle"]:hover {
   height: 50px;
   border: none;
   justify-content: center;
+  margin-top: 30px;
 }
 
 .inventory-buttons button[id='add-button'] {
@@ -721,6 +722,18 @@ button[id="dark-mode-toggle"]:hover {
   text-decoration: underline;
   text-underline-offset: -1%;
   text-decoration-thickness: 1px;
+}
+
+#filament-table-type {
+  width: 30%
+}
+
+#filament-table-in-stock {
+  width: 25%
+}
+
+#filament-table-colors {
+  width: 50%;
 }
 
 .filament-table-buttons {
@@ -761,6 +774,123 @@ button[id="dark-mode-toggle"]:hover {
 
 .in-stock-checkbox:checked {
   background-color: #007bff;
+}
+
+.colors-dropdown {
+  position: relative;
+  width: 70%;
+}
+
+.colors-dropdown .colors-dropdown-list {
+  position: absolute;
+  top: 40px;
+  left: 0px;
+  right: 0px;
+  box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .15);
+  transform-origin: 50% 0;
+  transform: scale(1, 0);
+  transition: transform .15s ease-in-out .15s;
+  max-height: 66vh;
+  overflow-y: scroll;
+  z-index: 1000;
+  border: 1px solid #404040;
+  background-color: white;
+}
+
+.colors-dropdown .dropdown-color {
+  display: flex;
+  margin: 15px;
+  opacity: 0;
+  transition: opacity .15s ease-in-out;
+  justify-content: space-between;
+}
+
+.colors-dropdown .dropdown-color-label {
+}
+
+.colors-dropdown .colors-dropdown-label {
+  display: block;
+  height: 30px;
+  background: #fff;
+  border: 1px solid #404040;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.colors-dropdown .colors-dropdown-label::before {
+  content: '▼';
+  float: right;
+}
+
+.colors-dropdown.on .colors-dropdown-list {
+  transform: scale(1, 1);
+  transition-delay: 0s;
+}
+
+.colors-dropdown.on .colors-dropdown-list .dropdown-color {
+  opacity: 1;
+  transition-delay: .2s;
+}
+
+.colors-dropdown.on .colors-dropdown-label::before {
+  content: '▲';
+}
+
+.remove-color-button {
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1em;
+  font-family: "Acumin-ECBPro";
+  float: right;
+  height: 37.5px;
+  width: 75px;
+  cursor: pointer;
+}
+
+.remove-color-button:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.dropdown-buttons {
+  display: flex;
+  border: none;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 15px;  
+  opacity: 0;
+  transition: opacity .15s ease-in-out;
+}
+
+.colors-dropdown.on .colors-dropdown-list .dropdown-buttons {
+  opacity: 1;
+  transition-delay: .2s;
+}
+
+.add-color-button {
+  background-color: white;
+  width: 75px;
+  height: 37.5px;
+  font-size: 1em;
+  border: 2px solid #6d8d24;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  margin-right: 10px;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+
+.add-color-button:hover {
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
 }
 
 @keyframes shake {
@@ -868,7 +998,7 @@ button[id="dark-mode-toggle"]:hover {
 
 /************** end reject order modal **************/
 
-/************** add filament modal **************/
+/************** delete filament modal **************/
 
 .delete-filament-modal-content {
   background-color: #fefefe;
@@ -927,9 +1057,47 @@ button[id="dark-mode-toggle"]:hover {
   text-decoration-thickness: 1px;
 }
 
-/************** end add filament modal **************/
+/************** end delete filament modal **************/
 
-/************** delete filament modal **************/
+/************** delete color modal **************/
+
+.delete-filament-modal-content button[id="delete-color-modal-submit-button"] {
+  border: 2px solid #6d8d24;
+  background-color: white;
+  margin-right: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.delete-filament-modal-content button[id="delete-color-modal-submit-button"]:hover {
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.delete-filament-modal-content button[id="delete-color-modal-cancel-button"] {
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.delete-filament-modal-content button[id="delete-color-modal-cancel-button"]:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+/************** end delete color modal **************/
+
+/************** add filament modal **************/
 
 .add-filament-modal-content {
   background-color: #fefefe;
@@ -1021,7 +1189,45 @@ button[id="dark-mode-toggle"]:hover {
   text-decoration-thickness: 1px;
 }
 
-/************** end delete filament modal **************/
+/************** end add filament modal **************/
+
+/************** add color modal **************/
+
+.add-filament-modal-content button[id="add-color-modal-submit-button"] {
+  border: 2px solid #6d8d24;
+  background-color: white;
+  margin-right: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.add-filament-modal-content button[id="add-color-modal-submit-button"]:hover {
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.add-filament-modal-content button[id="add-color-modal-cancel-button"] {
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.add-filament-modal-content button[id="add-color-modal-cancel-button"]:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+/************** end add color modal **************/
 
 /************** gcode preview modal **************/
 

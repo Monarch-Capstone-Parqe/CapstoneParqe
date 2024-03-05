@@ -389,7 +389,7 @@ function openApprovedPage() {
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
-    removeAllFilaments();l
+    removeAllFilaments();
     removeAllOrders();
     jobsBoxHeaderContent.innerText = 'APPROVED ORDERS';
     noJobsMessage.innerText = 'No orders have been approved.';
@@ -616,7 +616,7 @@ function refreshFilamentInventory()
         removeAllFilaments();
         renderFilamentButtons();
         for(let i = 0; i < data.filaments.length; i++) {
-            renderFilamentType(data.filaments[i], data.colors[i+1])
+            renderFilamentType(data.filaments[i], data.filament_colors[data.filaments[i].id], data.colors)
         }
     })
     .catch((error) => {
@@ -650,9 +650,6 @@ function updateFilament(type, in_stock)
         method: "PUT",
         body: formData
     })
-    .then(() => {
-        refreshFilamentInventory();
-    })
     .catch((error) => {
         console.error("Error: ", error);
     })
@@ -667,6 +664,65 @@ function deleteFilament(type)
         body: formData
     })
     .then(() => { 
+        refreshFilamentInventory();
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    })
+}
+
+function addFilamentColor(type, color_id)
+{
+    const formData = new FormData();
+    formData.append("filament_type", type);
+    formData.append("color_id", color_id);
+    fetch("/staff/filament/add_color", {
+        method: "POST",
+        body: formData
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    })
+}
+
+function removeFilamentColor(type, color_id)
+{
+    const formData = new FormData();
+    formData.append("filament_type", type);
+    formData.append("color_id", color_id);
+    fetch("/staff/filament/remove_color", {
+        method: "DELETE",
+        body: formData
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    })
+}
+
+function addColor(color) 
+{
+    const formData = new FormData();
+    formData.append('color', color);
+    fetch("/staff/color/add", {
+        method: "POST",
+        body: formData
+    })
+    .then(() => {
+        refreshFilamentInventory();
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    })
+}
+
+function deleteColor(color_id) {
+    const formData = new FormData();
+    formData.append('id', color_id);
+    fetch("/staff/color/remove", {
+        method: "DELETE",
+        body: formData
+    })
+    .then(() => {
         refreshFilamentInventory();
     })
     .catch((error) => {
@@ -702,10 +758,8 @@ function initFilamentsTable() {
     document.getElementById('filament-table').style.display = 'block';
 }
 
-function renderFilamentType(filament, colors) {
-    console.log(filament);
-    console.log(colors);
-    const exists = document.getElementById(filament.id)
+function renderFilamentType(filament, filament_colors, colors) {
+    const exists = document.getElementById(filament.type)
     if(exists) {
         return
     }
@@ -717,12 +771,133 @@ function renderFilamentType(filament, colors) {
         initFilamentsTable();
     }
     // insert the order into the table to display on staff page
-    insertFilamentTableRow(filament, colors);
+    insertFilamentTableRow(filament, filament_colors, colors);
 }
 
-function insertFilamentTableRow(filament, colors) {
+function initColorsDropdown(dropdown, filament_type) {
+    let isOpen = false;
+    let label = document.getElementById(filament_type + '-dropdown-label');
+    let list = document.getElementById(filament_type + '-dropdown-list'); 
+    let inputs = dropdown.querySelectorAll('input[type="checkbox"]');
+
+    label.addEventListener('click', () => {
+        console.log('clicked');
+        if(!isOpen) {
+            isOpen = true;
+            dropdown.classList.add('on');
+        }
+        else {
+            isOpen = false;
+            dropdown.classList.remove('on');
+        }
+    });
+
+    for(let i = 0; i < inputs.length; i++) {
+        inputs[i].addEventListener('change', () => {
+            updateDropdownLabel(label, inputs);
+        })
+    }
+    updateDropdownLabel(label, inputs);
+
+    let buttonBox = document.createElement('div');
+    buttonBox.classList.add('dropdown-buttons');
+
+    let addButton = document.createElement('button');
+    addButton.classList.add('add-color-button');
+    addButton.textContent = 'ADD';
+
+    addButton.addEventListener('click', () => {
+        openAddColorModal();
+    })
+
+    buttonBox.append(addButton);
+
+    list.append(buttonBox);
+}
+
+function updateDropdownLabel(label, inputs) {
+    label.innerText = '';
+    let checkedInputs = [];
+    for(let i = 0; i < inputs.length; i++) {
+        if(inputs[i].checked) {
+            checkedInputs.push(inputs[i]);
+        }
+    }
+
+    for(let i = 0; i < checkedInputs.length; i++) {
+        if(i+1 == checkedInputs.length) {
+            label.innerText += checkedInputs[i].parentNode.innerText;
+        }
+        else {
+            label.innerText += checkedInputs[i].parentNode.innerText + ', ';
+        }
+    }
+}
+
+function renderColorsDropdown(colors, filament_colors, parent, filament_type) {
+    let dropdown = document.createElement('div');
+    dropdown.classList.add('colors-dropdown');
+    dropdown.id = filament_type + '-dropdown';
+    let dropdownLabel = document.createElement('label');
+    dropdownLabel.id = filament_type + '-dropdown-label';
+    dropdownLabel.classList.add('colors-dropdown-label');
+
+    let dropdownList = document.createElement('div');
+    dropdownList.id = filament_type + '-dropdown-list';
+    dropdownList.classList.add('colors-dropdown-list');
+
+    for(let i = 0; i < colors.length; i++) {
+        let colorCheck = document.createElement('input');
+        colorCheck.type = 'checkbox';
+        colorCheck.classList.add('in-stock-checkbox');
+        colorCheck.id = colors[i].id;
+        for(let i = 0; i < filament_colors.length; i++) {
+            if(colorCheck.id == filament_colors[i].color_id) {
+                colorCheck.checked = true;
+            }
+        }
+
+        colorCheck.addEventListener('change', () => {
+            if(colorCheck.checked) {
+                addFilamentColor(filament_type, colorCheck.id);
+            }
+            else {
+                removeFilamentColor(filament_type, colorCheck.id);
+            }
+        })
+
+        let colorBox = document.createElement('div');
+        colorBox.classList.add('dropdown-color');
+
+        let colorName = document.createElement('label');
+        colorName.textContent = colors[i].color;
+        colorName.classList.add('dropdown-color-label');
+
+        let removeButton = document.createElement('button');
+        removeButton.classList.add('remove-color-button');
+        removeButton.textContent = 'REMOVE';
+
+        removeButton.addEventListener('click', () => {
+            openDeleteColorModal(colors[i].color, colorCheck.id);
+        })
+
+        colorName.append(colorCheck);
+        colorBox.append(colorName);
+        colorBox.append(removeButton);
+        dropdownList.append(colorBox);
+    }
+
+    dropdown.append(dropdownLabel);
+    dropdown.append(dropdownList);
+    parent.append(dropdown);
+    
+    initColorsDropdown(dropdown, filament_type);
+}
+
+function insertFilamentTableRow(filament, filament_colors, colors) {
     let tableRows = document.getElementById('filament-table-rows');
     let row = tableRows.insertRow();
+    console.log(filament);
 
     row.setAttribute('id', filament.type);
 
@@ -733,13 +908,25 @@ function insertFilamentTableRow(filament, colors) {
     
     typeCell.innerHTML = filament.type;
 
+    renderColorsDropdown(colors, filament_colors, colorsCell, filament.type);
+    let dropdown = document.getElementById(filament.type + '-dropdown');
+
     let inStockCheckBox = document.createElement('input');
     inStockCheckBox.type = 'checkbox';
     inStockCheckBox.checked = filament.in_stock;
+    if(!inStockCheckBox.checked) {
+        dropdown.style.display = 'none';
+    }
     inStockCheckBox.classList.add('in-stock-checkbox');
 
     inStockCheckBox.addEventListener('change', () => {
         updateFilament(filament.type, inStockCheckBox.checked);
+        if(inStockCheckBox.checked) {
+            dropdown.style.display = 'block';
+        }
+        else {
+            dropdown.style.display = 'none';
+        }
     })
 
     inStockCell.append(inStockCheckBox);
@@ -756,6 +943,11 @@ function insertFilamentTableRow(filament, colors) {
 
     buttonBox.append(removeButton);
     removeButtonCell.append(buttonBox);
+
+
+    typeCell.classList.add('table-data');
+    inStockCell.classList.add('table-data');
+    colorsCell.classList.add('table-data');
 }
 
 function openAddFilamentModal() {
@@ -767,24 +959,23 @@ function openAddFilamentModal() {
     addFilamentModal.style.display = 'block';
 
     addFilamentModalSubmitButton.onclick = function() {
-        const textInput = document.querySelector('.add-filament-modal-input');
+        const textInput = document.getElementById('add-filament-modal-filament-type');
         const input = textInput.value;
         console.log("INPUT: " + input)
         if (input.length == 0) {
             textInput.classList.add('modal-input-error');
-            textInput.placeholder = 'Please enter a filament type to continue..';
         }
         else { 
             addFilamentModal.style.display = 'none';
             textInput.classList.remove('modal-input-error');
-            textInput.placeholder = 'Type here..';
             textInput.value = '';
             addFilament(input, addFilamentModalCheckbox.checked);
+            addFilamentModalCheckbox.checked = false;
         }
     }
 
     addFilamentModalCancelButton.onclick = function() {
-        const textInput = document.querySelector('.add-filament-modal-input');
+        const textInput = document.getElementById('add-filament-modal-filament-type');
         addFilamentModal.style.display = 'none';
         textInput.classList.remove('modal-input-error');
         textInput.placeholder = 'Type here..';
@@ -811,6 +1002,57 @@ function openDeleteFilamentModal(type) {
     deleteFilamentModalCancelButton.onclick = function() {
         deleteFilamentModal.style.display = 'none';
     } 
+}
+
+function openAddColorModal() {
+    const addColorModal = document.getElementById('add-color-modal');
+    const addColorModalSubmitButton = document.getElementById('add-color-modal-submit-button');
+    const addColorModalCancelButton = document.getElementById('add-color-modal-cancel-button');
+
+    addColorModal.style.display = 'block';
+
+    addColorModalSubmitButton.onclick = function() {
+        const textInput = document.getElementById('add-color-modal-color-name');
+        const input = textInput.value;
+        console.log("INPUT: " + input)
+        if (input.length == 0) {
+            textInput.classList.add('modal-input-error');
+        }
+        else { 
+            addColorModal.style.display = 'none';
+            textInput.classList.remove('modal-input-error');
+            textInput.value = '';
+            addColor(input);
+        }
+    }
+
+    addColorModalCancelButton.onclick = function() {
+        const textInput = document.getElementById('add-color-modal-color-name');
+        addColorModal.style.display = 'none';
+        textInput.classList.remove('modal-input-error');
+        textInput.placeholder = 'Type here..';
+        textInput.value = '';
+    } 
+}
+
+function openDeleteColorModal(color, color_id) {
+    const deleteColorModal = document.getElementById('delete-color-modal');
+    const deleteColorModalSubmitButton = document.getElementById('delete-color-modal-submit-button'); 
+    const deleteColorModalCancelButton = document.getElementById('delete-color-modal-cancel-button');
+    const deleteColorModalText = document.getElementById('delete-color-modal-text');
+
+    deleteColorModalText.textContent = 'Press submit below to delete the color ' + color + '.';
+
+    deleteColorModal.style.display = 'block';
+
+    deleteColorModalSubmitButton.onclick = function() {
+        deleteColor(color_id);
+        deleteColorModal.style.display = 'none';
+    }
+
+    deleteColorModalCancelButton.onclick = function() {
+        deleteColorModal.style.display = 'none';
+    }
 }
 
 function removeFilamentButtons() {

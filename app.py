@@ -303,8 +303,10 @@ def filament(action):
             in_stock = request.form['in_stock']
             db.add_filament(filament_type, in_stock)
             black_id = db.get_color_id('black')
+            blue_id = db.get_color_id('blue')
             filament_id = db.get_filament_id(filament_type)
             db.add_filament_color(filament_id, black_id)
+            db.add_filament_color(filament_id, blue_id)
         elif action == 'update':
             in_stock = request.form['in_stock']
             db.update_filament(filament_type, in_stock)
@@ -331,7 +333,7 @@ def filament(action):
         app.logger.critical(f"Error in filament route: {e}")
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
    
-@app.route('/staff/color/<action>')
+@app.route('/staff/color/<action>', methods=['POST', 'DELETE'])
 @requires_auth
 def color(action):
     """
@@ -346,9 +348,11 @@ def color(action):
             color_name = request.form['color']
             db.add_color(color_name)
         elif action == 'remove':
-            db.remove_filament(request.form['id'])
+            db.remove_color(request.form['id'])
         else:
             return jsonify({'error': 'Invalid action type'}), HTTPStatus.BAD_REQUEST
+        
+        return jsonify({'message': 'Update received'}), HTTPStatus.OK
     
     # Reraise client errors
     except HTTPException:
@@ -369,13 +373,19 @@ def get_filament_inventory():
     """
     try:
         filaments = db.get_filaments()
-        print(filaments)
-        colors = {}
+        filament_colors = {}
 
         for each in filaments:
-            colors.update({each['id']: db.get_filament_colors(each['id'])})
+            filament_colors.update({each['id']: db.get_filament_colors(each['id'])})
 
-        return jsonify({'filaments': filaments, 'colors': colors}), HTTPStatus.OK
+        for each in filament_colors:
+            for i in filament_colors[each]:
+                i.update({'color': db.get_color(i['color_id'])})
+        print(filament_colors)
+
+        colors = db.get_colors()
+
+        return jsonify({'filaments': filaments, 'filament_colors': filament_colors, 'colors': colors}), HTTPStatus.OK
     # Reraise client errors
     except HTTPException:
         raise  

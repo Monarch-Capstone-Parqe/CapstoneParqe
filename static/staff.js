@@ -559,5 +559,27 @@ function openPreview(gcode_path)
 
 }
 
+//Search bar function that hides non-matching values from the table
+function searchOrders(){
+    var input, query, table, tr, td, txtValue;
+    input = document.getElementById("search-input");
+    query = input.value.toUpperCase();
+    table = document.getElementById("table-rows");
+    tr = table.getElementsByTagName("tr");
+    
+    for (var i = 0; i < tr.length; i++){
+        td = tr[i].getElementsByTagName("td")[1];
+        if(td){
+            txtValue = td.textContent || td.innerText || td.innerHTML;
+            if(txtValue.toUpperCase().indexOf(query) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+window.searchOrders = searchOrders;
+
 //Interval refreshing orders from database continuously to keep the page up to date
 let intervalId = setInterval(refreshOrdersWrapper, 10000);

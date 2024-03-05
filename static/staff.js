@@ -125,7 +125,7 @@ function refreshDeniedOrders()
     });
 }
 
-function refreshUnpaidOrders()
+function refreshPrintingOrders()
 {
     fetch("/staff/get_orders/unpaid", {
         method: "GET",
@@ -133,7 +133,7 @@ function refreshUnpaidOrders()
     .then((response) => response.json())
     .then((data) => {
         for(let i = 0; i < maxRender && i < data.orders.length; i++) {
-            renderUnpaidOrder(data.orders[i]);
+            renderPrintingOrders(data.orders[i]);
         }
         if(data.orders.length > maxRender) {
             renderLoadMoreButton();
@@ -157,8 +157,8 @@ function refreshOrdersWrapper()
     else if(window.location.hash == '#denied') {
         refreshDeniedOrders();
     }
-    else if(window.location.hash == '#unpaid') {
-        refreshUnpaidOrders();
+    else if(window.location.hash == '#printing') {
+        refreshPrintingOrders();
     }
 }
 
@@ -214,7 +214,7 @@ function renderDeniedOrder(order) {
     insertDeniedTableRow(order);
 }
 
-function renderUnpaidOrder(order)
+function renderPrintingOrders(order)
 {
     const exists = document.getElementById(order.id)
     if(exists) {
@@ -228,8 +228,9 @@ function renderUnpaidOrder(order)
         initJobsTable();
     }
     // insert the order into the table to display on staff page
-    insertUnpaidTableRow(order);
+    insertPrintingTableRow(order);
 }
+
 
 function renderLoadMoreButton() {
     const exists = document.getElementById('load-more-button');
@@ -331,9 +332,10 @@ function openApprovedPage() {
     removeAllOrders();
     jobsBoxHeaderContent.innerText = 'APPROVED ORDERS';
     noJobsMessage.innerText = 'No orders have been approved.';
-    document.getElementById('table-approved').classList.remove('hide');
     document.getElementById('table-denied').classList.add('hide');
-    document.getElementById('table-buttons').classList.add('hide');
+
+    document.getElementById('table-approved').classList.remove('hide');
+    document.getElementById('table-buttons').classList.remove('hide');
 
     refreshOrdersWrapper(); 
 }
@@ -377,21 +379,21 @@ function openDeniedPage() {
 }
 window.openDeniedPage = openDeniedPage;
 
-function openUnpaidPage() {
-    window.location.hash = 'unpaid';
+function openPrintingPage() {
+    window.location.hash = 'printing';
     const jobsBoxHeaderContent = document.getElementById('subheader-text');
     const noJobsMessage = document.getElementById('no-jobs-message');
 
     removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'UNPAID ORDERS';
-    noJobsMessage.innerText = 'No orders are have been approved for payment.';
+    jobsBoxHeaderContent.innerText = 'Ready for Print';
+    noJobsMessage.innerText = 'No orders are ready to print';
     document.getElementById('table-approved').classList.add('hide');
     document.getElementById('table-denied').classList.add('hide');
     document.getElementById('table-buttons').classList.remove('hide');
 
     refreshOrdersWrapper();
 }
-window.openUnpaidPage = openUnpaidPage
+window.openPrintingPage = openPrintingPage
 
 //Renders page of filament inventory
 function openInventoryPage() {
@@ -422,8 +424,8 @@ function initialLoad() {
     }
     else if(window.location.hash == '#denied') {
         openDeniedPage();
-    }else if(window.location.hash == '#unpaid') {
-        openUnpaidPage();
+    }else if(window.location.hash == '#printing') {
+        openPrintingPage();
     }
 }
 window.initialLoad = initialLoad;
@@ -503,8 +505,7 @@ function insertPendingTableRow(order) {
     row.insertCell(8).append(buttonBox);
 }
 
-//Similar to Pending Table, create Unpaid Pending orders
-function insertUnpaidTableRow(order) {
+function insertPrintingTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
 
@@ -538,34 +539,7 @@ function insertUnpaidTableRow(order) {
     quantityCell.classList.add('table-data');
     noteCell.classList.add('table-data');
 
-    let buttonBox = document.createElement('section');
-    buttonBox.classList.add('staff-buttons');
-
-    let approveButton = document.createElement('button');
-    approveButton.id = 'approve-button'
-    approveButton.addEventListener('click', () => {
-        approve_payment(order.id);
-    });
-    approveButton.textContent = 'APPROVE PAYMENT';
-
-    // let denyButton = document.createElement('button');
-    // denyButton.id = 'deny-button'
-    // denyButton.addEventListener('click', () => {
-    //     openRejectModal(order.id)
-    // });
-    // denyButton.textContent = 'DENY';
-
-    // let previewButton = document.createElement('button');
-    // previewButton.id = 'preview-button'
-    // previewButton.addEventListener('click', () => {
-    //     openPreview(order.gcode_path)
-    // });
-    // previewButton.textContent = 'PREVIEW';
-
-    // buttonBox.appendChild(previewButton);
-    buttonBox.appendChild(approveButton);
-    // buttonBox.appendChild(denyButton);
-    row.insertCell(8).append(buttonBox);
+   
 }
 
 // inserts an approved order into the jobs table
@@ -605,6 +579,19 @@ function insertApprovedTableRow(order) {
     quantityCell.classList.add('table-data');
     noteCell.classList.add('table-data');
     approvedCell.classList.add('table-data');
+
+    let buttonBox = document.createElement('section');
+    buttonBox.classList.add('staff-buttons');
+
+    let approveButton = document.createElement('button');
+    approveButton.id = 'approve-button'
+    approveButton.addEventListener('click', () => {
+        approve_payment(order.id);
+    });
+    approveButton.textContent = 'APPROVE PAYMENT';
+
+    buttonBox.appendChild(approveButton);
+    row.insertCell(9).append(buttonBox);
 }
 
 // inserts a denied order into the jobs table

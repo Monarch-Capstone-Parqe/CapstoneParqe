@@ -826,10 +826,10 @@ function updateDropdownLabel(label, inputs) {
 
     for(let i = 0; i < checkedInputs.length; i++) {
         if(i+1 == checkedInputs.length) {
-            label.innerText += checkedInputs[i].parentNode.innerText;
+            label.innerHTML += checkedInputs[i].parentNode.innerText;
         }
         else {
-            label.innerText += checkedInputs[i].parentNode.innerText + ', ';
+            label.innerHTML += checkedInputs[i].parentNode.innerText + ',&nbsp';
         }
     }
 }
@@ -869,9 +869,6 @@ function renderColorsDropdown(colors, filament_colors, parent, filament_type) {
         let colorBox = document.createElement('div');
         colorBox.classList.add('dropdown-color');
 
-        let colorContainer = document.createElement('div');
-        colorBox.classList.add('color-container');
-
         let colorName = document.createElement('label');
         colorName.textContent = colors[i].color;
         colorName.classList.add('dropdown-color-label');
@@ -885,8 +882,7 @@ function renderColorsDropdown(colors, filament_colors, parent, filament_type) {
         })
 
         colorName.append(colorCheck);
-        colorContainer.append(colorName);
-        colorBox.append(colorContainer);
+        colorBox.append(colorName);
         colorBox.append(removeButton);
         dropdownList.append(colorBox);
     }
@@ -994,7 +990,7 @@ function openDeleteFilamentModal(type) {
     const deleteFilamentModalCancelButton = document.getElementById('delete-filament-modal-cancel-button');
     const deleteFilamentModalText = document.getElementById('delete-filament-modal-text');
 
-    deleteFilamentModalText.textContent = 'Press submit below to delete the ' + type + ' filament type.';
+    deleteFilamentModalText.textContent = 'Press submit below to remove the ' + type + ' filament type.';
 
     deleteFilamentModal.style.display = 'block';
 

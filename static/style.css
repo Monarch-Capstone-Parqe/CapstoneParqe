@@ -816,9 +816,6 @@ button[id="dark-mode-toggle"]:hover {
   justify-content: space-between;
 }
 
-.colors-dropdown .dropdown-color-label {
-}
-
 .colors-dropdown .colors-dropdown-label {
   display: block;
   min-height: 25px;

@@ -32,9 +32,28 @@ There are 5 main componets to this project
 ---
 ### *User API* <a name="UserApi"></a>
 #### Purpose:
-The User webpage/API is the first step for PARQE which allows users to submit 3d models in .stl, .3mf, .stp, or .step format and allow users to alter printing configuration. 
+The User webpage/API is the interface in which a user interacts with PARQE in order to submit a 3d model for printing. Here the user can upload a 3d model in .stl, .3mf, .stp, or .step format and configure key print settings to ensure an optimal print. Default settings are selected by default in order to make the software accessible for users of all experience levels. Users will also have the option to include important details about their print for the staff to review and consider. This user facing API also has a built in dark/light mode switch to offer some stylistic customization to match the user's workspace.
 
 #### Functionality:
+The API consists of a submission form with the following field:
+
+   Email: The users email. Allows for identificaiton of user as well as to receive required follow up emails.
+
+   File: The 3d model file in .stl, .3mf, .stp, or .step format.
+
+   Filament Type: This field contains an up to date inventory of current filament types and colors in stock in the EPL. The inventory will be able to be edited via the staff API.
+
+   Nozzle Size: Availible nozzle sizes to choose from are 0.4mm and 0.6mm. 0.4mm will be selected by default.
+
+   Layer Height: Layer height options depend on nozzle size selection. A 0.4mm nozzle size selection will have options for 0.2mm (default) and 0.1mm layter heights. A 0.6mm nozzle size selection will have options for 0.3mm (default) and 0.15mm layer heights.
+
+   Infill Density: Infill density can range from 0% (no infill) to 100% (solid). 20% is selected by default.
+
+   Quanity: This value is for the quantity of prints that the user wants of the uploaded 3d model.
+   
+   Note: If the user has any additional important information or instructions for their print job that they want the staff to know, they can enter them here.
+
+Upon clicking the submit button on the form, the user will be guided through a series of custom modal windows. The first will have the user review and approve their print configuration. Upon approval, the data will be submitted to the staff API for review. If a succesful response is returned, the user will be notified via a modal window that their print has been submitted succesfully and provide them with next steps. If an error is returned, the user will be notified that there was an error and their print job was not submitted. 
 
 
 ---

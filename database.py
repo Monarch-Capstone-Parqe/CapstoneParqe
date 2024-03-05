@@ -40,18 +40,26 @@ def create_tables():
                             "price NUMERIC(6,2) NOT NULL,"
                             "date DATE DEFAULT CURRENT_DATE)"))
 
-        # Create the approved_orders table with a foreign key reference to staff table
+        # Create the approved_orders table
         conn.execute(text("CREATE TABLE IF NOT EXISTS approved_orders("
                             "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,"
                             "reviewed_by INTEGER REFERENCES staff(id))"))
 
-        # Create the denied_orders table with a foreign key reference to staff table
+        # Create the denied_orders table 
         conn.execute(text("CREATE TABLE IF NOT EXISTS denied_orders("
                             "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,"
                             "reviewed_by INTEGER REFERENCES staff(id))"))
 
-        # Create the pending_orders table with a foreign key reference to staff table
+        # Create the pending_orders table
         conn.execute(text("CREATE TABLE IF NOT EXISTS pending_orders("
+                            "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE)"))
+        
+        # Create the printing_orders table
+        conn.execute(text("CREATE TABLE IF NOT EXISTS printing_orders("
+                            "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE)"))
+        
+        # Create the closed orders table
+        conn.execute(text("CREATE TABLE IF NOT EXISTS closed_orders("
                             "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE)"))
         
         # Create the filaments table
@@ -215,6 +223,51 @@ def deny_order(order_id, email):
 
         conn.execute(text("DELETE FROM pending_orders WHERE order_id=:order_id"), {"order_id": order_id})
         conn.commit()
+
+def print_order(order_id):
+    """
+    Add an order to the 'printing_orders' table and remove it from the 'approved_orders' table.
+
+    Parameters:
+        order_id (int): The ID of the order.
+    """
+    with engine.connect() as conn:
+        # Add the order to the 'printing_orders' table
+        add_query = text("""
+            INSERT INTO printing_orders (order_id)
+            VALUES (:order_id)
+        """)
+        conn.execute(add_query, {'order_id': order_id})
+
+        # Remove the order from the 'approved_orders' table
+        remove_query = text("""
+            DELETE FROM approved_orders
+            WHERE order_id = :order_id
+        """)
+        conn.execute(remove_query, {'order_id': order_id})
+
+def close_order(order_id):
+    """
+    Add an order to the 'closed_orders' table and remove it from the 'printing_orders' table.
+
+    Parameters:
+        order_id (int): The ID of the order.
+    """
+    with engine.connect() as conn:
+        # Add the order to the 'closed_orders' table
+        add_query = text("""
+            INSERT INTO closed_orders (order_id)
+            VALUES (:order_id)
+        """)
+        conn.execute(add_query, {'order_id': order_id})
+
+        # Remove the order from the 'printing_orders' table
+        remove_query = text("""
+            DELETE FROM printing_orders
+            WHERE order_id = :order_id
+        """)
+        conn.execute(remove_query, {'order_id': order_id})
+
 
 def get_staff_emails() -> list:
     """

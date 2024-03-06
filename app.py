@@ -214,10 +214,6 @@ def get_orders(order_type):
         orders = db.get_orders()
     elif order_type == 'pending':
         orders = db.get_pending_orders()
-    elif order_type == 'approved':
-        orders = db.get_approved_orders()
-        for order in orders:
-            order['approved_by'] = db.get_staff_email_by_approved_order_id(order['id'])
     elif order_type == 'denied':
         orders = db.get_denied_orders()
         for order in orders:

@@ -18,7 +18,7 @@ def check_db_connect():
 def create_tables():
     with engine.connect() as conn:
         # This line is for development only
-        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders CASCADE"))
+        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, denied_orders, pending_orders, unpaid_orders, paid_orders CASCADE"))
 
         # Create the staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS staff("
@@ -40,12 +40,7 @@ def create_tables():
                             "price NUMERIC(6,2) NOT NULL,"
                             "date DATE DEFAULT CURRENT_DATE)"))
 
-        # Create the approved_orders table with a foreign key reference to staff table
-        conn.execute(text("CREATE TABLE IF NOT EXISTS approved_orders("
-                            "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,"
-                            "reviewed_by INTEGER REFERENCES staff(id))"))
-
-        # Create the denied_orders table with a foreign key reference to staff table
+       # Create the denied_orders table with a foreign key reference to staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS denied_orders("
                             "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,"
                             "reviewed_by INTEGER REFERENCES staff(id))"))
@@ -156,15 +151,6 @@ def get_pending_orders() -> list:
     """
     return fetch_orders("SELECT o.* FROM orders o JOIN pending_orders p ON o.id = p.order_id ORDER BY o.date")
 
-def get_approved_orders() -> list:
-    """
-    Retrieve all approved orders from the database.
-
-    Returns:
-        list: A list of dictionaries representing each approved order.
-    """
-    return fetch_orders("SELECT o.* FROM orders o JOIN approved_orders a ON o.id = a.order_id ORDER BY o.date")
-
 def get_denied_orders() -> list:
     """
     Retrieve all denied orders from the database.
@@ -205,7 +191,7 @@ def delete_order(order_id):
 
 def approve_order(order_id, email):
     """
-    Approve an order by adding it to the approved_orders table and removing it from the pending_orders table.
+    Approve an order by adding it to the unpaid_order table and removing it from the pending_orders table.
 
     Parameters:
         order_id (int): The ID of the order to be approved.
@@ -219,7 +205,6 @@ def approve_order(order_id, email):
                      {"order_id": order_id, "staff_id": staff_id})
 
         conn.execute(text("DELETE FROM pending_orders WHERE order_id=:order_id"), {"order_id": order_id})
-        conn.execute(text("DELETE FROM approved_orders WHERE order_id=:order_id"), {"order_id": order_id})
         conn.commit()
 
 def approve_payment_order(order_id, email):
@@ -300,20 +285,6 @@ def get_email_by_order_id(order_id) -> str:
     with engine.connect() as conn:
         result = conn.execute(text("SELECT email FROM orders WHERE id = :order_id"), {"order_id": order_id}).scalar()
         return result if result else None
-    
-def get_staff_email_by_approved_order_id(order_id) -> str:
-    """
-    Retrieve the staff email associated with the given approved order ID.
-
-    Parameters:
-        order_id (int): The primary key of the order.
-
-    Returns:
-        str: The staff email associated with the given approved order ID.
-    """
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT reviewed_by FROM approved_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
-        return get_staff_email(result)
     
 def get_staff_email_by_denied_order_id(order_id) -> str:
     """

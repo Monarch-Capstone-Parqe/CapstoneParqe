@@ -183,6 +183,15 @@ def get_unpaid_orders() -> list:
     """
     return fetch_orders("SELECT o.* FROM orders o JOIN unpaid_orders u ON o.id = u.order_id ORDER BY o.date")
 
+def get_paid_orders() -> list:
+    """
+    Retrieve all paid orders from the database.
+
+    Returns:
+        list: A list of dictionaries representing each paid order.
+    """
+    return fetch_orders("SELECT o.* FROM orders o JOIN paid_orders p ON o.id = p.order_id ORDER BY o.date")
+
 def delete_order(order_id):
     """
     Delete an order from the database based on its ID.
@@ -205,14 +214,12 @@ def approve_order(order_id, email):
     with engine.connect() as conn:
         staff_id_result = conn.execute(text("SELECT id FROM staff WHERE email=:email"), {"email": email})
         staff_id = staff_id_result.fetchone()[0]  # Fetch the staff ID from the result
-
-        conn.execute(text("INSERT INTO approved_orders(order_id, reviewed_by) VALUES (:order_id, :staff_id)"),
-                     {"order_id": order_id, "staff_id": staff_id})
         
         conn.execute(text("INSERT INTO unpaid_orders(order_id, reviewed_by) VALUES (:order_id, :staff_id)"),
                      {"order_id": order_id, "staff_id": staff_id})
 
         conn.execute(text("DELETE FROM pending_orders WHERE order_id=:order_id"), {"order_id": order_id})
+        conn.execute(text("DELETE FROM approved_orders WHERE order_id=:order_id"), {"order_id": order_id})
         conn.commit()
 
 def approve_payment_order(order_id, email):

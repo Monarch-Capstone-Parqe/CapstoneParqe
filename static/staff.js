@@ -68,7 +68,6 @@ function refreshPendingOrders()
     })
     .then((response) => response.json())
     .then((data) => {
-        console.log(data)
         for(let i = 0; i < maxRender && i < data.orders.length; i++) {
             renderPendingOrder(data.orders[i]);
         }
@@ -85,7 +84,7 @@ function refreshPendingOrders()
 function refreshApprovedOrders()
 {
     console.log("refresh")
-    fetch("/staff/get_orders/approved", {
+    fetch("/staff/get_orders/unpaid", {
         method: "GET",
     })
     .then((response) => response.json())
@@ -127,11 +126,13 @@ function refreshDeniedOrders()
 
 function refreshPrintingOrders()
 {
-    fetch("/staff/get_orders/unpaid", {
+    fetch("/staff/get_orders/paid", {
         method: "GET",
     })
     .then((response) => response.json())
     .then((data) => {
+        console.log("Printing:");
+        console.log(data);
         for(let i = 0; i < maxRender && i < data.orders.length; i++) {
             renderPrintingOrders(data.orders[i]);
         }

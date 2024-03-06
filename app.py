@@ -226,6 +226,8 @@ def get_orders(order_type):
         orders = db.get_unpaid_orders()
         for order in orders:
             order['reviewed_by'] = db.get_staff_email_by_unpaid_order_id(order['id'])
+    elif order_type == 'paid':
+        orders = db.get_paid_orders()
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 

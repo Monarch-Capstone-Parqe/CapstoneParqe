@@ -83,7 +83,7 @@ function refreshPendingOrders()
 //Get approved orders from database
 function refreshApprovedOrders()
 {
-    console.log("refresh")
+    console.log("refresh approved")
     fetch("/staff/get_orders/unpaid", {
         method: "GET",
     })
@@ -331,7 +331,7 @@ function openApprovedPage() {
     const noJobsMessage = document.getElementById('no-jobs-message');
 
     removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'APPROVED ORDERS';
+    jobsBoxHeaderContent.innerText = 'Unpaid Orders';
     noJobsMessage.innerText = 'No orders have been approved.';
     document.getElementById('table-denied').classList.add('hide');
 
@@ -569,7 +569,7 @@ function insertApprovedTableRow(order) {
     infillCell.innerHTML = order.infill;
     quantityCell.innerHTML = order.quantity;
     noteCell.innerHTML = order.note;
-    approvedCell.innerHTML = order.approved_by;
+    approvedCell.innerHTML = order.reviewed_by;
 
     priceCell.classList.add('table-data');
     emailCell.classList.add('table-data');

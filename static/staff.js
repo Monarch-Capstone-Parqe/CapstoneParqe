@@ -1,7 +1,7 @@
 import * as GCodePreview from 'gcode-preview';
 import * as THREE from 'three';
 
-/**************************************** GENERAL ****************************************/
+/**************************************** GENERAL FUNCTIONS ****************************************/
 
 //Maximum number of orders able to render on a page
 let maxRender = 10;
@@ -35,12 +35,12 @@ window.initialLoad = initialLoad;
 //Interval refreshing orders from database continuously to keep the page up to date
 let intervalId = setInterval(refreshOrdersWrapper, 10000);
 
-/**************************************** END GENERAL ****************************************/
+/**************************************** END GENERAL FUNCTIONS ****************************************/
 
 
 
 
-/**************************************** SHARED ****************************************/
+/**************************************** SHARED FUNCTIONS ****************************************/
 
 //Function to refresh orders from database
 //Correlates with window location via url hash
@@ -57,6 +57,7 @@ function refreshOrdersWrapper()
     }
 }
 
+//Renders load more button under the orders table
 function renderLoadMoreButton() {
     const exists = document.getElementById('load-more-button');
     if(exists) {
@@ -79,6 +80,7 @@ function renderLoadMoreButton() {
     jobsBox.append(loadMoreButtonBox);
 }
 
+//Removes load more button from the page
 function removeLoadMoreButton() {
     const toRemove = document.getElementById('load-more-button');
     if(!toRemove) {
@@ -92,10 +94,12 @@ function removeLoadMoreButton() {
 //Function to remove an order by id from the page
 function removeOrder(id) {
     document.getElementById(id).remove();
+    let jobsTable = document.getElementById('jobs-table');
 
-    if(jobsTable = document.querySelector('#jobs-table').rows.length === 1) {
+    console.log(jobsTable.rows.length);
+    if(jobsTable.rows.length == 1) {
         // hide the intialized table
-        document.querySelector('#jobs-table').style.display = 'none';
+        jobsTable.style.display = 'none';
 
         // show the no jobs in queue message
         document.getElementById('no-jobs-message').style.display = 'block';
@@ -111,13 +115,10 @@ function removeAllOrders() {
     removeLoadMoreButton();
 }
 
-// initializes the table when their are orders in the queue
-// and sets width of table columns
+// initializes the table when their are orders in the queue, hiding the no jobs message and displaying the table
 function initJobsTable() {
-    // hide the no jobs in queue message
     document.getElementById('no-jobs-message').style.display = 'none';
 
-    // display the intialized table
     document.querySelector('#jobs-table').style.display = 'block';
 }
 
@@ -171,7 +172,7 @@ function openPreview(gcode_path)
 
 }
 
-/**************************************** END SHARED ****************************************/
+/**************************************** END SHARED FUNCTIONS ****************************************/
 
 
 
@@ -237,7 +238,7 @@ function approve(id)
     removeOrder(id);
 }
 
-//Updates status of order to denied and sends order back to database
+//Updates status of order to denied and sends order back to database with message stating why the order was denied
 function deny(id, message)
 {
     console.log("deny");
@@ -255,7 +256,7 @@ function deny(id, message)
     removeOrder(id);
 }
 
-//Function to create order sections with input variables
+//Function to create pending order sections with input variables
 //Variables will be received from database
 function renderPendingOrder(order)
 {
@@ -265,8 +266,6 @@ function renderPendingOrder(order)
     }
     
     if(document.querySelector('#jobs-table').rows.length > 0) {
-        // hide the 'no jobs' message
-        document.getElementById('no-jobs-message').style.display = 'none';
         // display the table
         initJobsTable();
     }
@@ -423,6 +422,8 @@ function refreshApprovedOrders()
     });
 }
 
+//Function to create approved order sections with input variables
+//Variables will be received from database
 function renderApprovedOrder(order) {
     const exists = document.getElementById(order.id)
     if(exists) {
@@ -430,8 +431,6 @@ function renderApprovedOrder(order) {
     }
 
     if(document.querySelector('#jobs-table').rows.length > 0) {
-        // hide the 'no jobs' message
-        document.getElementById('no-jobs-message').style.display = 'none';
         // display the table
         initJobsTable();
     }
@@ -527,6 +526,8 @@ function refreshDeniedOrders()
     });
 }
 
+//Function to create denied order sections with input variables
+//Variables will be received from database
 function renderDeniedOrder(order) {
     const exists = document.getElementById(order.id)
     if(exists) {
@@ -534,8 +535,6 @@ function renderDeniedOrder(order) {
     }
 
     if(document.querySelector('#jobs-table').rows.length > 0) {
-        // hide the 'no jobs' message
-        document.getElementById('no-jobs-message').style.display = 'none';
         // display the table
         initJobsTable();
     }
@@ -604,6 +603,7 @@ function openInventoryPage() {
 }
 window.openInventoryPage = openInventoryPage;
 
+//Fetches filaments and colors from the database
 function refreshFilamentInventory()
 {
     console.log("refresh")
@@ -615,6 +615,18 @@ function refreshFilamentInventory()
         console.log(data)
         removeAllFilaments();
         renderFilamentButtons();
+
+        //Sorts incoming filaments alphabetically by type so they always appear in the same order on the webpage
+        data.filaments.sort((a,b) => {
+            if (a.type < b.type) {
+                return  -1;
+            }
+            if (a.type > b.type) {
+                return 1;
+            }
+            return 0;
+        });
+
         for(let i = 0; i < data.filaments.length; i++) {
             renderFilamentType(data.filaments[i], data.filament_colors[data.filaments[i].id], data.colors)
         }
@@ -624,6 +636,7 @@ function refreshFilamentInventory()
     });
 }
 
+//Sends information for a new filament to be added to the database
 function addFilament(type, in_stock)
 {
     const formData = new FormData();
@@ -641,6 +654,7 @@ function addFilament(type, in_stock)
     })
 }
 
+//Updates the 'in_stock' status of a filament type in the database
 function updateFilament(type, in_stock)
 {
     const formData = new FormData();
@@ -655,6 +669,7 @@ function updateFilament(type, in_stock)
     })
 }
 
+//Deletes a filament from the database 
 function deleteFilament(type)
 {
     const formData = new FormData();
@@ -664,13 +679,14 @@ function deleteFilament(type)
         body: formData
     })
     .then(() => { 
-        refreshFilamentInventory();
+        removeFilament(type);
     })
     .catch((error) => {
         console.error("Error: ", error);
     })
 }
 
+//Adds a new association between a filament and a color to the database
 function addFilamentColor(type, color_id)
 {
     const formData = new FormData();
@@ -685,6 +701,7 @@ function addFilamentColor(type, color_id)
     })
 }
 
+//Deletes an association between a filament and a color from the database
 function removeFilamentColor(type, color_id)
 {
     const formData = new FormData();
@@ -699,6 +716,7 @@ function removeFilamentColor(type, color_id)
     })
 }
 
+//Adds a new color to the database
 function addColor(color) 
 {
     const formData = new FormData();
@@ -715,6 +733,7 @@ function addColor(color)
     })
 }
 
+//Deletes a color from the database
 function deleteColor(color_id) {
     const formData = new FormData();
     formData.append('id', color_id);
@@ -730,6 +749,7 @@ function deleteColor(color_id) {
     })
 }
 
+//Creates the 'add' button to add new filament types to the database
 function renderFilamentButtons() {
     const exists = document.getElementById('inventory-buttons');
     if(exists) {
@@ -752,28 +772,14 @@ function renderFilamentButtons() {
     jobsBox.append(inventoryButtons);
 }
 
+//Initializaes the filaments table by hiding the no jobs message and showing the table on the page
 function initFilamentsTable() {
     document.getElementById('no-jobs-message').style.display = 'none';
 
     document.getElementById('filament-table').style.display = 'block';
 }
 
-function renderFilamentType(filament, filament_colors, colors) {
-    const exists = document.getElementById(filament.type)
-    if(exists) {
-        return
-    }
-
-    if(document.getElementById('filament-table').rows.length > 0) {
-        // hide the 'no jobs' message
-        document.getElementById('no-jobs-message').style.display = 'none';
-        // display the table
-        initFilamentsTable();
-    }
-    // insert the order into the table to display on staff page
-    insertFilamentTableRow(filament, filament_colors, colors);
-}
-
+//Initializes a colors dropdown box associated with a filament type
 function initColorsDropdown(dropdown, filament_type) {
     let isOpen = false;
     let label = document.getElementById(filament_type + '-dropdown-label');
@@ -815,25 +821,23 @@ function initColorsDropdown(dropdown, filament_type) {
     list.append(buttonBox);
 }
 
-function updateDropdownLabel(label, inputs) {
-    label.innerText = '';
-    let checkedInputs = [];
-    for(let i = 0; i < inputs.length; i++) {
-        if(inputs[i].checked) {
-            checkedInputs.push(inputs[i]);
-        }
+//Function to create filament type sections with input variables
+//Variables will be received from database
+function renderFilamentType(filament, filament_colors, colors) {
+    const exists = document.getElementById(filament.type)
+    if(exists) {
+        return
     }
 
-    for(let i = 0; i < checkedInputs.length; i++) {
-        if(i+1 == checkedInputs.length) {
-            label.innerHTML += checkedInputs[i].parentNode.innerText;
-        }
-        else {
-            label.innerHTML += checkedInputs[i].parentNode.innerText + ',&nbsp';
-        }
+    if(document.getElementById('filament-table').rows.length > 0) {
+        // display the table
+        initFilamentsTable();
     }
+    // insert the order into the table to display on staff page
+    insertFilamentTableRow(filament, filament_colors, colors);
 }
 
+//Creates the colors dropdown box that is used to select which colors a filament has in stock
 function renderColorsDropdown(colors, filament_colors, parent, filament_type) {
     let dropdown = document.createElement('div');
     dropdown.classList.add('colors-dropdown');
@@ -894,11 +898,33 @@ function renderColorsDropdown(colors, filament_colors, parent, filament_type) {
     initColorsDropdown(dropdown, filament_type);
 }
 
+//Updates the dropdown label corresponding to which colors are checked as in stock
+function updateDropdownLabel(label, inputs) {
+    label.innerText = '';
+    let checkedInputs = [];
+    for(let i = 0; i < inputs.length; i++) {
+        if(inputs[i].checked) {
+            checkedInputs.push(inputs[i]);
+        }
+    }
+
+    for(let i = 0; i < checkedInputs.length; i++) {
+        if(i+1 == checkedInputs.length) {
+            label.innerHTML += checkedInputs[i].parentNode.innerText;
+        }
+        else {
+            label.innerHTML += checkedInputs[i].parentNode.innerText + ',&nbsp';
+        }
+    }
+}
+
+//Inserts a filament type into the filaments table
 function insertFilamentTableRow(filament, filament_colors, colors) {
     let tableRows = document.getElementById('filament-table-rows');
     let row = tableRows.insertRow();
     console.log(filament);
 
+    // Sets the table row's id to the associated filament type
     row.setAttribute('id', filament.type);
 
     let typeCell = row.insertCell(0);
@@ -950,6 +976,7 @@ function insertFilamentTableRow(filament, filament_colors, colors) {
     colorsCell.classList.add('table-data');
 }
 
+//Opens the add filament modal to allow a new filament to be added to the database
 function openAddFilamentModal() {
     const addFilamentModal = document.getElementById('add-filament-modal');
     const addFilamentModalSubmitButton = document.getElementById('add-filament-modal-submit-button');
@@ -984,6 +1011,7 @@ function openAddFilamentModal() {
     } 
 }
 
+//Opens the delete filament modal to confirm a filament to be deleted from the database
 function openDeleteFilamentModal(type) {
     const deleteFilamentModal = document.getElementById('delete-filament-modal');
     const deleteFilamentModalSubmitButton = document.getElementById('delete-filament-modal-submit-button');
@@ -1004,6 +1032,7 @@ function openDeleteFilamentModal(type) {
     } 
 }
 
+//Opens the add color modal to allow a new color to be added to the database
 function openAddColorModal() {
     const addColorModal = document.getElementById('add-color-modal');
     const addColorModalSubmitButton = document.getElementById('add-color-modal-submit-button');
@@ -1035,6 +1064,7 @@ function openAddColorModal() {
     } 
 }
 
+//Opens the delete color modal to confirm a color to be deleted from the database
 function openDeleteColorModal(color, color_id) {
     const deleteColorModal = document.getElementById('delete-color-modal');
     const deleteColorModalSubmitButton = document.getElementById('delete-color-modal-submit-button'); 
@@ -1055,6 +1085,7 @@ function openDeleteColorModal(color, color_id) {
     }
 }
 
+//Removes all filament table buttons from the page
 function removeFilamentButtons() {
     const toRemove = document.getElementById('inventory-buttons');
     if(!toRemove) {
@@ -1064,16 +1095,18 @@ function removeFilamentButtons() {
     toRemove.parentNode.removeChild(toRemove);
 }
 
+//Removes a filament from the page based on its id
 function removeFilament(id) {
     document.getElementById(id).remove();
     let filamentTable = document.getElementById('filament-table');
 
-    if(filamentTable.rows.length === 1) {
+    if(filamentTable.rows.length == 1) {
         filamentTable.style.display = 'none';
         document.getElementById('no-jobs-message').style.display = 'block';
     }
 }
 
+//Removes all filaments from the page and hides the filaments table
 function removeAllFilaments() {
     document.getElementById('filament-table-rows').innerHTML = '';
     document.getElementById('filament-table').style.display = 'none';

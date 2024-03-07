@@ -82,7 +82,7 @@ The User API plays a pivotal role in empowering users to interact with the PARQE
 ---
 ### 2) *Staff API* <a name="StaffApi"></a>
 #### Purpose:
-The Staff API serves as the managerial hub within the PARQE project, facilitating efficient oversight and control over incoming print jobs.
+The Staff API serves as the managerial hub within the PARQE project, facilitating efficient oversight and control over incoming print jobs and the inventory of filaments available to print with.
 
 #### Functionality:
 The Staff API encompasses the following key functionalities:
@@ -98,6 +98,11 @@ The Staff API encompasses the following key functionalities:
 3. **Denied Page:**
    - The Denied Page displays a catalog of print jobs that have been rejected by managerial review. This section provides insights into the reasons for denial and offers an opportunity for staff to communicate feedback to users.
    - Staff members can access relevant details and communicate denial reasons, fostering effective collaboration between staff and users.
+
+4. **Filament Inventory Page:**
+   - The Filament Inventory Page displays an inventory of all filament types present in the database
+   - Staff members can add new filament types, indicate whether existing filament types are in stock, and adjust what colors are available for each filament type.
+   - Updates from this page are communicated to the backend and reflected on the user page immediately. 
 
 #### Workflow:
 1. **Pending Page Review:**

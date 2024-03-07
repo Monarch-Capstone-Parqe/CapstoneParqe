@@ -564,12 +564,6 @@ button[id="dark-mode-toggle"]:hover {
   font-family: 'Acumin-LtPro';
 }
 
-.boxed-data-underline {
-  height: 1px;
-  display: block;
-  background-color: #404040;
-}
-
 #no-jobs-message {
   color: #404040;
   margin: 0;
@@ -577,21 +571,6 @@ button[id="dark-mode-toggle"]:hover {
   padding-top: 15px;
   padding-bottom: 15px;
   font-family: 'Acumin-LtPro';
-}
-
-.first-text {
-  color: #404040;
-  margin: 0 auto;
-  font-size: 1.05em;
-  font-family: 'Acumin-ItPro';
-}
-
-.emphasis-text {
-  color: #404040;
-  margin: 0 auto;
-  margin-left: 20px;
-  font-size: 1.05em;
-  font-family: 'Acumin-ItPro';
 }
 
 .staff-buttons {
@@ -665,7 +644,6 @@ button[id="dark-mode-toggle"]:hover {
   text-underline-offset: -1%;
   text-decoration-thickness: 1px;
 }
-
 
 .load-more-button-box {
   width: 100%;

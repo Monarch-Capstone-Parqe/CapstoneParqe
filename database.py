@@ -18,7 +18,7 @@ def check_db_connect():
 def create_tables():
     with engine.connect() as conn:
         # This line is for development only
-        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
+        # conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
 
         # Create the staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS staff("

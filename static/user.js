@@ -489,11 +489,13 @@ document.addEventListener("DOMContentLoaded", function () {
         let options = [];
 
         for (let i = 0; i < data.filaments.length; i++) {
-          let filamentColors = data.filament_colors[data.filaments[i].id];
-          for (let j = 0; j < filamentColors.length; j++) {
-            options.push(
-              `${data.filaments[i].type}, ${filamentColors[j].color}`
-            );
+          if (data.filaments[i].in_stock) {
+            let filamentColors = data.filament_colors[data.filaments[i].id];
+            for (let j = 0; j < filamentColors.length; j++) {
+              options.push(
+                `${data.filaments[i].type}, ${filamentColors[j].color}`
+              );
+            }
           }
         }
         console.log(`filament options: ${options}`);

@@ -1140,5 +1140,3 @@ function removeAllFilaments() {
 /**************************************** END INVENTORY PAGE ****************************************/
 
 
-//Interval refreshing orders from database continuously to keep the page up to date
-let intervalId = setInterval(refreshOrdersWrapper, 10000);

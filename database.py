@@ -18,7 +18,7 @@ def check_db_connect():
 def create_tables():
     with engine.connect() as conn:
         # This line is for development only
-        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders CASCADE"))
+        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
 
         # Create the staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS staff("
@@ -76,7 +76,12 @@ def create_tables():
         # Create the filament_colors table with a foreign key reference to the colors and filaments tables
         conn.execute(text("CREATE TABLE IF NOT EXISTS filament_colors("
                           "color_id INTEGER NOT NULL REFERENCES colors(id) ON DELETE CASCADE,"
-                          "filament INTEGER NOT NULL REFERENCES filaments(id) ON DELETE CASCADE)"))
+                          "filament_id INTEGER NOT NULL REFERENCES filaments(id) ON DELETE CASCADE)"))
+
+        # Populate colors table with default black color 
+        color_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM colors WHERE color = :color)"), {"color": "black"}).scalar()
+        if not color_exists:
+           conn.execute(text("INSERT INTO colors(color) VALUES (:color)"), {"color": "black"})
 
         conn.commit()
 
@@ -355,8 +360,8 @@ def add_staff_member(email) -> bool:
             return True
         else:
             return False
-    
-def add_filament(type):
+        
+def add_filament(type, in_stock):
     """
     Add a new type of filament to the 'filaments' table if not already exists.
 
@@ -366,7 +371,7 @@ def add_filament(type):
     with engine.connect() as conn:
         filament_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM filaments WHERE type = :type)"), {"type": type}).scalar()
         if not filament_exists:
-            conn.execute(text("INSERT INTO filaments(type, in_stock) VALUES (:type, FALSE)"), {"type": type})
+            conn.execute(text("INSERT INTO filaments(type, in_stock) VALUES (:type, :in_stock)"), {"type": type, "in_stock": in_stock})
 
         conn.commit()
 
@@ -381,6 +386,8 @@ def update_filament(type, in_stock):
     with engine.connect() as conn:
         conn.execute(text("UPDATE filaments SET in_stock=:in_stock WHERE type=:type"),
                      {"in_stock": in_stock, "type": type})
+        
+        conn.commit()
 
 def remove_filament(type):
     """
@@ -393,4 +400,171 @@ def remove_filament(type):
         conn.execute(text("DELETE FROM filaments WHERE type=:type"), {"type": type})
 
         conn.commit()
+
+def get_filament_id(type):
+    """
+    Retrieve a filament id by its type
+
+    Parameters:
+        type (str): The type of the filament
+
+    Returns:
+        int: The filament id
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT id FROM filaments WHERE type=:type"), {"type": type}).scalar()
+
+        return result
+
+def get_filaments():
+    """
+    Retrieve all filaments from the 'filaments' table
+
+    Returns:
+        list: A list of all filaments 
+    """
+    filaments_table = metadata.tables['filaments']
+    column_names = filaments_table.columns.keys()
+
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM filaments")).fetchall()
+        if not result:
+            return []  # Return an empty list if no orders are found
+        filaments = []
+        for row in result:
+            row_dict = dict(zip(column_names, row))  # Create dictionary using column names
+            filaments.append(row_dict)
+        return filaments
+    
+def add_color(color):
+    """
+    Add a color to the 'colors' table 
+
+    Parameters:
+        color (str): The color to be added
+    """
+    with engine.connect() as conn:
+        color_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM colors WHERE color = :color)"), {"color": color}).scalar()
+        if not color_exists:
+           conn.execute(text("INSERT INTO colors(color) VALUES (:color)"), {"color": color})
+
+        conn.commit()
+
+def remove_color(color_id):
+    """
+    Remove a color from the 'colors' table 
+
+    Parameters:
+        color_id (int): The id of the color to be removed
+    """
+    with engine.connect() as conn:
+        conn.execute(text("DELETE FROM colors WHERE id=:id"), {"id": color_id})
+
+        conn.commit()
+
+def get_color(color_id):
+    """
+    Retrieve a color by its id
+
+    Parameters:
+        color_id (int): The id of the color
+
+    Returns:
+        str: The color
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT color FROM colors WHERE id=:color_id"), {"color_id": color_id})
+        result_dict = []
+        for row in result:
+            row_as_dict = row._mapping
+            result_dict.append(dict(row_as_dict))
+        color = result_dict[0]['color']
+        return color
+    
+def get_color_id(color):
+    """
+    Retrieve a color by its name
+
+    Parameters:
+        color (str): The name of the color
+
+    Returns:
+        str: The id of the color
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT id FROM colors WHERE color=:color"), {"color": color}).scalar()
+        return result
+    
+def get_colors():
+    """
+    Retrieve all colors from the 'colors' table
+
+    Returns:
+        list: A list of all colors 
+    """
+    colors_table = metadata.tables['colors']
+    column_names = colors_table.columns.keys()
+
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT * FROM colors")).fetchall()
+        if not result:
+            return []  # Return an empty list if no orders are found
+        colors = []
+        for row in result:
+            row_dict = dict(zip(column_names, row))  # Create dictionary using column names
+            colors.append(row_dict)
+        return colors
+
+def add_filament_color(filament_id, color_id):
+    """
+    Add a color to a filament type by adding it to the 'filament_colors' table
+
+    Parameters:
+        filament_id (int): The id of the filament type
+        color_id (int): The id of the color
+    """
+    with engine.connect() as conn:
+        conn.execute(text("INSERT INTO filament_colors(filament_id, color_id) VALUES (:filament_id, :color_id)"),
+                     {"filament_id": filament_id, "color_id": color_id})
+        
+        conn.commit()
+
+def remove_filament_color(filament_id, color_id):
+    """
+    Remove a color from a filament type by removing it from the 'filament_colors' table
+
+    Parameters:
+        filament_id (int): The id of the filament type
+        color_id (int): The id of the color
+    """
+    with engine.connect() as conn:
+        conn.execute(text("DELETE FROM filament_colors WHERE filament_id=:filament_id AND color_id=:color_id"),
+                     {"filament_id": filament_id, "color_id": color_id})
+        
+        conn.commit()
+
+def get_filament_colors(filament_id):
+    """
+    Retrieve colors associated with a filament id
+
+    Parameters:
+        filament_id (int): The id of the filament type 
+
+    Returns:
+        list: A list of all color ids associated with a filament type
+    """
+    filament_colors_table = metadata.tables['filament_colors']
+    column_names = filament_colors_table.columns.keys()
+
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT color_id FROM filament_colors WHERE filament_id=:filament_id"),
+                     {"filament_id": filament_id}).fetchall()
+        if not result:
+            return []  # Return an empty list if no orders are found
+        filament_colors = []
+        for row in result:
+            row_dict = dict(zip(column_names, row))  # Create dictionary using column names
+            filament_colors.append(row_dict)
+        return filament_colors
+ 
    

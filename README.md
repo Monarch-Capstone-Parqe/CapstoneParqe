@@ -46,42 +46,43 @@ The project consists of 5 main componets:
 ---
 ### *User API* <a name="UserApi"></a>
 #### Purpose:
-The User API is a crucial component of the PARQE project, dedicated to providing a seamless and user-friendly experience for individuals interacting with the system.
+The User webpage/API is the interface in which a user interacts with PARQE in order to submit a 3d model for printing. Here the user can upload a 3d model in .stl, .3mf, .stp, or .step format and configure key print settings to ensure an optimal print. Default settings are selected by default in order to make the software accessible for users of all experience levels. Users will also have the option to include important details about their print for the staff to review and consider. This user facing API also has a built in dark/light mode switch to offer some stylistic customization to match the user's workspace.
 
 #### Functionality:
-The User API offers the following features:
+The API consists of a submission form with the following field:
 
-1. **User Authentication:**
-   - Allows users to securely log in to the PARQE system, ensuring data privacy and user-specific interactions.
+   **Email:** 
+   - The users email. Allows for identificaiton of user as well as to receive required follow up emails.
 
-2. **File Submission:**
-   - Enables users to submit 3D models in various formats, including STL, .3MF, .STP, or .STEP. This functionality forms the core of the design submission process.
+   **File:** 
+   - The 3d model file in .stl, .3mf, .stp, or .step format.
 
-3. **Printing Configuration:**
-   - Empowers users to customize printing configurations, providing flexibility and control over the 3D printing process.
+   **Filament Type:** 
+   - This field contains an up to date inventory of current filament types and colors in stock in the EPL. The inventory will be able to be edited via the staff API.
 
-4. **User Dashboard:**
-   - Offers a personalized dashboard where users can track the status of their submitted designs, view past print jobs, and manage their account settings.
+   **Nozzle Size:** 
+   - Availible nozzle sizes to choose from are 0.4mm and 0.6mm. 0.4mm will be selected by default.
 
-#### Workflow:
-1. **User Authentication:**
-   - Users are required to log in to access the full functionality of the User API. This step ensures a secure and personalized experience.
+   **Layer Height:** 
+   - Layer height options depend on nozzle size selection. A 0.4mm nozzle size selection will have options for 0.2mm (default) and 0.1mm layter heights. A 0.6mm nozzle size selection will have options for 0.3mm (default) and 0.15mm layer heights.
 
-2. **File Submission:**
-   - Users can upload 3D models using supported file formats through a user-friendly interface. The system validates and processes the submitted files for further review.
+   **Infill Density:** 
+   - Infill density can range from 0% (no infill) to 100% (solid). 20% is selected by default.
 
-3. **Printing Configuration:**
-   - Users have the option to adjust printing configurations, such as print quality, materials, and other relevant parameters before finalizing the submission.
+   **Quanity:** 
+   - This value is for the quantity of prints that the user wants of the uploaded 3d model.
+   
+   **Note:** 
+   - If the user has any additional important information or instructions for their print job that they want the staff to know, they can enter them here.
 
-4. **Submission Review:**
-   - The User API provides a submission review page, allowing users to confirm their selections, ensuring accuracy before the design is sent for managerial approval.
+Upon clicking the submit button on the form, the user will be guided through a series of custom modal windows. The first will have the user review and approve their print configuration. Upon approval, the data will be submitted to the staff API for review. If a succesful response is returned, the user will be notified via a modal window that their print has been submitted succesfully and provide them with next steps. If an error is returned, the user will be notified that there was an error and their print job was not submitted. 
 
 The User API plays a pivotal role in empowering users to interact with the PARQE project efficiently and effectively, facilitating a streamlined workflow from design submission to the final 3D print.
 
 ---
 ### 2) *Staff API* <a name="StaffApi"></a>
 #### Purpose:
-The Staff API serves as the managerial hub within the PARQE project, facilitating efficient oversight and control over incoming print jobs.
+The Staff API serves as the managerial hub within the PARQE project, facilitating efficient oversight and control over incoming print jobs and the inventory of filaments available to print with.
 
 #### Functionality:
 The Staff API encompasses the following key functionalities:
@@ -97,6 +98,11 @@ The Staff API encompasses the following key functionalities:
 3. **Denied Page:**
    - The Denied Page displays a catalog of print jobs that have been rejected by managerial review. This section provides insights into the reasons for denial and offers an opportunity for staff to communicate feedback to users.
    - Staff members can access relevant details and communicate denial reasons, fostering effective collaboration between staff and users.
+
+4. **Filament Inventory Page:**
+   - The Filament Inventory Page displays an inventory of all filament types present in the database
+   - Staff members can add new filament types, indicate whether existing filament types are in stock, and adjust what colors are available for each filament type.
+   - Updates from this page are communicated to the backend and reflected on the user page immediately. 
 
 #### Workflow:
 1. **Pending Page Review:**

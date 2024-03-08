@@ -444,7 +444,6 @@ button[id="dark-mode-toggle"]:hover {
 .staff-header-box {
   background-size: 100%;
   width: 100%;
-  height: 200px;
   margin-top: 80px;
   margin-bottom: 80px;
   margin-left: auto;
@@ -507,7 +506,7 @@ button[id="dark-mode-toggle"]:hover {
   width: 100%;
 }
 
-#jobs-table {
+.staff-table {
   display: none;
   border-collapse: collapse;
   width: 100%;
@@ -573,12 +572,6 @@ button[id="dark-mode-toggle"]:hover {
   font-family: 'Acumin-LtPro';
 }
 
-.boxed-data-underline {
-  height: 1px;
-  display: block;
-  background-color: #404040;
-}
-
 #no-jobs-message {
   color: #404040;
   margin: 0;
@@ -586,21 +579,6 @@ button[id="dark-mode-toggle"]:hover {
   padding-top: 15px;
   padding-bottom: 15px;
   font-family: 'Acumin-LtPro';
-}
-
-.first-text {
-  color: #404040;
-  margin: 0 auto;
-  font-size: 1.05em;
-  font-family: 'Acumin-ItPro';
-}
-
-.emphasis-text {
-  color: #404040;
-  margin: 0 auto;
-  margin-left: 20px;
-  font-size: 1.05em;
-  font-family: 'Acumin-ItPro';
 }
 
 .staff-buttons {
@@ -675,7 +653,6 @@ button[id="dark-mode-toggle"]:hover {
   text-decoration-thickness: 1px;
 }
 
-
 .load-more-button-box {
   width: 100%;
   margin-top: 30px;
@@ -702,7 +679,214 @@ button[id="dark-mode-toggle"]:hover {
   text-decoration-thickness: 1px;
 }
 
-/************** reject order modal **************/
+.inventory-buttons {
+  display: flex;
+  width: 100%;
+  height: 50px;
+  border: none;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.inventory-buttons button[id='add-button'] {
+  color: black;
+  background-color: white;
+  width: 100px;
+  height: 100%;
+  font-size: 1.3em;
+  border: 2px solid #6d8d24;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  margin-right: 10px;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+
+#add-button:hover {
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+#filament-table-type {
+  width: 30%
+}
+
+#filament-table-in-stock {
+  width: 25%
+}
+
+#filament-table-colors {
+  width: 50%;
+}
+
+.filament-table-buttons {
+  display: flex;
+  height: 50px;
+  border: none;
+  justify-content: center;
+}
+
+.filament-table-buttons button[id='remove-button'] {
+  color: black;
+  background-color: white;
+  width: 100px;
+  height: 100%;
+  font-size: 1.3em;
+  border: 2px solid #a10e0e;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  margin-left: 10px;
+  transition: 0.3s;
+}
+
+#remove-button:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.in-stock-checkbox {
+  height: 25px;
+  width: 25px;
+  margin-top: 15px;
+  background-color: white;  
+  cursor: pointer;
+}
+
+.in-stock-checkbox:checked {
+  background-color: #007bff;
+}
+
+.color-checkbox {
+  height: 25px;
+  width: 25px;
+  background-color: white;  
+  cursor: pointer;
+}
+
+.color-checkbox:checked {
+  background-color: #007bff;
+}
+
+.colors-dropdown {
+  position: relative;
+  width: 70%;
+}
+
+.colors-dropdown .colors-dropdown-list {
+  position: absolute;
+  top: 45px;
+  left: 0px;
+  right: 0px;
+  box-shadow: 0 1px 2px 1px rgba(0, 0, 0, .15);
+  transform-origin: 50% 0;
+  transform: scale(1, 0);
+  transition: transform .15s ease-in-out .15s;
+  max-height: 66vh;
+  overflow-y: scroll;
+  z-index: 1000;
+  border: 1px solid #404040;
+  background-color: white;
+}
+
+.colors-dropdown .dropdown-color {
+  display: flex;
+  margin: 15px;
+  opacity: 0;
+  transition: opacity .15s ease-in-out;
+  justify-content: space-between;
+}
+
+.colors-dropdown .colors-dropdown-label {
+  display: block;
+  min-height: 25px;
+  background: #fff;
+  border: 1px solid #404040;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.colors-dropdown .colors-dropdown-label::before {
+  content: '▼';
+  float: right;
+}
+
+.colors-dropdown.on .colors-dropdown-list {
+  transform: scale(1, 1);
+  transition-delay: 0s;
+}
+
+.colors-dropdown.on .colors-dropdown-list .dropdown-color {
+  opacity: 1;
+  transition-delay: .2s;
+}
+
+.colors-dropdown.on .colors-dropdown-label::before {
+  content: '▲';
+}
+
+.remove-color-button {
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1em;
+  font-family: "Acumin-ECBPro";
+  float: right;
+  height: 37.5px;
+  width: 75px;
+  cursor: pointer;
+}
+
+.remove-color-button:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.dropdown-buttons {
+  display: flex;
+  border: none;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 15px;  
+  opacity: 0;
+  transition: opacity .15s ease-in-out;
+}
+
+.colors-dropdown.on .colors-dropdown-list .dropdown-buttons {
+  opacity: 1;
+  transition-delay: .2s;
+}
+
+.add-color-button {
+  background-color: white;
+  width: 75px;
+  height: 37.5px;
+  font-size: 1em;
+  border: 2px solid #6d8d24;
+  cursor: pointer;
+  font-family: "Acumin-ECBPro";
+  margin-right: 10px;
+  margin-left: 10px;
+  transition: 0.3s;
+}
+
+.add-color-button:hover {
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
 @keyframes shake {
   0% {
     margin-left: 0rem;
@@ -718,10 +902,10 @@ button[id="dark-mode-toggle"]:hover {
   }
 }
 
-.reject-order-modal {
+.staff-modal {
   display: none;
   position: fixed;
-  z-index: 1;
+  z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;
@@ -730,6 +914,8 @@ button[id="dark-mode-toggle"]:hover {
   background-color: rgb(0,0,0);
   background-color: rgba(0,0,0,0.4);
 }
+
+/************** reject order modal **************/
 
 .reject-order-modal-content {
   background-color: #fefefe;
@@ -743,8 +929,7 @@ button[id="dark-mode-toggle"]:hover {
   font-family: "Acumin-LtPro";
 }
 
-
-.reject-modal-input-error {
+.modal-input-error {
   animation: shake 0.2s ease-in-out 0s 2;
   background-color: #e88282;
 }
@@ -807,6 +992,236 @@ button[id="dark-mode-toggle"]:hover {
 
 /************** end reject order modal **************/
 
+/************** delete filament modal **************/
+
+.delete-filament-modal-content {
+  background-color: #fefefe;
+  margin: 300px auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 450px;
+  height: auto;
+  text-align: center;
+  font-family: "Acumin-LtPro";
+}
+
+.delete-filament-modal-content .delete-filament-modal-button {
+  display: inline-block;
+  color: black;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  border: none;
+  cursor: pointer;
+  width: 100px;
+  height: 50px;
+}
+
+.delete-filament-modal-content button[id="delete-filament-modal-submit-button"] {
+  border: 2px solid #6d8d24;
+  background-color: white;
+  margin-right: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.delete-filament-modal-content button[id="delete-filament-modal-submit-button"]:hover {
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.delete-filament-modal-content button[id="delete-filament-modal-cancel-button"] {
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.delete-filament-modal-content button[id="delete-filament-modal-cancel-button"]:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+/************** end delete filament modal **************/
+
+/************** delete color modal **************/
+
+.delete-filament-modal-content button[id="delete-color-modal-submit-button"] {
+  border: 2px solid #6d8d24;
+  background-color: white;
+  margin-right: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.delete-filament-modal-content button[id="delete-color-modal-submit-button"]:hover {
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.delete-filament-modal-content button[id="delete-color-modal-cancel-button"] {
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.delete-filament-modal-content button[id="delete-color-modal-cancel-button"]:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+/************** end delete color modal **************/
+
+/************** add filament modal **************/
+
+.add-filament-modal-content {
+  background-color: #fefefe;
+  margin: 300px auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 450px;
+  height: auto;
+  text-align: center;
+  font-family: "Acumin-LtPro";
+}
+
+.add-filament-modal-content .add-filament-modal-label {
+  font-family: 'Acumin-ItPro';
+  margin-right: 20px;
+  margin-top: 20px;
+}
+
+.add-filament-modal-content .add-filament-modal-input-container {
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  color: #404040;
+  font-size: 1.05em;
+  display: flex;
+  flex-direction: row;
+}
+
+.add-filament-modal-content .add-filament-modal-checkbox-container {
+  color: #404040;
+  font-size: 1.05em;
+  height: 25px;
+  padding-bottom: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.add-filament-modal-content .add-filament-modal-button {
+  display: inline-block;
+  color: black;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  border: none;
+  cursor: pointer;
+  width: 100px;
+  height: 50px;
+}
+
+.add-filament-modal-content .add-filament-modal-input {
+  margin-top: 15px;
+  border: 1px solid #404040;
+  font-size: 1em;
+  width: 250px;
+}
+
+.add-filament-modal-content button[id="add-filament-modal-submit-button"] {
+  border: 2px solid #6d8d24;
+  background-color: white;
+  margin-right: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.add-filament-modal-content button[id="add-filament-modal-submit-button"]:hover {
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.add-filament-modal-content button[id="add-filament-modal-cancel-button"] {
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.add-filament-modal-content button[id="add-filament-modal-cancel-button"]:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+/************** end add filament modal **************/
+
+/************** add color modal **************/
+
+.add-filament-modal-content button[id="add-color-modal-submit-button"] {
+  border: 2px solid #6d8d24;
+  background-color: white;
+  margin-right: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.add-filament-modal-content button[id="add-color-modal-submit-button"]:hover {
+  color: white;
+  background-color: #6d8d24;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+.add-filament-modal-content button[id="add-color-modal-cancel-button"] {
+  border: 2px solid #a10e0e;
+  background-color: white;
+  margin-left: 10px;
+  transition: 0.3s;
+  font-size: 1.2em;
+  font-family: "Acumin-ECBPro";
+}
+
+.add-filament-modal-content button[id="add-color-modal-cancel-button"]:hover {
+  color: white;
+  background-color: #a10e0e;
+  text-decoration: underline;
+  text-underline-offset: -1%;
+  text-decoration-thickness: 1px;
+}
+
+/************** end add color modal **************/
 
 /************** gcode preview modal **************/
 

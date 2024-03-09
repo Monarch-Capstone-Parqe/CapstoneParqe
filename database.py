@@ -19,6 +19,7 @@ def create_tables():
     with engine.connect() as conn:
         # This line is for development only
         #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
+        # Note: reviewed_by keeps track of the either who approved/denied the order or who confirmed payment, which ever is more recent.
 
         # Create the staff table
         conn.execute(text("CREATE TABLE IF NOT EXISTS staff("
@@ -53,6 +54,11 @@ def create_tables():
         # Create the pending_orders table
         conn.execute(text("CREATE TABLE IF NOT EXISTS pending_orders("
                             "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE)"))
+        
+        # Create the paid_orders table
+        conn.execute(text("CREATE TABLE IF NOT EXISTS paid_orders("
+                            "order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,"
+                            "reviewed_by INTEGER REFERENCES staff(id))"))
         
         # Create the printing_orders table
         conn.execute(text("CREATE TABLE IF NOT EXISTS printing_orders("
@@ -224,9 +230,36 @@ def deny_order(order_id, email):
         conn.execute(text("DELETE FROM pending_orders WHERE order_id=:order_id"), {"order_id": order_id})
         conn.commit()
 
+def pay_order(order_id, email):
+    """
+    Add an order to the 'paid_orders' table and remove it from the 'approved_orders' table.
+
+    Parameters:
+        order_id (int): The ID of the order.
+        email (str): The email of the staff member confirming the payment.
+    """
+    with engine.connect() as conn:
+        # Fetch the staff ID using the provided email
+        staff_id_result = conn.execute(text("SELECT id FROM staff WHERE email=:email"), {"email": email})
+        staff_id = staff_id_result.fetchone()[0]  # Fetch the staff ID from the result
+        
+        # Add the order to the 'paid_orders' table
+        add_query = text("""
+            INSERT INTO paid_orders (order_id, reviewed_by)
+            VALUES (:order_id, :staff_id)
+        """)
+        conn.execute(add_query, {'order_id': order_id, 'staff_id': staff_id})
+
+        # Remove the order from the 'approved_orders' table
+        remove_query = text("""
+            DELETE FROM approved_orders
+            WHERE order_id = :order_id
+        """)
+        conn.execute(remove_query, {'order_id': order_id})
+
 def print_order(order_id):
     """
-    Add an order to the 'printing_orders' table and remove it from the 'approved_orders' table.
+    Add an order to the 'printing_orders' table and remove it from the 'paid_orders' table.
 
     Parameters:
         order_id (int): The ID of the order.
@@ -239,9 +272,9 @@ def print_order(order_id):
         """)
         conn.execute(add_query, {'order_id': order_id})
 
-        # Remove the order from the 'approved_orders' table
+        # Remove the order from the 'paid_orders' table
         remove_query = text("""
-            DELETE FROM approved_orders
+            DELETE FROM paid_orders
             WHERE order_id = :order_id
         """)
         conn.execute(remove_query, {'order_id': order_id})

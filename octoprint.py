@@ -2,7 +2,10 @@ import threading
 import time
 import requests
 from http import HTTPStatus
+import json
+from requests.exceptions import Timeout, ConnectionError
 
+import config.variables as variables
 import database as db
 
 stop_event = threading.Event()
@@ -32,22 +35,30 @@ def stop_sending_orders():
     background_thread.join()
 
 def enqueue_print(order) -> bool:
-    # Octoprint Automation URL
-    url = 'http://192.168.1.100/api/endpoint'
 
     with open(f"uploads/{order['gcode_path']}", 'rb') as f:
         files = {'file': f}
 
-        del order['gcode_path']
-        del order['price']
-        del order['prusa_output']
-        del order['date']
+        # Remove unnecessary keys from order dict
+        keys_to_remove = ['gcode_path', 'price', 'prusa_output', 'date']
+        for key in keys_to_remove:
+            order.pop(key, None)
 
-        # Send the POST request with the file
-        response = requests.post(url, files=files, data=order)
+        json_data = json.dumps(order, default=str)  # Serialize Decimal to string
 
-        # Check the response
-        if response.status_code == HTTPStatus.CREATED:
-            return True  
-        else:
+        headers = {'Content-Type': 'application/json'}
+
+        try:
+            # Send the POST request with the file and JSON data
+            response = requests.post(variables.OCTOPRINT_UPLOAD_ENDPOINT, files=files, json=json_data, headers=headers, timeout=10)  # Timeout set to 10 seconds
+            
+            if response.status_code == HTTPStatus.CREATED:
+                return True  
+            else:
+                return False
+            
+        except Timeout:
+            return False
+        # Multiple failures indicate that the server is not reachable
+        except ConnectionError:
             return False

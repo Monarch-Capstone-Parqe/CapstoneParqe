@@ -4,7 +4,7 @@ from urllib.parse import quote_plus, urlencode
 from http import HTTPStatus
 import smtplib
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_file, abort, g
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_file, abort
 import logging
 from flask_session import Session
 import jwt
@@ -141,7 +141,7 @@ def order():
         token = jwt.encode(payload={"email": session['email']}, key=app.config["SECRET_KEY"], algorithm="HS256")
         verification_url = url_for('confirm_order', token=token, _external=True)
         message = f"Press here to confirm your order: {verification_url}"
-        send_email(session['email'], "EPL Verify Purchase", message)
+        send_email(session['email'], "EPL Verify Order", message)
 
         return jsonify('Model uploaded'), HTTPStatus.CREATED
     
@@ -266,17 +266,18 @@ def review_orders():
         staff_email = session['token']['userinfo']['email']
 
         if(order_status == 'denied'):
-            order_message = request.form['message']
+            reason = request.form['message']
+            send_email(order_email, "EPL Order Denied", f"{reason}")
             db.deny_order(order_id, staff_email)
-            message = f"Your order has been denied. Reason: {order_message}"
+
         elif(order_status == 'approved'):
             db.approve_order(order_id, staff_email)
-            message = f"Your EPL 3D printing order has been approved."
+            send_email(order_email, "EPL Order Approved", f"To pay for your order, proceed to {variables.EPL_PAY_SITE}")
+        elif(order_status == 'confirm_payment'):
+            db.pay_order(order_id, staff_email)
         else:
             return abort(HTTPStatus.BAD_REQUEST, jsonify({'error': f'"{order_status}" is an invalid status.'}))
         
-        send_email(order_email, "EPL Verify Purchase", message)
-
         return jsonify({'message': 'Update received'}), HTTPStatus.OK
     
     # Reraise client errors
@@ -394,7 +395,7 @@ def get_filament_inventory():
 @requires_auth
 def close_order():
     """
-    Review and update orders.
+    Updates order status to completed or 'closed'.
 
     Returns:
         JSON response indicating the status of the operation.
@@ -403,8 +404,10 @@ def close_order():
         # Grab order details
         order_id = request.form['id']
         db.close_order(order_id)
-        return jsonify({'message': 'Update received'}), HTTPStatus.OK
-    
+        order_email = db.get_email_by_order_id(order_id)
+        send_email(order_email, "EPL Print Ready for Pickup", "Go get it.")
+        return jsonify({'message': 'Order closed'}), HTTPStatus.OK
+
     # Unkown
     except Exception as e:
         app.logger.critical(f"Error in order route: {e}")

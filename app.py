@@ -273,7 +273,8 @@ def review_orders():
         elif(order_status == 'approved'):
             db.approve_order(order_id, staff_email)
             send_email(order_email, "EPL Order Approved", f"To pay for your order, proceed to {variables.EPL_PAY_SITE}")
-
+        elif(order_status == 'confirm_payment'):
+            db.pay_order(order_id, staff_email)
         else:
             return abort(HTTPStatus.BAD_REQUEST, jsonify({'error': f'"{order_status}" is an invalid status.'}))
         

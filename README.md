@@ -238,3 +238,72 @@ git pull
 git checkout -b <branch-name>
 git push --set-upstream origin <branch name>
 ```
+
+# PARQE Project Setup Guide
+
+1. **Clone PARQE repository**
+   - Run the following command in your terminal:
+     ```bash
+     git clone {url}
+     ```
+
+2. **Navigate to Setup Directory**
+   - Change into the setup directory:
+     ```bash
+     cd CapstoneParqe/setup
+     ```
+
+3. **Run Setup Script**
+   - Execute the setup script (you may need to make it executable before running):
+     ```bash
+     chmod +x setup.sh
+     ./setup.sh
+     ```
+
+4. **Return to Main Folder**
+   - Go back to the main project folder:
+     ```bash
+     cd ..
+     ```
+
+5. **Create Uploads Folder**
+   - Create the 'uploads' folder:
+     ```bash
+     mkdir uploads
+     ```
+
+6. **Run the Application**
+   - Start the application:
+     ```bash
+     python3 app.py
+     ```
+
+7. **Install Required Libraries**
+   - Add the following dependencies to the `requirements.txt` file:
+     ```
+     python-dotenv
+     authlib
+     octorest
+     ```
+   - Install the libraries using:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+8. **Database Connection and Manual Manipulation**
+   - Connect to PostgreSQL as the superuser:
+     ```bash
+     sudo -u postgres psql
+     ```
+
+   - Connect to the PARQE database:
+     ```sql
+     \c parqe
+     ```
+
+   - Display all tables in PARQE:
+     ```sql
+     \d
+     ```
+
+   - From here on, you can use normal SQL commands to manipulate the database.

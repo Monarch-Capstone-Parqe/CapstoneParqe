@@ -5,6 +5,52 @@ import * as THREE from 'three';
 
 //Maximum number of orders able to render on a page
 let maxRender = 10;
+let loggedIn = false;
+
+//Fetches the url for staff to login via auth0
+function login() {
+    window.location.href = '/staff/login';
+}
+window.login = login;
+
+//Fetches the url for staff to logout via auth0
+function logout() {
+    window.location.href = '/staff/logout';
+}
+window.logout = logout;
+
+async function loggedInStatus() {
+    return fetch('/staff/status', {
+        method: 'GET'
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        if(data.status) {
+            loggedIn = true;
+            document.getElementById('login-button').classList.add('hide');
+            document.getElementById('logout-button').classList.remove('hide');
+
+            document.getElementById('pending-page-button').classList.remove('hide');
+            document.getElementById('approved-page-button').classList.remove('hide');
+            document.getElementById('denied-page-button').classList.remove('hide');
+            document.getElementById('inventory-page-button').classList.remove('hide');
+        }
+        else {
+            loggedIn = false;
+            document.getElementById('login-button').classList.remove('hide');
+            document.getElementById('logout-button').classList.add('hide');
+
+            document.getElementById('pending-page-button').classList.add('hide');
+            document.getElementById('approved-page-button').classList.add('hide');
+            document.getElementById('denied-page-button').classList.add('hide');
+            document.getElementById('inventory-page-button').classList.add('hide');
+        }
+        return loggedIn;
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
+}
 
 //Updates page content based on url hash change
 window.addEventListener("hashchange", () => {
@@ -12,9 +58,12 @@ window.addEventListener("hashchange", () => {
 })
 
 //Determines which page to display based on current url hash
-function initialLoad() {
-    console.log(window.location.hash);
-    if(window.location.hash == '') {
+async function initialLoad() {
+    await loggedInStatus();
+    if(loggedIn == false) {
+        openInvalidPage();
+    }
+    else if(window.location.hash == '' || window.location.hash == '#invalid') {
         window.location.hash = 'pending';
     }
     if(window.location.hash == '#pending') {
@@ -99,7 +148,8 @@ function removeOrder(id) {
     console.log(jobsTable.rows.length);
     if(jobsTable.rows.length == 1) {
         // hide the intialized table
-        jobsTable.style.display = 'none';
+        jobsTable.style.display = 'none'; 
+        document.getElementById('search-input').style.display = 'none';
 
         // show the no jobs in queue message
         document.getElementById('no-jobs-message').style.display = 'block';
@@ -111,6 +161,7 @@ function removeOrder(id) {
 function removeAllOrders() {
     document.getElementById('table-rows').innerHTML = '';
     document.getElementById('jobs-table').style.display = 'none';
+    document.getElementById('search-input').style.display = 'none';
     document.getElementById('no-jobs-message').style.display = 'block';
     removeLoadMoreButton();
 }
@@ -119,6 +170,7 @@ function removeAllOrders() {
 function initJobsTable() {
     document.getElementById('no-jobs-message').style.display = 'none';
 
+    document.getElementById('search-input').style.display = 'block';
     document.querySelector('#jobs-table').style.display = 'block';
 }
 
@@ -195,6 +247,26 @@ function searchOrders(){
 window.searchOrders = searchOrders;
 
 /**************************************** END SHARED FUNCTIONS ****************************************/
+
+
+
+
+/**************************************** INVALID PAGE ****************************************/
+function openInvalidPage() {
+    window.location.hash = 'invalid';
+
+    const jobsBoxHeaderContent = document.getElementById('subheader-text');
+    const noJobsMessage = document.getElementById('no-jobs-message');
+    
+    removeAllFilaments();
+    removeAllOrders();
+
+    jobsBoxHeaderContent.innerText = 'INVALID EMAIL';
+    noJobsMessage.innerText = 'Your email is not registered in the EPL staff database, speak with an EPL staff member to register your email.';
+}
+
+
+/**************************************** END INVALID PAGE ****************************************/
 
 
 

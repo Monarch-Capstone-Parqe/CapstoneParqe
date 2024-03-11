@@ -91,12 +91,27 @@ def staff_logout():
         + "/v2/logout?"
         + urlencode(
             {
-                "returnTo": url_for("home", _external=True),
+                "returnTo": url_for("staff_home", _external=True),
                 "client_id": variables.AUTH0_CLIENT_ID,
             },
             quote_via=quote_plus,
         )
     )
+
+@app.route('/staff/status', methods=['GET'])
+@requires_auth
+def staff_status():
+    """Determine whether staff member is valid in database"""
+    try:
+        print('status')
+        staff_email = session['token']['userinfo']['email']
+        result = db.staff_email_exists(staff_email) 
+        print(result)
+        return jsonify({"status": result}), HTTPStatus.OK
+    
+    except Exception as e:
+        app.logger.error(f"Error in staff/status route: {e}")
+        return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route('/order', methods=['POST'])
 def order():

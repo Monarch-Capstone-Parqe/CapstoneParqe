@@ -331,6 +331,23 @@ def get_staff_email(id):
         staff_email = staff_email_dict[0]['email']
         return staff_email
 
+def staff_email_exists(email):
+    """
+    Check whether the email of a staff member exists in the database.
+
+    Parameters:
+        email (str): The email of the staff member being checked.
+
+    Returns:
+        bool: Whether the email exists or not
+    """
+    with engine.connect() as conn:
+        staff_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM staff WHERE email=:email)"),
+                                    {"email": email}).scalar()
+        if not staff_exists:
+            return False
+        return True
+
 def get_email_by_order_id(order_id) -> str:
     """
     Retrieve the email associated with the given order ID.

@@ -278,18 +278,7 @@ git push --set-upstream origin <branch name>
      python3 app.py
      ```
 
-7. **Install Required Libraries**
-   - Add the following dependencies to the `requirements.txt` file:
-     ```
-     python-dotenv
-     authlib
-     ```
-   - Install the libraries using:
-     ```bash
-     pip install -r requirements.txt
-     ```
-
-8. **Database Connection and Manual Manipulation**
+7. **Database Connection and Manual Manipulation**
    - Connect to PostgreSQL as the superuser:
      ```bash
      sudo -u postgres psql

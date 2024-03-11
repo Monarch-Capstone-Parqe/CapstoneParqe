@@ -497,11 +497,159 @@ function insertApprovedTableRow(order) {
     quantityCell.classList.add('table-data');
     noteCell.classList.add('table-data');
     approvedCell.classList.add('table-data');
+
+        let buttonBox = document.createElement('section');
+    buttonBox.classList.add('staff-buttons');
+
+    let approveButton = document.createElement('button');
+    approveButton.id = 'approve-button'
+    approveButton.addEventListener('click', () => {
+        approve_payment(order.id);
+    });
+    approveButton.textContent = 'APPROVE PAYMENT';
+
+    buttonBox.appendChild(approveButton);
+    row.insertCell(9).append(buttonBox);
+}
+
+function approve_payment(id){
+    const formData = new FormData();
+    formData.append("id", id)
+    formData.append("status", "confirm_payment")
+    fetch("/staff/review_orders", {
+        method: "PUT",
+        body: formData
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    })
+    removeOrder(id);
 }
 
 /**************************************** END APPROVED PAGE ****************************************/
 
+/**************************************** PRINT PAGE****************************************/
 
+//Render data onto a table given an order
+function insertGeneralData(row, order){
+
+    // set the id of the row to the corresponding order, for use in the removeJob() function
+    row.setAttribute('id', order.id);
+
+    let priceCell = row.insertCell(0);
+    let emailCell = row.insertCell(1);
+    let filamentCell = row.insertCell(2);
+    let nozzleCell = row.insertCell(3);
+    let layerCell = row.insertCell(4);
+    let infillCell = row.insertCell(5);
+    let quantityCell = row.insertCell(6);
+    let noteCell = row.insertCell(7); 
+    let approvedCell = row.insertCell(8);
+
+    priceCell.innerHTML = order.price;
+    emailCell.innerHTML = order.email;
+    filamentCell.innerHTML = order.filament_type;
+    nozzleCell.innerHTML = order.nozzle_size;
+    layerCell.innerHTML = order.layer_height;
+    infillCell.innerHTML = order.infill;
+    quantityCell.innerHTML = order.quantity;
+    noteCell.innerHTML = order.note;
+    approvedCell.innerHTML = order.approved_by;
+
+    priceCell.classList.add('table-data');
+    emailCell.classList.add('table-data');
+    filamentCell.classList.add('table-data');
+    nozzleCell.classList.add('table-data');
+    layerCell.classList.add('table-data');
+    infillCell.classList.add('table-data');
+    quantityCell.classList.add('table-data');
+    noteCell.classList.add('table-data');
+    approvedCell.classList.add('table-data');
+}
+
+function insertPrintingTableRow(order) {
+    let tableRows = document.querySelector('#table-rows');
+    let row = tableRows.insertRow();
+    insertGeneralData(row, order);
+    let buttonBox = document.createElement('section');
+    buttonBox.classList.add('staff-buttons');
+
+    let approveButton = document.createElement('button');
+    approveButton.id = 'approve-button'
+    approveButton.addEventListener('click', () => {
+        approve_payment(order.id);
+    });
+    approveButton.textContent = 'APPROVE PAYMENT';
+
+    buttonBox.appendChild(approveButton);
+    row.insertCell(9).append(buttonBox);
+}
+
+//Renders page of approved orders
+function openPrintingPage() {
+    openPage('printing');
+}
+
+function openPage(page) {
+    window.location.hash = page;
+    maxRender = 10;
+
+    const jobsBoxHeaderContent = document.getElementById('subheader-text');
+    const noJobsMessage = document.getElementById('no-jobs-message');
+
+    removeAllFilaments();
+    removeAllOrders();
+    jobsBoxHeaderContent.innerText = 'PRINTING ORDERS';
+    noJobsMessage.innerText = 'No orders have been approved.';
+    document.getElementById('table-approved').classList.remove('hide');
+    document.getElementById('table-denied').classList.add('hide');
+    document.getElementById('table-buttons').classList.add('hide');
+
+    refreshOrdersWrapper(); 
+
+}
+
+window.openPrintingPage = openPrintingPage;
+
+//Get approved orders from database
+function refreshPrintingOrders()
+{
+    console.log("refresh")
+    fetch("/staff/get_orders/approved_payment", {
+        method: "GET",
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data)
+        for(let i = 0; i < maxRender && i < data.orders.length; i++) {
+            renderPrintingOrder(data.orders[i]);
+        }
+        if(data.orders.length > maxRender) {
+            renderLoadMoreButton();
+        }
+    })
+    .catch((error) => {
+        console.error("Error: ", error);
+    });
+}
+
+//Function to create approved order sections with input variables
+//Variables will be received from database
+function renderPrintingOrder(order) {
+    const exists = document.getElementById(order.id)
+    if(exists) {
+        return
+    }
+
+    if(document.querySelector('#jobs-table').rows.length > 0) {
+        // display the table
+        initJobsTable();
+    }
+    // insert the order into the table to display on staff page
+    insertPrintingTableRow(order);
+}
+
+/**************************************** END PRINTING PAGE ****************************************/
 
 
 /**************************************** DENIED PAGE ****************************************/

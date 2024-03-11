@@ -256,6 +256,7 @@ def pay_order(order_id, email):
             WHERE order_id = :order_id
         """)
         conn.execute(remove_query, {'order_id': order_id})
+        conn.commit()
 
 def print_order(order_id):
     """

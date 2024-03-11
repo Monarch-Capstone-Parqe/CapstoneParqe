@@ -362,7 +362,7 @@ def color(action):
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
 
 @app.route('/staff/get_filament_inventory', methods=['GET'])
-@requires_auth
+#@requires_auth
 def get_filament_inventory():
     """
     Retrieve filament inventory

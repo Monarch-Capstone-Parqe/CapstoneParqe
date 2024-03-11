@@ -5,7 +5,7 @@ import * as THREE from 'three';
 
 //Maximum number of orders able to render on a page
 let maxRender = 10;
-let loggedIn = false;
+let verified = false;
 
 //Fetches the url for staff to login via auth0
 function login() {
@@ -19,14 +19,14 @@ function logout() {
 }
 window.logout = logout;
 
-async function loggedInStatus() {
+async function verifyEmail() {
     return fetch('/staff/verify', {
         method: 'GET'
     })
     .then((response) => response.json())
     .then((data) => {
         if(data.status) {
-            loggedIn = true;
+            verified = true;
             document.getElementById('login-button').classList.add('hide');
             document.getElementById('logout-button').classList.remove('hide');
 
@@ -36,7 +36,7 @@ async function loggedInStatus() {
             document.getElementById('inventory-page-button').classList.remove('hide');
         }
         else {
-            loggedIn = false;
+            verified = false;
             document.getElementById('login-button').classList.remove('hide');
             document.getElementById('logout-button').classList.add('hide');
 
@@ -45,7 +45,7 @@ async function loggedInStatus() {
             document.getElementById('denied-page-button').classList.add('hide');
             document.getElementById('inventory-page-button').classList.add('hide');
         }
-        return loggedIn;
+        return verified;
     })
     .catch((error) => {
         console.error("Error: ", error);
@@ -59,8 +59,8 @@ window.addEventListener("hashchange", () => {
 
 //Determines which page to display based on current url hash
 async function initialLoad() {
-    await loggedInStatus();
-    if(loggedIn == false) {
+    await verifyEmail();
+    if(verified == false) {
         openInvalidPage();
     }
     else if(window.location.hash == '' || window.location.hash == '#invalid') {

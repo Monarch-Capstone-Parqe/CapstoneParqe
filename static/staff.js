@@ -20,7 +20,7 @@ function logout() {
 window.logout = logout;
 
 async function loggedInStatus() {
-    return fetch('/staff/status', {
+    return fetch('/staff/verify', {
         method: 'GET'
     })
     .then((response) => response.json())

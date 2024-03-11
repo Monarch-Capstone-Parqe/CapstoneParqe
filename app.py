@@ -98,7 +98,7 @@ def staff_logout():
         )
     )
 
-@app.route('/staff/status', methods=['GET'])
+@app.route('/staff/verify', methods=['GET'])
 @requires_auth
 def staff_status():
     """Determine whether staff member is valid in database"""

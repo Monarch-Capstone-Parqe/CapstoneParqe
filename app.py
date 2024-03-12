@@ -226,6 +226,10 @@ def get_orders(order_type):
         orders = db.get_paid_orders()
         for order in orders:
             order['checked_by'] = db.get_staff_email_by_paid_order_id(order['id'])
+    elif order_type == 'print':
+        orders = db.get_printing_orders()
+    elif order_type == 'closed':
+        orders = db.get_closed_orders()
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 

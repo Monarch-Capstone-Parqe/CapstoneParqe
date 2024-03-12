@@ -26,6 +26,15 @@ function initialLoad() {
     else if(window.location.hash == '#denied') {
         openDeniedPage();
     }
+    else if (window.location.hash == '#paid') {
+        openPaidPage();
+    }
+    else if (window.location.hash == '#print') {
+        openPrintingPage();
+    }
+    else if (window.location.hash == '#closed') {
+        openClosedPage();
+    }
     else if(window.location.hash == '#inventory') {
         openInventoryPage();
     }
@@ -56,7 +65,13 @@ function refreshOrdersWrapper()
         refreshDeniedOrders();
     }
     else if(window.location.hash == '#paid') {
-        refreshPaidOrders();
+        refreshOrders('staff/get_orders/paid', renderPaidOrder);
+    }
+    else if(window.location.hash == '#print') {
+        refreshOrders('staff/get_orders/print', renderPrintOrder);
+    }
+    else if(window.location.hash == '#closed') {
+        refreshOrders('staff/get_orders/closed', renderClosedOrder);
     }
 }
 
@@ -574,26 +589,14 @@ function insertPaidTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
     insertGeneralData(row, order);
-    // let buttonBox = document.createElement('section');
-    // buttonBox.classList.add('staff-buttons');
-
-    // let approveButton = document.createElement('button');
-    // approveButton.id = 'approve-button'
-    // approveButton.addEventListener('click', () => {
-    //     approve_payment(order.id);
-    // });
-    // approveButton.textContent = 'APPROVE PAYMENT';
-
-    // buttonBox.appendChild(approveButton);
-    // row.insertCell(9).append(buttonBox);
 }
 
 //Renders page of approved orders
-function openPaidOrder() {
-    openPage('paid');
+function openPaidPage() {
+    openPage('paid', 'PAID ORDERS/PENDING PRINT');
 }
 
-function openPage(page) {
+function openPage(page, headerText) {
     window.location.hash = page;
     maxRender = 10;
 
@@ -602,30 +605,30 @@ function openPage(page) {
 
     removeAllFilaments();
     removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'PAID ORDERS';
-    noJobsMessage.innerText = 'No orders have been approved.';
+    jobsBoxHeaderContent.innerText = headerText;
+    noJobsMessage.innerText = 'No orders to display.';
     document.getElementById('table-approved').classList.remove('hide');
     document.getElementById('table-denied').classList.add('hide');
     document.getElementById('table-buttons').classList.add('hide');
 
     refreshOrdersWrapper(); 
-
 }
 
-window.openPaidOrder = openPaidOrder;
+window.openPaidOrder = openPaidPage;
 
-//Get approved orders from database
-function refreshPaidOrders()
+//Get orders based on an endpoint to fetch data from
+//Pass in function call to render the order
+function refreshOrders(fetchDataEndpoint, renderOrder)
 {
     console.log("refresh")
-    fetch("/staff/get_orders/paid", {
+    fetch(fetchDataEndpoint, {
         method: "GET",
     })
     .then((response) => response.json())
     .then((data) => {
         console.log(data)
         for(let i = 0; i < maxRender && i < data.orders.length; i++) {
-            renderPaidOrder(data.orders[i]);
+            renderOrder(data.orders[i]);
         }
         if(data.orders.length > maxRender) {
             renderLoadMoreButton();
@@ -654,6 +657,60 @@ function renderPaidOrder(order) {
 
 /**************************************** END PAID PAGE ****************************************/
 
+/**************************************** PRINTING PAGE ****************************************/
+function openPrintingPage(){
+    openPage('print', 'ORDERS PRINTING');
+}
+
+window.openPrintingPage = openPrintingPage;
+
+//Function to create approved order sections with input variables
+//Variables will be received from database
+function renderPrintOrder(order) {
+    const exists = document.getElementById(order.id)
+    if(exists) {
+        return
+    }
+
+    if(document.querySelector('#jobs-table').rows.length > 0) {
+        // display the table
+        initJobsTable();
+    }
+    // insert the order into the table to display on staff page
+    let tableRows = document.querySelector('#table-rows');
+    let row = tableRows.insertRow();
+    insertGeneralData(row, order);
+    //Can add a buttonBox here if need 
+}
+
+/**************************************** END PRINTING PAGE ****************************************/
+
+/**************************************** CLOSED ORDERSPAGE ****************************************/
+function openClosedPage(){
+    openPage('closed', 'CLOSED ORDERS');
+}
+
+window.openClosedPage = openClosedPage;
+
+//Function to create approved order sections with input variables
+//Variables will be received from database
+function renderClosedOrder(order) {
+    const exists = document.getElementById(order.id)
+    if(exists) {
+        return
+    }
+
+    if(document.querySelector('#jobs-table').rows.length > 0) {
+        // display the table
+        initJobsTable();
+    }
+    // insert the order into the table to display on staff page
+    let tableRows = document.querySelector('#table-rows');
+    let row = tableRows.insertRow();
+    insertGeneralData(row, order);
+}
+
+/**************************************** END CLOSED ORDERSPAGE ****************************************/
 
 /**************************************** DENIED PAGE ****************************************/
 

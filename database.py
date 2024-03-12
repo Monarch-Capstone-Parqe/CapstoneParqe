@@ -18,7 +18,7 @@ def check_db_connect():
 def create_tables():
     with engine.connect() as conn:
         # This line is for development only
-        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
+        # conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
         # Note: reviewed_by keeps track of the either who approved/denied the order or who confirmed payment, which ever is more recent.
 
         # Create the staff table
@@ -183,6 +183,17 @@ def get_paid_orders() -> list:
     """
     return fetch_orders("SELECT o.* FROM orders o JOIN paid_orders p ON o.id = p.order_id ORDER BY o.date")
 
+def get_printing_orders() -> list:
+    """
+    Retrieve all printing orders in db
+    """
+    return fetch_orders("SELECT o.* FROM orders o JOIN printing_orders p ON o.id = p.order_id ORDER BY o.date")
+
+def get_closed_orders() -> list:
+    """
+    Retrieve all closed orders in db
+    """
+    return fetch_orders("SELECT o.* FROM orders o JOIN closed_orders c ON o.id = c.order_id ORDER BY o.date")
 
 def get_denied_orders() -> list:
     """

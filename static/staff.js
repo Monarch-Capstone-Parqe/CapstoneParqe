@@ -55,6 +55,9 @@ function refreshOrdersWrapper()
     else if(window.location.hash == '#denied') {
         refreshDeniedOrders();
     }
+    else if(window.location.hash == '#paid') {
+        refreshPaidOrders();
+    }
 }
 
 //Renders load more button under the orders table
@@ -498,7 +501,7 @@ function insertApprovedTableRow(order) {
     noteCell.classList.add('table-data');
     approvedCell.classList.add('table-data');
 
-        let buttonBox = document.createElement('section');
+    let buttonBox = document.createElement('section');
     buttonBox.classList.add('staff-buttons');
 
     let approveButton = document.createElement('button');
@@ -554,7 +557,7 @@ function insertGeneralData(row, order){
     infillCell.innerHTML = order.infill;
     quantityCell.innerHTML = order.quantity;
     noteCell.innerHTML = order.note;
-    approvedCell.innerHTML = order.approved_by;
+    approvedCell.innerHTML = order.checked_by;
 
     priceCell.classList.add('table-data');
     emailCell.classList.add('table-data');
@@ -567,27 +570,27 @@ function insertGeneralData(row, order){
     approvedCell.classList.add('table-data');
 }
 
-function insertPrintingTableRow(order) {
+function insertPaidTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
     insertGeneralData(row, order);
-    let buttonBox = document.createElement('section');
-    buttonBox.classList.add('staff-buttons');
+    // let buttonBox = document.createElement('section');
+    // buttonBox.classList.add('staff-buttons');
 
-    let approveButton = document.createElement('button');
-    approveButton.id = 'approve-button'
-    approveButton.addEventListener('click', () => {
-        approve_payment(order.id);
-    });
-    approveButton.textContent = 'APPROVE PAYMENT';
+    // let approveButton = document.createElement('button');
+    // approveButton.id = 'approve-button'
+    // approveButton.addEventListener('click', () => {
+    //     approve_payment(order.id);
+    // });
+    // approveButton.textContent = 'APPROVE PAYMENT';
 
-    buttonBox.appendChild(approveButton);
-    row.insertCell(9).append(buttonBox);
+    // buttonBox.appendChild(approveButton);
+    // row.insertCell(9).append(buttonBox);
 }
 
 //Renders page of approved orders
-function openPrintingPage() {
-    openPage('printing');
+function openPaidOrder() {
+    openPage('paid');
 }
 
 function openPage(page) {
@@ -599,7 +602,7 @@ function openPage(page) {
 
     removeAllFilaments();
     removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'PRINTING ORDERS';
+    jobsBoxHeaderContent.innerText = 'PAID ORDERS';
     noJobsMessage.innerText = 'No orders have been approved.';
     document.getElementById('table-approved').classList.remove('hide');
     document.getElementById('table-denied').classList.add('hide');
@@ -609,20 +612,20 @@ function openPage(page) {
 
 }
 
-window.openPrintingPage = openPrintingPage;
+window.openPaidOrder = openPaidOrder;
 
 //Get approved orders from database
-function refreshPrintingOrders()
+function refreshPaidOrders()
 {
     console.log("refresh")
-    fetch("/staff/get_orders/approved_payment", {
+    fetch("/staff/get_orders/paid", {
         method: "GET",
     })
     .then((response) => response.json())
     .then((data) => {
         console.log(data)
         for(let i = 0; i < maxRender && i < data.orders.length; i++) {
-            renderPrintingOrder(data.orders[i]);
+            renderPaidOrder(data.orders[i]);
         }
         if(data.orders.length > maxRender) {
             renderLoadMoreButton();
@@ -635,7 +638,7 @@ function refreshPrintingOrders()
 
 //Function to create approved order sections with input variables
 //Variables will be received from database
-function renderPrintingOrder(order) {
+function renderPaidOrder(order) {
     const exists = document.getElementById(order.id)
     if(exists) {
         return
@@ -646,10 +649,10 @@ function renderPrintingOrder(order) {
         initJobsTable();
     }
     // insert the order into the table to display on staff page
-    insertPrintingTableRow(order);
+    insertPaidTableRow(order);
 }
 
-/**************************************** END PRINTING PAGE ****************************************/
+/**************************************** END PAID PAGE ****************************************/
 
 
 /**************************************** DENIED PAGE ****************************************/

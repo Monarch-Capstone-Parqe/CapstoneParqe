@@ -174,6 +174,16 @@ def get_approved_orders() -> list:
     """
     return fetch_orders("SELECT o.* FROM orders o JOIN approved_orders a ON o.id = a.order_id ORDER BY o.date")
 
+def get_paid_orders() -> list:
+    """
+    Retrieve all paid orders
+
+    Returns:
+        list: A list of dictionaries representing each paid order.
+    """
+    return fetch_orders("SELECT o.* FROM orders o JOIN paid_orders p ON o.id = p.order_id ORDER BY o.date")
+
+
 def get_denied_orders() -> list:
     """
     Retrieve all denied orders from the database.
@@ -360,6 +370,20 @@ def get_staff_email_by_approved_order_id(order_id) -> str:
         result = conn.execute(text("SELECT reviewed_by FROM approved_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
         return get_staff_email(result)
     
+def get_staff_email_by_paid_order_id(order_id) -> str:
+    """
+    Retrieve the staff email associated with the given paid order ID.
+
+    Parameters:
+        order_id (int): The primary key of the order.
+
+    Returns:
+        str: The staff email associated with the given paid order ID.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT reviewed_by FROM paid_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
+        return get_staff_email(result)
+
 def get_staff_email_by_denied_order_id(order_id) -> str:
     """
     Retrieve the staff email associated with the given denied order ID.

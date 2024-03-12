@@ -222,6 +222,10 @@ def get_orders(order_type):
         orders = db.get_denied_orders()
         for order in orders:
             order['denied_by'] = db.get_staff_email_by_denied_order_id(order['id'])
+    elif order_type == 'paid':
+        orders = db.get_paid_orders()
+        for order in orders:
+            order['checked_by'] = db.get_staff_email_by_paid_order_id(order['id'])
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 

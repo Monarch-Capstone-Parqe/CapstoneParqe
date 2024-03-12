@@ -103,10 +103,8 @@ def staff_logout():
 def staff_status():
     """Determine whether staff member is valid in database"""
     try:
-        print('status')
         staff_email = session['token']['userinfo']['email']
         result = db.staff_email_exists(staff_email) 
-        print(result)
         return jsonify({"status": result}), HTTPStatus.OK
     
     except Exception as e:

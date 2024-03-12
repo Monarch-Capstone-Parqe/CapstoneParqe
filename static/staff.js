@@ -19,6 +19,7 @@ function logout() {
 }
 window.logout = logout;
 
+//Verifies the email used for login with the staff database
 async function verifyEmail() {
     return fetch('/staff/verify', {
         method: 'GET'
@@ -37,8 +38,8 @@ async function verifyEmail() {
         }
         else {
             verified = false;
-            document.getElementById('login-button').classList.remove('hide');
-            document.getElementById('logout-button').classList.add('hide');
+            document.getElementById('login-button').classList.add('hide');
+            document.getElementById('logout-button').classList.remove('hide');
 
             document.getElementById('pending-page-button').classList.add('hide');
             document.getElementById('approved-page-button').classList.add('hide');
@@ -252,6 +253,8 @@ window.searchOrders = searchOrders;
 
 
 /**************************************** INVALID PAGE ****************************************/
+
+//Renders invalid page for emails accessing the page that aren't in the staff database
 function openInvalidPage() {
     window.location.hash = 'invalid';
 
@@ -264,7 +267,6 @@ function openInvalidPage() {
     jobsBoxHeaderContent.innerText = 'INVALID EMAIL';
     noJobsMessage.innerText = 'Your email is not registered in the EPL staff database, speak with an EPL staff member to register your email.';
 }
-
 
 /**************************************** END INVALID PAGE ****************************************/
 

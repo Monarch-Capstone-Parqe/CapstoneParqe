@@ -300,6 +300,7 @@ def print_order(order_id):
             WHERE order_id = :order_id
         """)
         conn.execute(remove_query, {'order_id': order_id})
+        conn.commit()
 
 def close_order(order_id):
     """
@@ -322,6 +323,7 @@ def close_order(order_id):
             WHERE order_id = :order_id
         """)
         conn.execute(remove_query, {'order_id': order_id})
+        conn.commit()
 
 
 def get_staff_emails() -> list:

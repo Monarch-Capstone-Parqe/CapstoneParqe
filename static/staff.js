@@ -548,7 +548,7 @@ function approve_payment(id){
 
 /**************************************** PRINT PAGE****************************************/
 
-//Render data onto a table given an order
+//Render basic data onto a table given an order and information on order
 function insertGeneralData(row, order){
 
     // set the id of the row to the corresponding order, for use in the removeJob() function
@@ -562,7 +562,6 @@ function insertGeneralData(row, order){
     let infillCell = row.insertCell(5);
     let quantityCell = row.insertCell(6);
     let noteCell = row.insertCell(7); 
-    let approvedCell = row.insertCell(8);
 
     priceCell.innerHTML = order.price;
     emailCell.innerHTML = order.email;
@@ -572,8 +571,7 @@ function insertGeneralData(row, order){
     infillCell.innerHTML = order.infill;
     quantityCell.innerHTML = order.quantity;
     noteCell.innerHTML = order.note;
-    approvedCell.innerHTML = order.checked_by;
-
+    
     priceCell.classList.add('table-data');
     emailCell.classList.add('table-data');
     filamentCell.classList.add('table-data');
@@ -582,13 +580,15 @@ function insertGeneralData(row, order){
     infillCell.classList.add('table-data');
     quantityCell.classList.add('table-data');
     noteCell.classList.add('table-data');
-    approvedCell.classList.add('table-data');
 }
 
 function insertPaidTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
     insertGeneralData(row, order);
+    let approvedCell = row.insertCell(8);
+    approvedCell.innerHTML = order.checked_by;
+    approvedCell.classList.add('table-data');
 }
 
 //Renders page of approved orders
@@ -617,7 +617,7 @@ function openPage(page, headerText) {
 window.openPaidOrder = openPaidPage;
 
 //Get orders based on an endpoint to fetch data from
-//Pass in function call to render the order
+//Pass in function name to render the order
 function refreshOrders(fetchDataEndpoint, renderOrder)
 {
     console.log("refresh")
@@ -639,7 +639,7 @@ function refreshOrders(fetchDataEndpoint, renderOrder)
     });
 }
 
-//Function to create approved order sections with input variables
+//Function to create paid order sections with input variables
 //Variables will be received from database
 function renderPaidOrder(order) {
     const exists = document.getElementById(order.id)
@@ -651,6 +651,7 @@ function renderPaidOrder(order) {
         // display the table
         initJobsTable();
     }
+
     // insert the order into the table to display on staff page
     insertPaidTableRow(order);
 }
@@ -658,14 +659,14 @@ function renderPaidOrder(order) {
 /**************************************** END PAID PAGE ****************************************/
 
 /**************************************** PRINTING PAGE ****************************************/
+
 function openPrintingPage(){
     openPage('print', 'ORDERS PRINTING');
+    document.getElementById('table-approved').classList.add('hide');
 }
 
 window.openPrintingPage = openPrintingPage;
 
-//Function to create approved order sections with input variables
-//Variables will be received from database
 function renderPrintOrder(order) {
     const exists = document.getElementById(order.id)
     if(exists) {
@@ -673,14 +674,11 @@ function renderPrintOrder(order) {
     }
 
     if(document.querySelector('#jobs-table').rows.length > 0) {
-        // display the table
         initJobsTable();
     }
-    // insert the order into the table to display on staff page
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
     insertGeneralData(row, order);
-    //Can add a buttonBox here if need 
 }
 
 /**************************************** END PRINTING PAGE ****************************************/
@@ -688,12 +686,11 @@ function renderPrintOrder(order) {
 /**************************************** CLOSED ORDERSPAGE ****************************************/
 function openClosedPage(){
     openPage('closed', 'CLOSED ORDERS');
+    document.getElementById('table-approved').classList.add('hide');
 }
 
 window.openClosedPage = openClosedPage;
 
-//Function to create approved order sections with input variables
-//Variables will be received from database
 function renderClosedOrder(order) {
     const exists = document.getElementById(order.id)
     if(exists) {
@@ -701,10 +698,9 @@ function renderClosedOrder(order) {
     }
 
     if(document.querySelector('#jobs-table').rows.length > 0) {
-        // display the table
         initJobsTable();
     }
-    // insert the order into the table to display on staff page
+
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
     insertGeneralData(row, order);

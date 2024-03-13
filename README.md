@@ -8,7 +8,6 @@
 2. [How to Set Up Development Environment ](#Set)
    1. [Set Up with Windows/Linux](#setupWindow/Linux)
    2. [Set Up PARQE Project](#setup/run)
-3. Conclusion
 
 ---
 # Introduction <a name="intro"></a>

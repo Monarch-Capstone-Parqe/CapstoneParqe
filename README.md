@@ -1,17 +1,15 @@
 # CapstonePARQE
 
-
 # Table of Contents
 1. [Introduction](#intro)
    1. [Project Description](#projectDesc)
    2. [Project Details](#projectDetails)
    3. [Capstone Team](#capstoneTeam)
 2. [How to Set Up Development Environment ](#Set)
-   1. [Set Up with Windows](#setupWindow)
-   2. [Set Up with Linux](#setupLinux)
-3. Conclusion
+   1. [Set Up with Windows/Linux](#setupWindow/Linux)
+   2. [Set Up PARQE Project](#setup/run)
 
-
+---
 # Introduction <a name="intro"></a>
 
 Welcome to the Portland State University Capstone Project, brought to you by Team Monarch. 
@@ -22,8 +20,8 @@ For detailed documentation, refer to [PARQE Document]().
 ## Project Description <a name="projectDesc"></a>
 
 **Objective:**
-The primary objective of this project is to revolutionize the 3D printing submission workflow within the Portland State University Electronics Prototyping Lab. 
-Through the implementation of the PrusaSlicer Automated Routing and Quoting Engine (PARQE), we aim to introduce modernization and automation to the existing processes.
+
+The primary objective of this project is to revolutionize the 3D printing submission workflow within the Portland State University Electronics Prototyping Lab. Through the implementation of the PrusaSlicer Automated Routing and Quoting Engine (PARQE), we aim to introduce modernization and automation to the existing processes.
 
 **Key Goals:**
 - Streamline the design-to-prototype journey for students.
@@ -120,12 +118,7 @@ The Staff API encompasses the following key functionalities:
 The Staff API streamlines managerial responsibilities, offering a centralized platform for reviewing, approving, and denying print jobs, ultimately contributing to an organized and efficient 3D printing workflow.
 
 ---
-### 3) *Backend* <a name="Backend"></a>
-Related Files
-1. file 1
-2. file 2
-3. file 3
-   
+### 3) *Backend* <a name="Backend"></a>  
 #### Purpose:
 The Backend component serves as the central hub, orchestrating seamless communication and integration among the various modules of the PARQE project.
 
@@ -179,18 +172,19 @@ List of Capstone teams and members who have participated in the development of P
 1. Team Monarch (Fall-Winter 2023-24)
    - Team Lead: Michael Do
    - Team Members:
-     - Fairuz Mohamad Yusuf
+     - Fairuz Yusuf
      - Ryan Niiya
-     - Jordan
-     - Andrew
-     - David
+     - Jordan Hyde
+     - Alan Schaaf
+     - Andrew Steblyakov
+     - David Van
      - Matthew Mahnke
-     - Alan
+     
 2. TBA
    - Team Lead: N/A
    - Team Members: N/A
 
-
+---
 # Guide
 # How to Set Up Development Environment <a name="Set"></a>
 > [!NOTE]
@@ -206,8 +200,8 @@ List of Capstone teams and members who have participated in the development of P
    - Microsoft Visual Studios
    - Visual Studios code
    - JetBrains
-   - 
-## Window <a name="setupWindow"></a>
+
+## Window/Linux Setup <a name="setupWindow/Linux"></a>
 > [!NOTE]
 > Developers can setup local branch however they see fit. This is a barebones basic branch creation.
 ### Setting Up Local Branch
@@ -229,12 +223,60 @@ git push --set-upstream origin <branch name>
 
 ![image](https://github.com/Monarch-Capstone-Parqe/CapstoneParqe/assets/92550433/086854e3-aa84-44b4-9523-ec4c322462ef)
 
-5. 
+---
+# PARQE Project Setup & Run Guide <a name="setup/run"></a>
 
-## Linux <a name="setupLinux"></a>
-```
-git checkout (master branch)
-git pull
-git checkout -b <branch-name>
-git push --set-upstream origin <branch name>
-```
+1. **Clone PARQE repository**
+   - Run the following command in your terminal:
+     ```bash
+     git clone {url}
+     ```
+
+2. **Navigate to Setup Directory**
+   - Change into the setup directory:
+     ```bash
+     cd CapstoneParqe/setup
+     ```
+
+3. **Run Setup Script**
+   - Execute the setup script (you may need to make it executable before running):
+     ```bash
+     chmod +x setup.sh
+     ./setup.sh
+     ```
+
+4. **Return to Main Folder**
+   - Go back to the main project folder:
+     ```bash
+     cd ..
+     ```
+
+5. **Create Uploads Folder**
+   - Create the 'uploads' folder:
+     ```bash
+     mkdir uploads
+     ```
+
+6. **Run the Application**
+   - Start the application:
+     ```bash
+     python3 app.py
+     ```
+
+7. **Database Connection and Manual Manipulation**
+   - Connect to PostgreSQL as the superuser:
+     ```bash
+     sudo -u postgres psql
+     ```
+
+   - Connect to the PARQE database:
+     ```sql
+     \c parqe
+     ```
+
+   - Display all tables in PARQE:
+     ```sql
+     \d
+     ```
+
+   - From here, you can use normal SQL commands to manipulate the database.

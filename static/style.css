@@ -476,11 +476,15 @@ button[id="dark-mode-toggle"]:hover {
 }
 
 .search-input {
+    border: 0px solid #ddd;
+    border-bottom: 1px solid #404040;
     width: 100%;
-    border: 1px solid #ddd;
-    padding: 12px 20px 12px 20px;
-    font-size: 16px; 
-    font-family: "Acumin-ECBPro";
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 20px;
+    margin: 0 auto;
+    font-size: 1.05em; 
+    font-family: "Acumin-ITPro";
 }
 
 .boxed-data {
@@ -504,6 +508,7 @@ button[id="dark-mode-toggle"]:hover {
   height: 1px;
   background-color: #404040;
   width: 100%;
+  padding-left: 22px;
 }
 
 .staff-table {
@@ -583,7 +588,7 @@ button[id="dark-mode-toggle"]:hover {
 
 .staff-buttons {
   display: flex;
-  width: 300px;
+  justify-content: flex-end;
   height: 50px;
   margin-left: 50px;
   border: none;

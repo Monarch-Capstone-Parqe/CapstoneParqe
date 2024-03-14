@@ -91,12 +91,25 @@ def staff_logout():
         + "/v2/logout?"
         + urlencode(
             {
-                "returnTo": url_for("home", _external=True),
+                "returnTo": url_for("staff_home", _external=True),
                 "client_id": variables.AUTH0_CLIENT_ID,
             },
             quote_via=quote_plus,
         )
     )
+
+@app.route('/staff/verify', methods=['GET'])
+@requires_auth
+def staff_status():
+    """Determine whether staff member is valid in database"""
+    try:
+        staff_email = session['token']['userinfo']['email']
+        result = db.staff_email_exists(staff_email) 
+        return jsonify({"status": result}), HTTPStatus.OK
+    
+    except Exception as e:
+        app.logger.error(f"Error in staff/status route: {e}")
+        return jsonify({'error': 'Internal Server Error'}), HTTPStatus.INTERNAL_SERVER_ERROR
 
 @app.route('/order', methods=['POST'])
 def order():
@@ -222,6 +235,14 @@ def get_orders(order_type):
         orders = db.get_denied_orders()
         for order in orders:
             order['denied_by'] = db.get_staff_email_by_denied_order_id(order['id'])
+    elif order_type == 'paid':
+        orders = db.get_paid_orders()
+        for order in orders:
+            order['checked_by'] = db.get_staff_email_by_paid_order_id(order['id'])
+    elif order_type == 'print':
+        orders = db.get_printing_orders()
+    elif order_type == 'closed':
+        orders = db.get_closed_orders()
     else:
         return jsonify({'error': 'Invalid order type'}), HTTPStatus.BAD_REQUEST
 

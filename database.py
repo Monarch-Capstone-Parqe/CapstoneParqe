@@ -18,7 +18,7 @@ def check_db_connect():
 def create_tables():
     with engine.connect() as conn:
         # This line is for development only
-        #conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
+        # conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
         # Note: reviewed_by keeps track of the either who approved/denied the order or who confirmed payment, which ever is more recent.
 
         # Create the staff table
@@ -266,6 +266,7 @@ def pay_order(order_id, email):
             WHERE order_id = :order_id
         """)
         conn.execute(remove_query, {'order_id': order_id})
+        conn.commit()
 
 def print_order(order_id):
     """
@@ -288,6 +289,7 @@ def print_order(order_id):
             WHERE order_id = :order_id
         """)
         conn.execute(remove_query, {'order_id': order_id})
+        conn.commit()
 
 def close_order(order_id):
     """
@@ -310,6 +312,7 @@ def close_order(order_id):
             WHERE order_id = :order_id
         """)
         conn.execute(remove_query, {'order_id': order_id})
+        conn.commit()
 
 
 def get_staff_emails() -> list:
@@ -341,6 +344,23 @@ def get_staff_email(id):
         staff_email = staff_email_dict[0]['email']
         return staff_email
 
+def staff_email_exists(email):
+    """
+    Check whether the email of a staff member exists in the database.
+
+    Parameters:
+        email (str): The email of the staff member being checked.
+
+    Returns:
+        bool: Whether the email exists or not
+    """
+    with engine.connect() as conn:
+        staff_exists = conn.execute(text("SELECT EXISTS(SELECT 1 FROM staff WHERE email=:email)"),
+                                    {"email": email}).scalar()
+        if not staff_exists:
+            return False
+        return True
+
 def get_email_by_order_id(order_id) -> str:
     """
     Retrieve the email associated with the given order ID.
@@ -369,6 +389,20 @@ def get_staff_email_by_approved_order_id(order_id) -> str:
         result = conn.execute(text("SELECT reviewed_by FROM approved_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
         return get_staff_email(result)
     
+def get_staff_email_by_paid_order_id(order_id) -> str:
+    """
+    Retrieve the staff email associated with the given paid order ID.
+
+    Parameters:
+        order_id (int): The primary key of the order.
+
+    Returns:
+        str: The staff email associated with the given paid order ID.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT reviewed_by FROM paid_orders WHERE order_id = :order_id"), {"order_id": order_id}).scalar()
+        return get_staff_email(result)
+
 def get_staff_email_by_denied_order_id(order_id) -> str:
     """
     Retrieve the staff email associated with the given denied order ID.

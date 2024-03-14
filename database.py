@@ -448,7 +448,28 @@ def add_staff_member(email) -> bool:
             return True
         else:
             return False
-        
+
+def remove_staff_member(email) -> bool:
+    """
+    Removes a staff member from the staff table if exists.
+
+    Parameters:
+        email (str): The email of the staff member to be removed.
+
+    Returns:
+        bool: True if the staff member was removed successfully, False if the email does not exist.
+    """
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT COUNT(*) FROM staff WHERE email = :email"), {"email": email})
+        count = result.fetchone()[0]
+
+        if count != 0:
+            conn.execute(text("DELETE FROM staff WHERE email=(:email)"), {"email": email})
+            conn.commit()
+            return True
+        else:
+            return False   
+          
 def add_filament(type, in_stock):
     """
     Add a new type of filament to the 'filaments' table if not already exists.

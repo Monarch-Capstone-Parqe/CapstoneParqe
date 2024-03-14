@@ -84,7 +84,6 @@ def create_tables():
            conn.execute(text("INSERT INTO colors(color) VALUES (:color)"), {"color": "black"})
 
         conn.commit()
-        add_staff_member('andrey7@pdx.edu')
 
 def insert_order(email, filament_type=None, nozzle_size=None, layer_height=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
     """

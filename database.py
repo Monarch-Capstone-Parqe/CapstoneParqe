@@ -174,6 +174,16 @@ def get_approved_orders() -> list:
     """
     return fetch_orders("SELECT o.* FROM orders o JOIN approved_orders a ON o.id = a.order_id ORDER BY o.date")
 
+def get_paid_orders() -> list:
+    """
+    Retrieve all paid orders from the database.
+
+    Returns:
+        list: A list of dictionaries representing each paid order.
+    """
+    return fetch_orders("SELECT o.* FROM orders o JOIN paid_orders a ON o.id = a.order_id ORDER BY o.date")
+
+
 def get_denied_orders() -> list:
     """
     Retrieve all denied orders from the database.

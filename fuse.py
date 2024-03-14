@@ -13,7 +13,7 @@ stop_event = threading.Event()
 # Function that will run in a separate thread
 def background_task():
     while not stop_event.is_set():
-        orders = db.get_approved_orders()
+        orders = db.get_paid_orders()
         for order in orders:
             result = enqueue_print(order)
             if result:

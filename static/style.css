@@ -588,7 +588,7 @@ button[id="dark-mode-toggle"]:hover {
 
 .staff-buttons {
   display: flex;
-  width: 300px;
+  justify-content: flex-end;
   height: 50px;
   margin-left: 50px;
   border: none;

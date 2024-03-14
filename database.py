@@ -1,12 +1,8 @@
 from datetime import date
-
-
 from sqlalchemy import create_engine, text, MetaData
-
 import config.variables as variables
 
-#DB_USERNAME & DB_PASSWORD exist as system environment variables
-# -TODO Likely will make the whole DB_URI its own env var eventually
+# Create engine and metadata
 engine = create_engine(f'postgresql://{variables.DB_USERNAME}:{variables.DB_PASSWORD}@localhost:5432/parqe')
 metadata = MetaData()
 metadata.reflect(bind=engine)
@@ -17,8 +13,6 @@ def check_db_connect():
 # Create PARQE tables
 def create_tables():
     with engine.connect() as conn:
-        # This line is for development only
-        # conn.execute(text("DROP TABLE IF EXISTS staff, orders, approved_orders, denied_orders, pending_orders, filaments, colors, filament_colors CASCADE"))
         # Note: reviewed_by keeps track of the either who approved/denied the order or who confirmed payment, which ever is more recent.
 
         # Create the staff table
@@ -90,8 +84,7 @@ def create_tables():
            conn.execute(text("INSERT INTO colors(color) VALUES (:color)"), {"color": "black"})
 
         conn.commit()
-
-
+        add_staff_member('andrey7@pdx.edu')
 
 def insert_order(email, filament_type=None, nozzle_size=None, layer_height=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
     """
@@ -183,6 +176,23 @@ def get_paid_orders() -> list:
     """
     return fetch_orders("SELECT o.* FROM orders o JOIN paid_orders a ON o.id = a.order_id ORDER BY o.date")
 
+def get_printing_orders() -> list:
+    """
+    Retrieve all printing orders from the database.
+
+    Returns:
+        list: A list of dictionaries representing each printing order.
+    """
+    return fetch_orders("SELECT o.* FROM orders o JOIN printing_orders a ON o.id = a.order_id ORDER BY o.date")
+
+def get_closed_orders() -> list:
+    """
+    Retrieve all closed orders from the database.
+
+    Returns:
+        list: A list of dictionaries representing each closed order.
+    """
+    return fetch_orders("SELECT o.* FROM orders o JOIN closed_orders a ON o.id = a.order_id ORDER BY o.date")
 
 def get_denied_orders() -> list:
     """

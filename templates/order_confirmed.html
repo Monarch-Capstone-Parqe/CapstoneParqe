@@ -1,26 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmed</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .message {
-            font-size: 24px;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <div class="message">
-        Order confirmed
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}
+Order Confirmed
+{% endblock %}
+
+{% block head %}
+<style>
+  main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    text-align: center;
+    font-family: 'Acumin-ECBPro';
+  }
+  
+  header {
+    font-size: 96px;
+    margin-bottom: 0;
+    line-height: 1; 
+  }
+
+  .psu-logo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100px;
+    width: auto;
+  }
+
+  p {
+    font-size: 36px;
+  }
+
+</style>
+{% endblock %}
+
+{% block body %}
+<img
+  class="psu-logo"
+  src="{{ url_for('static', filename='images/psu_logo.png') }}"
+  alt="Portland State Logo"
+/>
+
+<main>
+  <header>
+    <h1>Order Confirmed</h1>
+    <p>You will be emailed when your order is approved.</p>
+  </header>
+</main>
+{% endblock %}

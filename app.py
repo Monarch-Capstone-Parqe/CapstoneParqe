@@ -21,7 +21,6 @@ import fuse
 db.check_db_connect()
 db.create_tables()
 
-fuse.start_sending_orders()
 
 # Init flask
 app = Flask(__name__, static_url_path='/static', static_folder='static')
@@ -29,6 +28,8 @@ app.config["SECRET_KEY"] = variables.APP_SECRET_KEY
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
+fuse.start_sending_orders()
 
 # Init auth0
 oauth = OAuth(app)
@@ -383,7 +384,6 @@ def color(action):
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
 
 @app.route('/staff/get_filament_inventory', methods=['GET'])
-#@requires_auth
 def get_filament_inventory():
     """
     Retrieve filament inventory

@@ -163,15 +163,12 @@ function openPage(page, headerText) {
 function refreshOrdersWrapper()
 {
     if(window.location.hash == '#pending') {
-        //refreshPendingOrders();
         refreshOrders('staff/get_orders/pending', renderPendingOrder)
     }
     else if(window.location.hash == '#approved') {
-        //refreshApprovedOrders();
         refreshOrders('staff/get_orders/approved', renderApprovedOrder)
     }
     else if(window.location.hash == '#denied') {
-        //refreshDeniedOrders();
         refreshOrders('staff/get_orders/denied', renderDeniedOrder)
     }
     else if(window.location.hash == '#paid') {
@@ -285,7 +282,6 @@ function openPreview(gcode_path)
     })
     .then((response) => response.text())
     .then((data) => {
-        //console.log(data)
         
         //display the modal
         const previewModal = document.querySelector('.gcode-preview-modal');
@@ -657,28 +653,6 @@ function openDeniedPage() {
 }
 window.openDeniedPage = openDeniedPage;
 
-//Get denied orders from database
-function refreshDeniedOrders()
-{
-    console.log("refresh")
-    fetch("/staff/get_orders/denied", {
-        method: "GET",
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        console.log(data)
-        for(let i = 0; i < maxRender && i < data.orders.length; i++) {
-            renderDeniedOrder(data.orders[i]);
-        }
-        if(data.orders.length > maxRender) {
-            renderLoadMoreButton();
-        }
-    })
-    .catch((error) => {
-        console.error("Error: ", error);
-    });
-}
-
 //Function to create denied order sections with input variables
 //Variables will be received from database
 function renderDeniedOrder(order) {
@@ -691,8 +665,6 @@ function renderDeniedOrder(order) {
         // display the table
         initJobsTable();
     }
-    // insert the order into the table to display on staff page
-    //insertDeniedTableRow(order);
 
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();

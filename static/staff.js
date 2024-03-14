@@ -5,7 +5,6 @@ import * as THREE from 'three';
 
 //Maximum number of orders able to render on a page
 let maxRender = 10;
-let verified = false;
 
 //Fetches the url for staff to login via auth0
 function login() {
@@ -27,7 +26,6 @@ async function verifyEmail() {
     .then((response) => response.json())
     .then((data) => {
         if(data.status) {
-            verified = true;
             document.getElementById('login-button').classList.add('hide');
             document.getElementById('logout-button').classList.remove('hide');
 
@@ -38,9 +36,9 @@ async function verifyEmail() {
             document.getElementById('paid-page-button').classList.remove('hide');
             document.getElementById('print-page-button').classList.remove('hide');
             document.getElementById('closed-page-button').classList.remove('hide');
+            return true;
         }
         else {
-            verified = false;
             document.getElementById('login-button').classList.add('hide');
             document.getElementById('logout-button').classList.remove('hide');
 
@@ -52,8 +50,8 @@ async function verifyEmail() {
             document.getElementById('paid-page-button').classList.add('hide');
             document.getElementById('print-page-button').classList.add('hide');
             document.getElementById('closed-page-button').classList.add('hide');
+            return false;
         }
-        return verified;
     })
     .catch((error) => {
         console.error("Error: ", error);
@@ -67,7 +65,7 @@ window.addEventListener("hashchange", () => {
 
 //Determines which page to display based on current url hash
 async function initialLoad() {
-    await verifyEmail();
+    const verified = await verifyEmail();
     if(verified == false) {
         openInvalidPage();
     }
@@ -153,7 +151,7 @@ function openPage(page, headerText) {
     removeAllOrders();
     jobsBoxHeaderContent.innerText = headerText;
     noJobsMessage.innerText = 'No orders to display.';
-    document.getElementById('table-approved').classList.remove('hide');
+    document.getElementById('table-approved').classList.add('hide');
     document.getElementById('table-denied').classList.add('hide');
     document.getElementById('table-buttons').classList.add('hide');
 
@@ -165,13 +163,16 @@ function openPage(page, headerText) {
 function refreshOrdersWrapper()
 {
     if(window.location.hash == '#pending') {
-        refreshPendingOrders();
+        //refreshPendingOrders();
+        refreshOrders('staff/get_orders/pending', renderPendingOrder)
     }
     else if(window.location.hash == '#approved') {
-        refreshApprovedOrders();
+        //refreshApprovedOrders();
+        refreshOrders('staff/get_orders/approved', renderApprovedOrder)
     }
     else if(window.location.hash == '#denied') {
-        refreshDeniedOrders();
+        //refreshDeniedOrders();
+        refreshOrders('staff/get_orders/denied', renderDeniedOrder)
     }
     else if(window.location.hash == '#paid') {
         refreshOrders('staff/get_orders/paid', renderPaidOrder);
@@ -377,45 +378,10 @@ function openInvalidPage() {
 
 //Renders page of pending orders
 function openPendingPage() {
-    window.location.hash = 'pending';
-    maxRender = 10;
-
-    const jobsBoxHeaderContent = document.getElementById('subheader-text');
-    const noJobsMessage = document.getElementById('no-jobs-message');
-
-    removeAllFilaments();
-    removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'PENDING ORDERS';
-    noJobsMessage.innerText = 'No orders are currently pending.';
-    document.getElementById('table-approved').classList.add('hide');
-    document.getElementById('table-denied').classList.add('hide');
+    openPage('pending', 'PENDING ORDERS');
     document.getElementById('table-buttons').classList.remove('hide');
-
-    refreshOrdersWrapper(); 
 }
 window.openPendingPage = openPendingPage;
-
-//Get pending orders from database
-function refreshPendingOrders()
-{
-    console.log("refresh")
-    fetch("/staff/get_orders/pending", {
-        method: "GET",
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        console.log(data)
-        for(let i = 0; i < maxRender && i < data.orders.length; i++) {
-            renderPendingOrder(data.orders[i]);
-        }
-        if(data.orders.length > maxRender) {
-            renderLoadMoreButton();
-        }
-    })
-    .catch((error) => {
-        console.error("Error: ", error);
-    });
-}
 
 //Updates status of order to approved and sends order back to database
 function approve(id)
@@ -465,44 +431,10 @@ function renderPendingOrder(order)
         // display the table
         initJobsTable();
     }
-    // insert the order into the table to display on staff page
-    insertPendingTableRow(order);
-}
 
-// inserts a pending order into the jobs table
-function insertPendingTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
-
-    // set the id of the row to the corresponding order, for use in the removeJob() function
-    row.setAttribute('id', order.id);
-
-    let priceCell = row.insertCell(0);
-    let emailCell = row.insertCell(1);
-    let filamentCell = row.insertCell(2);
-    let nozzleCell = row.insertCell(3);
-    let layerCell = row.insertCell(4);
-    let infillCell = row.insertCell(5);
-    let quantityCell = row.insertCell(6);
-    let noteCell = row.insertCell(7); 
-
-    priceCell.innerHTML = order.price;
-    emailCell.innerHTML = order.email;
-    filamentCell.innerHTML = order.filament_type;
-    nozzleCell.innerHTML = order.nozzle_size;
-    layerCell.innerHTML = order.layer_height;
-    infillCell.innerHTML = order.infill;
-    quantityCell.innerHTML = order.quantity;
-    noteCell.innerHTML = order.note;
-
-    priceCell.classList.add('table-data');
-    emailCell.classList.add('table-data');
-    filamentCell.classList.add('table-data');
-    nozzleCell.classList.add('table-data');
-    layerCell.classList.add('table-data');
-    infillCell.classList.add('table-data');
-    quantityCell.classList.add('table-data');
-    noteCell.classList.add('table-data');
+    insertGeneralData(row, order);
 
     let buttonBox = document.createElement('section');
     buttonBox.classList.add('staff-buttons');
@@ -578,45 +510,10 @@ function openRejectModal(id) {
 
 //Renders page of approved orders
 function openApprovedPage() {
-    window.location.hash = 'approved';
-    maxRender = 10;
-
-    const jobsBoxHeaderContent = document.getElementById('subheader-text');
-    const noJobsMessage = document.getElementById('no-jobs-message');
-
-    removeAllFilaments();
-    removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'APPROVED ORDERS';
-    noJobsMessage.innerText = 'No orders have been approved.';
+    openPage('approved', 'APPROVED ORDERS');
     document.getElementById('table-approved').classList.remove('hide');
-    document.getElementById('table-denied').classList.add('hide');
-    document.getElementById('table-buttons').classList.add('hide');
-
-    refreshOrdersWrapper(); 
 }
 window.openApprovedPage = openApprovedPage;
-
-//Get approved orders from database
-function refreshApprovedOrders()
-{
-    console.log("refresh")
-    fetch("/staff/get_orders/approved", {
-        method: "GET",
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        console.log(data)
-        for(let i = 0; i < maxRender && i < data.orders.length; i++) {
-            renderApprovedOrder(data.orders[i]);
-        }
-        if(data.orders.length > maxRender) {
-            renderLoadMoreButton();
-        }
-    })
-    .catch((error) => {
-        console.error("Error: ", error);
-    });
-}
 
 //Function to create approved order sections with input variables
 //Variables will be received from database
@@ -630,46 +527,13 @@ function renderApprovedOrder(order) {
         // display the table
         initJobsTable();
     }
-    // insert the order into the table to display on staff page
-    insertApprovedTableRow(order);
-}
 
-// inserts an approved order into the jobs table
-function insertApprovedTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
+    insertGeneralData(row, order);
 
-    // set the id of the row to the corresponding order, for use in the removeJob() function
-    row.setAttribute('id', order.id);
-
-    let priceCell = row.insertCell(0);
-    let emailCell = row.insertCell(1);
-    let filamentCell = row.insertCell(2);
-    let nozzleCell = row.insertCell(3);
-    let layerCell = row.insertCell(4);
-    let infillCell = row.insertCell(5);
-    let quantityCell = row.insertCell(6);
-    let noteCell = row.insertCell(7); 
     let approvedCell = row.insertCell(8);
-
-    priceCell.innerHTML = order.price;
-    emailCell.innerHTML = order.email;
-    filamentCell.innerHTML = order.filament_type;
-    nozzleCell.innerHTML = order.nozzle_size;
-    layerCell.innerHTML = order.layer_height;
-    infillCell.innerHTML = order.infill;
-    quantityCell.innerHTML = order.quantity;
-    noteCell.innerHTML = order.note;
     approvedCell.innerHTML = order.approved_by;
-
-    priceCell.classList.add('table-data');
-    emailCell.classList.add('table-data');
-    filamentCell.classList.add('table-data');
-    nozzleCell.classList.add('table-data');
-    layerCell.classList.add('table-data');
-    infillCell.classList.add('table-data');
-    quantityCell.classList.add('table-data');
-    noteCell.classList.add('table-data');
     approvedCell.classList.add('table-data');
 
     let buttonBox = document.createElement('section');
@@ -708,6 +572,7 @@ function approve_payment(id){
 //Loads up the paid page by passing in paid and title to openPage function
 function openPaidPage() {
     openPage('paid', 'PAID ORDERS/PENDING PRINT');
+    document.getElementById('table-approved').classList.remove('hide');
 }
 
 window.openPaidPage = openPaidPage;
@@ -738,7 +603,6 @@ function renderPaidOrder(order) {
 
 function openPrintingPage(){
     openPage('print', 'ORDERS PRINTING');
-    document.getElementById('table-approved').classList.add('hide');
 }
 
 window.openPrintingPage = openPrintingPage;
@@ -762,7 +626,6 @@ function renderPrintOrder(order) {
 /**************************************** CLOSED ORDERS PAGE ****************************************/
 function openClosedPage(){
     openPage('closed', 'CLOSED ORDERS');
-    document.getElementById('table-approved').classList.add('hide');
 }
 
 window.openClosedPage = openClosedPage;
@@ -782,28 +645,15 @@ function renderClosedOrder(order) {
     insertGeneralData(row, order);
 }
 
-/**************************************** END CLOSED ORDERSPAGE ****************************************/
+/**************************************** END CLOSED ORDERS PAGE ****************************************/
 
 
 /**************************************** DENIED PAGE ****************************************/
 
 //Renders page of denied orders
 function openDeniedPage() {
-    window.location.hash = 'denied';
-    maxRender = 10;
-
-    const jobsBoxHeaderContent = document.getElementById('subheader-text');
-    const noJobsMessage = document.getElementById('no-jobs-message');
-
-    removeAllFilaments();
-    removeAllOrders();
-    jobsBoxHeaderContent.innerText = 'DENIED ORDERS';
-    noJobsMessage.innerText = 'No orders have been denied.';
-    document.getElementById('table-approved').classList.add('hide');
+    openPage('denied', 'DENIED ORDERS');
     document.getElementById('table-denied').classList.remove('hide');
-    document.getElementById('table-buttons').classList.add('hide');
-
-    refreshOrdersWrapper(); 
 }
 window.openDeniedPage = openDeniedPage;
 
@@ -842,45 +692,13 @@ function renderDeniedOrder(order) {
         initJobsTable();
     }
     // insert the order into the table to display on staff page
-    insertDeniedTableRow(order);
-}
+    //insertDeniedTableRow(order);
 
-// inserts a denied order into the jobs table
-function insertDeniedTableRow(order) {
     let tableRows = document.querySelector('#table-rows');
     let row = tableRows.insertRow();
-
-    // set the id of the row to the corresponding order, for use in the removeJob() function
-    row.setAttribute('id', order.id);
-
-    let priceCell = row.insertCell(0);
-    let emailCell = row.insertCell(1);
-    let filamentCell = row.insertCell(2);
-    let nozzleCell = row.insertCell(3);
-    let layerCell = row.insertCell(4);
-    let infillCell = row.insertCell(5);
-    let quantityCell = row.insertCell(6);
-    let noteCell = row.insertCell(7); 
+    insertGeneralData(row, order);
     let deniedCell = row.insertCell(8);
-
-    priceCell.innerHTML = order.price;
-    emailCell.innerHTML = order.email;
-    filamentCell.innerHTML = order.filament_type;
-    nozzleCell.innerHTML = order.nozzle_size;
-    layerCell.innerHTML = order.layer_height;
-    infillCell.innerHTML = order.infill;
-    quantityCell.innerHTML = order.quantity;
-    noteCell.innerHTML = order.note;
     deniedCell.innerHTML = order.denied_by;
-
-    priceCell.classList.add('table-data');
-    emailCell.classList.add('table-data');
-    filamentCell.classList.add('table-data');
-    nozzleCell.classList.add('table-data');
-    layerCell.classList.add('table-data');
-    infillCell.classList.add('table-data');
-    quantityCell.classList.add('table-data');
-    noteCell.classList.add('table-data');
     deniedCell.classList.add('table-data');
 }
 

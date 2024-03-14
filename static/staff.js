@@ -602,7 +602,7 @@ function renderPaidOrder(order) {
 /**************************************** PRINTING PAGE ****************************************/
 
 function openPrintingPage(){
-    openPage('print', 'ORDERS PRINTING');
+    openPage('print', 'PRINTING ORDERS');
 }
 
 window.openPrintingPage = openPrintingPage;

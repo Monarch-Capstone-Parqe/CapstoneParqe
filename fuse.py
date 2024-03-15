@@ -50,7 +50,7 @@ def enqueue_print(order) -> bool:
 
         try:
             # Send the POST request with the file and JSON data
-            response = requests.post(variables.OCTOPRINT_UPLOAD_ENDPOINT, files=files, json=json_data, headers=headers, timeout=10)  # Timeout set to 10 seconds
+            response = requests.post(variables.FUSE_UPLOAD_ENDPOINT, files=files, json=json_data, headers=headers, timeout=10)  # Timeout set to 10 seconds
             
             if response.status_code == HTTPStatus.CREATED:
                 return True  

@@ -15,13 +15,12 @@ from werkzeug.exceptions import HTTPException
 import database as db
 from util import get_price, gen_file_uuid, process_order_data, send_email
 import config.variables as variables
-import octoprint
+import fuse
 
 # Init db
 db.check_db_connect()
 db.create_tables()
 
-octoprint.start_sending_orders()
 
 # Init flask
 app = Flask(__name__, static_url_path='/static', static_folder='static')
@@ -29,6 +28,8 @@ app.config["SECRET_KEY"] = variables.APP_SECRET_KEY
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
+fuse.start_sending_orders()
 
 # Init auth0
 oauth = OAuth(app)
@@ -208,7 +209,7 @@ def confirm_order(token):
 @app.route("/order_confirmed")
 def order_confirmed():
     """Render the order confirmation page."""
-    return "Order confirmed."
+    return render_template("order_confirmed.html")
 
 @app.route('/staff/get_orders/<order_type>', methods=['GET'])
 @requires_auth
@@ -383,7 +384,6 @@ def color(action):
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)
 
 @app.route('/staff/get_filament_inventory', methods=['GET'])
-#@requires_auth
 def get_filament_inventory():
     """
     Retrieve filament inventory
@@ -436,4 +436,4 @@ def close_order():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
-    octoprint.stop_sending_orders()
+    fuse.stop_sending_orders()

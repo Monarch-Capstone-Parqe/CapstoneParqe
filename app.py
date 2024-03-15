@@ -3,6 +3,7 @@ import subprocess
 from urllib.parse import quote_plus, urlencode
 from http import HTTPStatus
 import smtplib
+import json
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, send_file, abort
 import logging
@@ -412,8 +413,16 @@ def get_filament_inventory():
     except Exception as e:
         app.logger.critical(f"Error in filament inventory route: {e}")
 
+
+order_queue = []
+paid_orders = db.get_paid_orders()
+for each in paid_orders:
+    order_queue.append(each['id'])
+
+print(order_queue)
+
 @app.route('/staff/close_order', methods=['PUT'])
-@requires_auth
+#@requires_auth
 def close_order():
     """
     Updates order status to completed or 'closed'.
@@ -425,11 +434,29 @@ def close_order():
         # Grab order details
         order_id = request.form['id']
         db.close_order(order_id)
+        order_queue.remove(int(order_id))
         order_email = db.get_email_by_order_id(order_id)
         send_email(order_email, "EPL Print Ready for Pickup", "Go get it.")
         return jsonify({'message': 'Order closed'}), HTTPStatus.OK
 
     # Unkown
+    except Exception as e:
+        app.logger.critical(f"Error in order route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+
+@app.route('/print', methods=['POST'])
+def print_order():
+    try:
+        order = json.loads(request.files['json'].read())
+        print(order)
+        order_id = order['id']
+        print(order_id)
+        order_queue.append(order_id)
+        if(len(order_queue) > 3):
+            return jsonify({'message': 'Too many orders printing'}), HTTPStatus.CONFLICT
+        else:
+            return jsonify({'message': 'Order received'}), HTTPStatus.CREATED
+        
     except Exception as e:
         app.logger.critical(f"Error in order route: {e}")
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)

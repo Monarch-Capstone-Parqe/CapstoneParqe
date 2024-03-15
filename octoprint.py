@@ -13,7 +13,7 @@ stop_event = threading.Event()
 # Function that will run in a separate thread
 def background_task():
     while not stop_event.is_set():
-        orders = db.get_approved_orders()
+        orders = db.get_paid_orders()
         for order in orders:
             result = enqueue_print(order)
             if result:
@@ -37,20 +37,27 @@ def stop_sending_orders():
 def enqueue_print(order) -> bool:
 
     with open(f"uploads/{order['gcode_path']}", 'rb') as f:
-        files = {'file': f}
-
         # Remove unnecessary keys from order dict
         keys_to_remove = ['gcode_path', 'price', 'prusa_output', 'date']
         for key in keys_to_remove:
             order.pop(key, None)
 
         json_data = json.dumps(order, default=str)  # Serialize Decimal to string
+        print(json_data)
 
-        headers = {'Content-Type': 'application/json'}
+        
+        data = {
+            'json': json_data
+        }
+
+        files = {
+            'json': json_data,
+            'file': f
+            }
 
         try:
             # Send the POST request with the file and JSON data
-            response = requests.post(variables.OCTOPRINT_UPLOAD_ENDPOINT, files=files, json=json_data, headers=headers, timeout=10)  # Timeout set to 10 seconds
+            response = requests.post(variables.OCTOPRINT_UPLOAD_ENDPOINT, files=files, timeout=10)  # Timeout set to 10 seconds
             
             if response.status_code == HTTPStatus.CREATED:
                 return True  

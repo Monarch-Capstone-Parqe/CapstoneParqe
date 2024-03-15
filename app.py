@@ -16,11 +16,12 @@ import database as db
 from util import get_price, gen_file_uuid, process_order_data, send_email
 import config.variables as variables
 import fuse
+import json
 
 # Init db
 db.check_db_connect()
 db.create_tables()
-
+db.add_staff_member('mmahnke@pdx.edu')
 
 # Init flask
 app = Flask(__name__, static_url_path='/static', static_folder='static')
@@ -289,7 +290,7 @@ def review_orders():
 
         if(order_status == 'denied'):
             reason = request.form['message']
-            send_email(order_email, "EPL Order Denied", f"{reason}")
+            send_email(order_email, "EPL Order Denied", f"Reason: {reason}")
             db.deny_order(order_id, staff_email)
 
         elif(order_status == 'approved'):
@@ -412,8 +413,15 @@ def get_filament_inventory():
     except Exception as e:
         app.logger.critical(f"Error in filament inventory route: {e}")
 
+order_queue = []
+printing_orders = db.get_printing_orders()
+for each in printing_orders:
+    order_queue.append(each['id'])
+
+print(order_queue)
+
 @app.route('/staff/close_order', methods=['PUT'])
-@requires_auth
+#@requires_auth
 def close_order():
     """
     Updates order status to completed or 'closed'.
@@ -425,11 +433,30 @@ def close_order():
         # Grab order details
         order_id = request.form['id']
         db.close_order(order_id)
+        order_queue.remove(int(order_id))
+        print(order_queue)
         order_email = db.get_email_by_order_id(order_id)
         send_email(order_email, "EPL Print Ready for Pickup", "Go get it.")
         return jsonify({'message': 'Order closed'}), HTTPStatus.OK
 
     # Unkown
+    except Exception as e:
+        app.logger.critical(f"Error in order route: {e}")
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR)
+
+@app.route('/print', methods=['POST'])
+def print_order():
+    try:
+        order = json.loads(request.files['json'].read())
+        print(order)
+        order_id = order['id']
+        print(order_id)
+        if(len(order_queue) > 2):
+            return jsonify({'message': 'Too many orders printing'}), HTTPStatus.CONFLICT
+        else:
+            order_queue.append(order_id)
+            return jsonify({'message': 'Order received'}), HTTPStatus.CREATED
+        
     except Exception as e:
         app.logger.critical(f"Error in order route: {e}")
         abort(HTTPStatus.INTERNAL_SERVER_ERROR)

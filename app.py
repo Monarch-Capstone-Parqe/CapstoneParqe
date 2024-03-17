@@ -21,7 +21,6 @@ import json
 # Init db
 db.check_db_connect()
 db.create_tables()
-db.add_staff_member('mmahnke@pdx.edu')
 
 # Init flask
 app = Flask(__name__, static_url_path='/static', static_folder='static')

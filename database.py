@@ -85,7 +85,6 @@ def create_tables():
 
         conn.commit()
 
-    add_staff_member('mmahnke@pdx.edu')
 
 def insert_order(email, filament_type=None, nozzle_size=None, layer_height=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
     """

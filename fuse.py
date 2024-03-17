@@ -50,6 +50,8 @@ def enqueue_print(order) -> bool:
             'json': json_data,
             'file': f
         }
+        # Json can be accessed from the request like this: 
+        # order = json.loads(request.files['json'].read())
 
         try:
             # Send the POST request with the file and JSON data

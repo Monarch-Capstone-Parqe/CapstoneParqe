@@ -203,6 +203,20 @@ def get_denied_orders() -> list:
     """
     return fetch_orders("SELECT o.* FROM orders o JOIN denied_orders d ON o.id = d.order_id ORDER BY o.date")
 
+def get_order_price(id):
+    """
+    Retrieve the price of an order by its id.
+
+    Parameters:
+        id (int): The id of the order
+
+    Returns:
+        price (float): The price of the order
+    """
+    with engine.connect() as conn:
+        price = conn.execute(text("SELECT price FROM orders WHERE id=:id"), {"id": id}).scalar()
+        return price 
+
 def delete_order(order_id):
     """
     Delete an order from the database based on its ID.

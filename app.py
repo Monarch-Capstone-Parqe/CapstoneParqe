@@ -295,7 +295,8 @@ def review_orders():
 
         elif(order_status == 'approved'):
             db.approve_order(order_id, staff_email)
-            send_email(order_email, "EPL Order Approved", f"To pay for your order, proceed to {variables.EPL_PAY_SITE}")
+            price = db.get_order_price(order_id)
+            send_email(order_email, "EPL Order Approved", f"To pay for your order, proceed to {variables.EPL_PAY_SITE} and navigate to the EPL Cashnet site via the 'checkout' button. Fill in your order price of " + str(price) + " in the 3D Printing checkout field and proceed through the payment steps.")
         elif(order_status == 'confirm_payment'):
             db.pay_order(order_id, staff_email)
         else:

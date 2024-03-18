@@ -16,7 +16,6 @@ import database as db
 from util import get_price, gen_file_uuid, process_order_data, send_email
 import config.variables as variables
 import fuse
-import json
 
 # Init db
 db.check_db_connect()

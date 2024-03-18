@@ -85,6 +85,7 @@ def create_tables():
 
         conn.commit()
 
+
 def insert_order(email, filament_type=None, nozzle_size=None, layer_height=None, infill=None, quantity=None, note=None, prusa_output=None, gcode_path=None, price=None) -> int:
     """
     Insert a new order into the 'orders' and 'pending_orders' tables.
@@ -201,6 +202,20 @@ def get_denied_orders() -> list:
         list: A list of dictionaries representing each denied order.
     """
     return fetch_orders("SELECT o.* FROM orders o JOIN denied_orders d ON o.id = d.order_id ORDER BY o.date")
+
+def get_order_price(id):
+    """
+    Retrieve the price of an order by its id.
+
+    Parameters:
+        id (int): The id of the order
+
+    Returns:
+        price (float): The price of the order
+    """
+    with engine.connect() as conn:
+        price = conn.execute(text("SELECT price FROM orders WHERE id=:id"), {"id": id}).scalar()
+        return price 
 
 def delete_order(order_id):
     """

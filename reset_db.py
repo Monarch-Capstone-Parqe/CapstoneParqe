@@ -14,6 +14,8 @@ def drop_all_tables():
         # Drop each table
         for table_name in table_names:
             conn.execute(text(f"DROP TABLE IF EXISTS {table_name} CASCADE"))
+        
+        conn.commit()
 
     print("All tables dropped successfully.")
 

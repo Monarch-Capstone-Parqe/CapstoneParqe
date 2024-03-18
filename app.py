@@ -21,7 +21,6 @@ import fuse
 db.check_db_connect()
 db.create_tables()
 
-
 # Init flask
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.config["SECRET_KEY"] = variables.APP_SECRET_KEY
@@ -289,12 +288,13 @@ def review_orders():
 
         if(order_status == 'denied'):
             reason = request.form['message']
-            send_email(order_email, "EPL Order Denied", f"{reason}")
+            send_email(order_email, "EPL Order Denied", f"Reason: {reason}")
             db.deny_order(order_id, staff_email)
 
         elif(order_status == 'approved'):
             db.approve_order(order_id, staff_email)
-            send_email(order_email, "EPL Order Approved", f"To pay for your order, proceed to {variables.EPL_PAY_SITE}")
+            price = db.get_order_price(order_id)
+            send_email(order_email, "EPL Order Approved", f"To pay for your order, proceed to {variables.EPL_PAY_SITE} and navigate to the EPL Cashnet site via the 'checkout' button. Fill in your order price of " + str(price) + " in the 3D Printing checkout field and proceed through the payment steps.")
         elif(order_status == 'confirm_payment'):
             db.pay_order(order_id, staff_email)
         else:
@@ -411,6 +411,7 @@ def get_filament_inventory():
     # Unkown
     except Exception as e:
         app.logger.critical(f"Error in filament inventory route: {e}")
+
 
 @app.route('/staff/close_order', methods=['PUT'])
 @requires_auth

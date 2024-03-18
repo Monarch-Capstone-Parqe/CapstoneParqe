@@ -37,7 +37,6 @@ def stop_sending_orders():
 def enqueue_print(order) -> bool:
 
     with open(f"uploads/{order['gcode_path']}", 'rb') as f:
-        files = {'file': f}
 
         # Remove unnecessary keys from order dict
         keys_to_remove = ['gcode_path', 'price', 'prusa_output', 'date']
@@ -46,11 +45,17 @@ def enqueue_print(order) -> bool:
 
         json_data = json.dumps(order, default=str)  # Serialize Decimal to string
 
-        headers = {'Content-Type': 'application/json'}
+
+        files = {
+            'json': json_data,
+            'file': f
+        }
+        # Json can be accessed from the request like this: 
+        # order = json.loads(request.files['json'].read())
 
         try:
             # Send the POST request with the file and JSON data
-            response = requests.post(variables.FUSE_UPLOAD_ENDPOINT, files=files, json=json_data, headers=headers, timeout=10)  # Timeout set to 10 seconds
+            response = requests.post(variables.FUSE_UPLOAD_ENDPOINT, files=files, timeout=10)  # Timeout set to 10 seconds
             
             if response.status_code == HTTPStatus.CREATED:
                 return True  
